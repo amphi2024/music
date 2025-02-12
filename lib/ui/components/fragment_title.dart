@@ -13,6 +13,8 @@ class _FragmentTitleState extends State<FragmentTitle> {
     return Stack(
       children: [
         AnimatedPositioned(
+          left: 15,
+          top: 0,
           curve: Curves.easeOutQuint,
           duration: const Duration(milliseconds: 750),
           child:
