@@ -4,12 +4,17 @@ class Music {
   Map<String, String> title = {};
   String artist = "";
   String album = "";
+  String id = "";
 
   static Music created(Tag? tag) {
     var music = Music();
     music.title["default"] = tag?.title ?? "unknown";
 
     return music;
+  }
+
+  void save() {
+
   }
 }
 

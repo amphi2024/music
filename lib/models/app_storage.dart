@@ -5,6 +5,7 @@ import 'package:amphi/utils/path_utils.dart';
 import 'package:audiotags/audiotags.dart';
 import 'package:music/models/music/music.dart';
 
+import 'music/album.dart';
 import 'music/artist.dart';
 
 final appStorage = AppStorage.getInstance();
@@ -34,99 +35,58 @@ class AppStorage extends AppStorageCore {
     var tag = await AudioTags.read(filePath);
     print(tag?.albumArtist);
     print(tag?.trackArtist);
+    var albumExists = false;
     var artistExists = false;
+    String artistId = "";
+          var albumId = "";
     artists.forEach((id, artist) {
       if(artist.name.containsValue(tag?.albumArtist)) {
-
+        artistExists = true;
+        artistId = artist.id;
+        artist.albums.forEach((i, album) {
+          if(album.name.containsValue(tag?.album)) {
+            albumExists = true;
+            albumId = album.id;
+          }
+        });
       }
     });
 
-    //       val audioFile: AudioFile = AudioFileIO.read(file)
-    //
-    //       val tag: Tag = audioFile.tag
-    //
-    //       val metadataRetriever = MediaMetadataRetriever()
-    //       metadataRetriever.setDataSource(file.absolutePath)
-    //
-    //       val artistName = tag.getFirst(FieldKey.ARTIST) ?: ""
-    //       val albumName = tag.getFirst(FieldKey.ALBUM) ?: ""
-    //       var artistId = ""
-    //       var albumId = ""
-    //       var lyricistId = ""
-    //
-    //       var exists = false
-    //       var albumExists = false
-    //       AppStorage.artists.forEach { (_, artist) ->
-    // if(artist.name.containsValue(artistName)) {
-    // exists = true
-    // artistId = artist.id
-    //
-    // artist.albums.forEach { (_, album) ->
-    // if(album.name.containsValue(albumName)) {
-    // albumExists = true
-    // albumId = album.id
-    // }
-    // }
-    //
-    // }
-    // if(artist.name.containsValue(tag.getFirst(FieldKey.LYRICIST))) {
-    // lyricistId = artist.id
-    // }
-    // }
-    //
-    // if(!exists) {
-    // val artist = Artist.created(artistName)
-    // artistId = artist.id
-    // AppStorage.artists[artistId] = artist
-    // }
-    //
-    // if(!albumExists) {
-    // val album = Album.created(
-    // albumName = albumName,
-    // artistId = artistId,
-    // genreName = tag.getFirst(FieldKey.GENRE) ?: ""
-    // )
-    // albumId = album.id
-    // AppStorage.artists[artistId]!!.albums[albumId] = album
-    // }
-    //
-    // val artist = AppStorage.artists[artistId]!!
-    // artist.save()
-    // val album = artist.albums[albumId]!!
-    // album.save()
-    // if(metadataRetriever.embeddedPicture != null) {
-    // album.addCover(metadataRetriever.embeddedPicture!!)
-    // }
-    //
-    // val musicFilename = FilenameUtils.generatedDirectoryName("${artist.path}/${album.id}")
-    //
-    // val music = Music(
-    // title = mutableMapOf(
-    // "default" to tag.getFirst(FieldKey.TITLE)
-    // ),
-    // artist = artistId,
-    // album = albumId,
-    // lyricist = lyricistId,
-    // created = DateTime.now(),
-    // modified = DateTime.now(),
-    // duration = 0,
-    // id = musicFilename,
-    // path = "${album.path}/${musicFilename}",
-    // genre = mutableMapOf(
-    // "default" to tag.getFirst(FieldKey.GENRE)
-    // )
-    // )
-    //
-    // music.save()
-    //
-    // music.files.add( FileInMusic.created(file = file, music = music))
+    if(!artistExists) {
+      var artist = Artist.created(tag);
+      artistId = artist.id;
+      appStorage.artists[artistId] = artist;
+    }
 
-    var music = Music.created(tag);
+    if(!albumExists) {
+      var album = Album.created(tag);
+      albumId = album.id;
+      appStorage.artists[artistId]?.albums[albumId] = album;
+    }
 
+    var artist = appStorage.artists[artistId]!;
+    artist.save();
+    var album = artist.albums[albumId]!;
+    album.save();
+
+    var pictures = tag?.pictures;
+    if(pictures != null) {
+      if(pictures.isNotEmpty) {
+        //add cover
+      }
+    }
+
+    var createdMusic = Music.created(tag);
+    createdMusic.save();
+    music[createdMusic.id] = createdMusic;
   }
 
   void initMusic() {
     var directory = Directory(musicPath);
+    for(var file in directory.listSync()) {
+      if(file is Directory) {
 
+      }
+    }
   }
 }
