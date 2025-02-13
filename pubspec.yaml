@@ -36,8 +36,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   bitsdojo_window:
   audioplayers:
-  file_selector:
+  file_picker:
   path_provider:
+  audiotags:
   amphi:
     git: https://github.com/amphi2024/flutter-shared.git
 

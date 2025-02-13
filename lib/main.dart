@@ -1,6 +1,10 @@
+import 'dart:ui';
+
 import 'package:amphi/models/app.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
+import 'package:music/models/app_settings.dart';
+import 'package:music/models/app_storage.dart';
 import 'package:music/ui/views/main_view.dart';
 import 'package:music/ui/views/wide_main_view.dart';
 
@@ -18,31 +22,55 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
+  Locale? locale;
+
   @override
   void initState() {
-    if(App.isDesktop()) {
-      doWhenWindowReady(() {
-        final win = appWindow;
-        const initialSize = Size(600, 450);
-        win.minSize = initialSize;
-        win.size = initialSize;
-        win.alignment = Alignment.center;
-        win.title = "";
-        win.show();
+
+    appStorage.initialize(() {
+      appSettings.getData();
+      setState(() {
+        locale = Locale(appSettings.locale ?? PlatformDispatcher.instance.locale.languageCode);
       });
-    }
+      if(App.isDesktop()) {
+        doWhenWindowReady(() {
+          final win = appWindow;
+          const initialSize = Size(600, 450);
+          win.minSize = Size(450, 300);
+          win.size = initialSize;
+          win.alignment = Alignment.center;
+          win.title = "";
+          win.show();
+        });
+      }
+    });
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: App.isDesktop() || App.isWideScreen(context) ? WideMainView() : MainView(),
-    );
+    if(locale == null) {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: Scaffold(),
+      );
+    }
+    else {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        locale: locale,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: App.isDesktop() || App.isWideScreen(context) ? WideMainView() : MainView(),
+      );
+    }
+
   }
 }

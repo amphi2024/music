@@ -4,8 +4,8 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_linux
+  audiotags
   bitsdojo_window_linux
-  file_selector_linux
   media_kit_libs_linux
   media_kit_video
 )
