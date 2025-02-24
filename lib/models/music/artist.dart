@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:amphi/utils/file_name_utils.dart';
@@ -26,159 +27,31 @@ class Artist {
 
   static Artist created(Tag? tag) {
     var artist = Artist();
-    var filename = FilenameUtils.generatedDirectoryName(appStorage.musicPath);
-    var directory = Directory(PathUtils.join(appStorage.musicPath, filename));
-    directory.createSync();
-    // val filename =
-    // FilenameUtils.generatedDirectoryName("${AppStorage.selectedUser.storagePath}/music")
-    // val directory = File("${AppStorage.selectedUser.storagePath}/music/${filename}")
-    // if (!directory.exists()) {
-    //   directory.mkdirs()
-    // }
-    //
-    // val artist = Artist(
-    //     name = mutableMapOf(
-    //       "default" to artistName,
-    //     ),
-    //     id = filename,
-    //     path = directory.absolutePath
-    // )
-
-
+    var filename = FilenameUtils.generatedDirectoryName(appStorage.artistsPath);
+    var directory = Directory(PathUtils.join(appStorage.artistsPath , filename.substring(0, 1) ,filename));
+    directory.createSync(recursive: true);
+    artist.path = directory.path;
+    artist.id = filename;
+    artist.name["default"] = tag?.trackArtist ?? "";
 
     return artist;
   }
 
-  void save() {
+  Map<String, dynamic> toMap() {
+    List<String> membersData = [];
+    for(var member in members) {
+      membersData.add(member.id);
+    }
+    return {
+      "name": name,
+      "members": membersData
+    };
+  }
 
+  void save() async {
+    var infoFile = File(PathUtils.join(path, "info.json"));
+    await infoFile.writeAsString(jsonEncode(toMap()));
   }
 }
-
-// package com.amphi.music.models.music
-//
-// import com.amphi.music.models.AppStorage
-// import com.amphi.music.utils.FilenameUtils
-// import com.amphi.music.utils.JsonDecode
-// import com.amphi.music.utils.getMutableStringMapOrDefault
-// import com.amphi.music.utils.toMap
-// import org.json.JSONArray
-// import org.json.JSONObject
-// import java.io.File
-//
-//
-//
-// companion object {
-// fun created(artistName: String): Artist {
-// val filename =
-// FilenameUtils.generatedDirectoryName("${AppStorage.selectedUser.storagePath}/music")
-// val directory = File("${AppStorage.selectedUser.storagePath}/music/${filename}")
-// if (!directory.exists()) {
-// directory.mkdirs()
-// }
-//
-// val artist = Artist(
-// name = mutableMapOf(
-// "default" to artistName,
-// ),
-// id = filename,
-// path = directory.absolutePath
-// )
-//
-// return artist
-// }
-//
-// //        fun fromJsonObject(jsonObject: JSONObject) : Artist {
-// //
-// //        }
-//
-// fun fromDirectory(directory: File): Artist {
-// //            /user1/music/artist/info.json
-// //            /user1/music/artist/album/info.json
-// //            /user1/music/artist/album/song/song.mp3
-// //            /user1/music/artist/album/song/song.lyrics
-// //            /user1/music/artist/album/song/song.json
-// //            /user1/music/artist/album/song/info.json
-//
-// val infoFile = File("${directory.absolutePath}/info.json")
-//
-// val jsonObject = JsonDecode.tryJsonObjectFromFile(infoFile)
-//
-// val artist = Artist(
-// name = jsonObject.getMutableStringMapOrDefault("name"),
-// id = directory.name,
-// path = directory.absolutePath
-// )
-//
-// directory.listFiles()?.forEach { item ->
-// if (item.isDirectory) {
-// val album = Album.fromDirectory(item, artist)
-// artist.albums[album.id] = album
-// }
-// }
-//
-// return artist
-// }
-// }
-//
-// fun toJsonObject(): JSONObject {
-// val jsonObject = JSONObject()
-// val nameObject = JSONObject()
-// name.forEach { (localeCode, name) ->
-// nameObject.put(localeCode, name)
-// }
-//
-// jsonObject.put("name", nameObject)
-//
-// return jsonObject
-// }
-//
-// fun save() {
-// val directory = File(path)
-// if (!directory.exists()) {
-// directory.mkdirs()
-// }
-//
-// val infoFile = File("${directory.absolutePath}/info.json")
-//
-//
-// val membersJsonArray = JSONArray()
-//
-// val jsonObject = toJsonObject()
-// members.forEach { member ->
-// if (member is String) {
-// membersJsonArray.put(member)
-// } else if (member is Artist) {
-// membersJsonArray.put(
-// member.toJsonObject()
-// )
-// }
-// }
-//
-// infoFile.writeText(jsonObject.toString())
-// }
-// //    {
-// //        "name":  {
-// //        "default": "Billie",
-// //        "ko": "빌리"
-// //    },
-// //        "members": [
-// //        "@tdk",
-// //        {
-// //            "name": {
-// //            "default": "츠키",
-// //            "en": "Tsuki",
-// //            "ko": "츠키"
-// //        }
-// //        }
-// //        ]
-// //
-// //    }
-// }
-//
-// fun MutableMap<String, String>.getValueByLocale() : String {
-// return this["default"] ?: "unknown"
-// }
-//
-
 
 

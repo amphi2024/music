@@ -1,4 +1,12 @@
+import 'dart:io';
+import 'dart:math';
+
+import 'package:amphi/utils/file_name_utils.dart';
+import 'package:amphi/utils/path_utils.dart';
 import 'package:audiotags/audiotags.dart';
+import 'package:music/utils/random_alphabet.dart';
+
+import '../app_storage.dart';
 
 class Album {
 // val name: MutableMap<String, String>,
@@ -16,6 +24,11 @@ class Album {
 
   static Album created(Tag? tag) {
     var album = Album();
+    String alphabet = randomAlphabet();
+    var filename = FilenameUtils.generatedDirectoryName(appStorage.albumsPath);
+
+    var directory = Directory(PathUtils.join(appStorage.albumsPath , filename.substring(0, 1) ,filename));
+    directory.createSync(recursive: true);
 
     return album;
   }

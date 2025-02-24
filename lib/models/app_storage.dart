@@ -14,6 +14,8 @@ class AppStorage extends AppStorageCore {
 
   late String themesPath;
   late String musicPath;
+  late String artistsPath;
+  late String albumsPath;
 
   static final _instance = AppStorage();
   static AppStorage getInstance() => _instance;
@@ -27,8 +29,12 @@ class AppStorage extends AppStorageCore {
     super.initPaths();
     themesPath = PathUtils.join(selectedUser.storagePath, "themes");
     musicPath = PathUtils.join(selectedUser.storagePath, "music");
+    artistsPath = PathUtils.join(selectedUser.storagePath, "artists");
+    albumsPath = PathUtils.join(selectedUser.storagePath, "albums");
     createDirectoryIfNotExists(themesPath);
     createDirectoryIfNotExists(musicPath);
+    createDirectoryIfNotExists(artistsPath);
+    createDirectoryIfNotExists(albumsPath);
   }
 
   void createMusicAndAll(String filePath) async {
