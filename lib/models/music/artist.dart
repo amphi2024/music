@@ -6,13 +6,20 @@ import 'package:amphi/utils/path_utils.dart';
 import 'package:audiotags/audiotags.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/album.dart';
+import 'package:music/utils/random_alphabet.dart';
 
 class Artist {
 
-  Map<String, String> name = {};
-  List<Artist> members = [];
+  Map<String, dynamic> data = {
+    "name": <String, String>{},
+    "albums": <String>[],
+    "members": <String>[]
+  };
+  Map<String, String> get name => data["name"];
+  List<String> get albums => data["albums"];
+  List<String> get members => data["members"];
   late String id;
-  Map<String, Album> albums = {};
+
   late String path;
 
   static Artist fromDirectory(Directory directory) {
@@ -21,14 +28,14 @@ class Artist {
     artist.path = directory.path;
     artist.id = PathUtils.basename(directory.path);
 
-
     return artist;
   }
 
   static Artist created(Tag? tag) {
     var artist = Artist();
-    var filename = FilenameUtils.generatedDirectoryName(appStorage.artistsPath);
-    var directory = Directory(PathUtils.join(appStorage.artistsPath , filename.substring(0, 1) ,filename));
+    var alphabet = randomAlphabet();
+    var filename = FilenameUtils.generatedDirectoryNameWithChar(appStorage.artistsPath, alphabet);
+    var directory = Directory(PathUtils.join(appStorage.artistsPath , alphabet ,filename));
     directory.createSync(recursive: true);
     artist.path = directory.path;
     artist.id = filename;
@@ -37,20 +44,9 @@ class Artist {
     return artist;
   }
 
-  Map<String, dynamic> toMap() {
-    List<String> membersData = [];
-    for(var member in members) {
-      membersData.add(member.id);
-    }
-    return {
-      "name": name,
-      "members": membersData
-    };
-  }
-
   void save() async {
     var infoFile = File(PathUtils.join(path, "info.json"));
-    await infoFile.writeAsString(jsonEncode(toMap()));
+    await infoFile.writeAsString(jsonEncode(data));
   }
 }
 

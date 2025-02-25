@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -15,26 +16,53 @@ class Album {
 // val covers: MutableList<String> = mutableListOf(),
 // val genre: MutableMap<String, String>,
 // val artist: String
-  Map<String, String> name = {};
+
+  Map<String, dynamic> data = {
+    "name": <String, String>{},
+    "genre": <String, String>{},
+    "artist": "",
+    "covers": <String>[]
+  };
+
+  Map<String, String> get name => data["name"];
+  Map<String, String> get genre => data["genre"];
+  String get artist => data["artist"];
+  set artist(value) => data["artist"] = value;
+  List<String> get covers => data["covers"];
+
   late String id;
   late String path;
-  List<String> covers = [];
-  String genre = "unknown";
-  String artist = "";
 
-  static Album created(Tag? tag) {
+  static Album created(Tag? tag, String artistId) {
     var album = Album();
     String alphabet = randomAlphabet();
-    var filename = FilenameUtils.generatedDirectoryName(appStorage.albumsPath);
+    var filename = FilenameUtils.generatedDirectoryNameWithChar(appStorage.albumsPath, alphabet);
 
-    var directory = Directory(PathUtils.join(appStorage.albumsPath , filename.substring(0, 1) ,filename));
+    var directory = Directory(PathUtils.join(appStorage.albumsPath , alphabet , filename));
     directory.createSync(recursive: true);
+
+    Directory(PathUtils.join(directory.path, "covers")).createSync();
+    album.path = directory.path;
+    album.id = filename;
+
+    album.name["default"] = tag?.album ?? "";
+    album.genre["default"] = tag?.genre ?? "";
+    album.artist = artistId;
+
+    var cover = tag?.pictures.firstOrNull;
+
+    if(cover != null) {
+      var coverFilename = FilenameUtils.generatedFileName(".jpg", PathUtils.join(album.path, "covers"));
+      var coverFile = File(PathUtils.join(album.path, "covers", coverFilename));
+      coverFile.writeAsBytes(tag!.pictures.first.bytes);
+    }
 
     return album;
   }
 
-  void save() {
-
+  void save() async {
+    var infoFile = File(PathUtils.join(path, "info.json"));
+    await infoFile.writeAsString(jsonEncode(data));
   }
 }
 

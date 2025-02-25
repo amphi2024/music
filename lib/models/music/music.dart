@@ -1,20 +1,53 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:amphi/utils/file_name_utils.dart';
+import 'package:amphi/utils/path_utils.dart';
 import 'package:audiotags/audiotags.dart';
 
-class Music {
-  Map<String, String> title = {};
-  String artist = "";
-  String album = "";
-  String id = "";
+import '../../utils/random_alphabet.dart';
+import '../app_storage.dart';
 
-  static Music created(Tag? tag) {
+class Music {
+
+  Map<String, dynamic> data = {
+    "title": <String, String>{},
+    "genre": <String, String>{},
+    "artist": "",
+    "album": ""
+  };
+
+  Map<String, String> get title => data["title"];
+  Map<String, String> get genre => data["genre"];
+  set artist(value) => data["artist"] = value;
+  String get artist => data["artist"];
+  set album(value) => data["album"] = value;
+  String get album => data["album"];
+  String id = "";
+  String path = "";
+
+  static Music created({required Tag? tag,required String artistId, required String albumId}) {
     var music = Music();
+
+    String alphabet = randomAlphabet();
+    var filename = FilenameUtils.generatedDirectoryNameWithChar(appStorage.musicPath, alphabet);
+
+    var directory = Directory(PathUtils.join(appStorage.musicPath , alphabet ,filename));
+    directory.createSync(recursive: true);
+
     music.title["default"] = tag?.title ?? "unknown";
+    music.id = filename;
+    music.path = directory.path;
+    music.artist = artistId;
+    music.album = albumId;
+    music.genre["default"] = tag?.genre ?? "unknown";
 
     return music;
   }
 
-  void save() {
-
+  void save() async {
+    var infoFile = File(PathUtils.join(path, "info.json"));
+    await infoFile.writeAsString(jsonEncode(data));
   }
 }
 

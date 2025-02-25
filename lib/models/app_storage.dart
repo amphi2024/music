@@ -23,6 +23,7 @@ class AppStorage extends AppStorageCore {
   Map<String, Artist> artists = {};
   Map<String, Music> music = {};
   Map<String, Map<String, String>> genres = {};
+  Map<String, Album> albums = {};
 
   @override
   void initPaths() {
@@ -49,30 +50,32 @@ class AppStorage extends AppStorageCore {
       if(artist.name.containsValue(tag?.albumArtist)) {
         artistExists = true;
         artistId = artist.id;
-        artist.albums.forEach((i, album) {
-          if(album.name.containsValue(tag?.album)) {
+
+        for(String id in artist.albums) {
+          if(appStorage.albums[id]!.name.containsValue(tag?.album)) {
             albumExists = true;
-            albumId = album.id;
+            albumId = id;
           }
-        });
+        }
       }
     });
 
     if(!artistExists) {
       var artist = Artist.created(tag);
       artistId = artist.id;
-      appStorage.artists[artistId] = artist;
+      artists[artistId] = artist;
     }
 
     if(!albumExists) {
-      var album = Album.created(tag);
+      var album = Album.created(tag, artistId);
       albumId = album.id;
-      appStorage.artists[artistId]?.albums[albumId] = album;
+      artists[artistId]?.albums.add(albumId);
+      albums[albumId] = album;
     }
 
-    var artist = appStorage.artists[artistId]!;
+    var artist = artists[artistId]!;
     artist.save();
-    var album = artist.albums[albumId]!;
+    var album = albums[albumId]!;
     album.save();
 
     var pictures = tag?.pictures;
@@ -82,7 +85,7 @@ class AppStorage extends AppStorageCore {
       }
     }
 
-    var createdMusic = Music.created(tag);
+    var createdMusic = Music.created(tag: tag, artistId: artistId, albumId: albumId);
     createdMusic.save();
     music[createdMusic.id] = createdMusic;
   }
