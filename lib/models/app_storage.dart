@@ -83,11 +83,44 @@ class AppStorage extends AppStorageCore {
     music[createdMusic.id] = createdMusic;
   }
 
+  void initArtists() {
+    var directory = Directory(artistsPath);
+    for(var subDirectory in directory.listSync()) {
+      if(subDirectory is Directory) {
+        for(var file in subDirectory.listSync()) {
+          if(file is Directory) {
+            var artist = Artist.fromDirectory(file);
+            artists[artist.id] = artist;
+          }
+        }
+      }
+    }
+  }
+
+  void initAlbums() {
+    var directory = Directory(albumsPath);
+    for(var subDirectory in directory.listSync()) {
+      if(subDirectory is Directory) {
+        for(var file in subDirectory.listSync()) {
+          if(file is Directory) {
+            var album = Album.fromDirectory(file);
+            albums[album.id] = album;
+          }
+        }
+      }
+    }
+  }
+
   void initMusic() {
     var directory = Directory(musicPath);
-    for(var file in directory.listSync()) {
-      if(file is Directory) {
-
+    for(var subDirectory in directory.listSync()) {
+      if(subDirectory is Directory) {
+        for(var file in subDirectory.listSync()) {
+          if(file is Directory) {
+            var musicObj = Music.fromDirectory(file);
+            music[musicObj.id] = musicObj;
+          }
+        }
       }
     }
   }

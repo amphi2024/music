@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:amphi/widgets/profile_image.dart';
 import 'package:music/models/app_storage.dart';
+
+import '../animated_profile_image.dart';
 class AccountButton extends StatelessWidget {
 
   final bool expanded;
@@ -27,14 +29,13 @@ class AccountButton extends StatelessWidget {
           child: Stack(
             children: [
               Center(
-                child: ProfileImage(
+                child: AnimatedProfileImage(
                   user: appStorage.selectedUser,
                   token: appStorage.selectedUser.token,
                   size: expanded ? 80 : 40,
                   fontSize: 15,
                 ),
               ),
-
             ],
           ),
         ),

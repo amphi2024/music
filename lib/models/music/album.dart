@@ -54,6 +54,24 @@ class Album {
       var coverFilename = FilenameUtils.generatedFileName(".jpg", PathUtils.join(album.path, "covers"));
       var coverFile = File(PathUtils.join(album.path, "covers", coverFilename));
       coverFile.writeAsBytes(tag!.pictures.first.bytes);
+      album.covers.add(coverFile.path);
+    }
+
+    return album;
+  }
+
+  static Album fromDirectory(Directory directory) {
+    Album album = Album();
+    album.path = directory.path;
+    album.id = PathUtils.basename(album.path);
+
+    var coversDir = Directory(PathUtils.join(directory.path, "covers"));
+    print(coversDir.path);
+    if(!coversDir.existsSync()) {
+      coversDir.createSync();
+    }
+    for(var file in coversDir.listSync()) {
+      album.covers.add(file.path);
     }
 
     return album;

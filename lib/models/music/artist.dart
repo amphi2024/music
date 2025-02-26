@@ -11,11 +11,11 @@ import 'package:music/utils/random_alphabet.dart';
 class Artist {
 
   Map<String, dynamic> data = {
-    "name": <String, String>{},
+    "name": <String, dynamic>{},
     "albums": <String>[],
     "members": <String>[]
   };
-  Map<String, String> get name => data["name"];
+  Map<String, dynamic> get name => data["name"];
   List<String> get albums => data["albums"];
   List<String> get members => data["members"];
   late String id;
@@ -27,6 +27,8 @@ class Artist {
 
     artist.path = directory.path;
     artist.id = PathUtils.basename(directory.path);
+    var infoFile = File(PathUtils.join(artist.path, "info.json"));
+    artist.data = jsonDecode(infoFile.readAsStringSync());
 
     return artist;
   }

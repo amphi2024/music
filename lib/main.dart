@@ -29,6 +29,9 @@ class _MyAppState extends State<MyApp> {
 
     appStorage.initialize(() {
       appSettings.getData();
+      appStorage.initMusic();
+      appStorage.initArtists();
+      appStorage.initAlbums();
       setState(() {
         locale = Locale(appSettings.locale ?? PlatformDispatcher.instance.locale.languageCode);
       });
@@ -67,6 +70,12 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
+            shadowColor: Colors.grey.withValues(alpha: 0.5)
+          // shadowColor:
+          // backgroundColor.green + backgroundColor.blue + backgroundColor.red >
+          //     381
+          //     ? Colors.grey.withValues(alpha: 0.5)
+          //     : Colors.black.withValues(alpha: 0.5)
         ),
         home: App.isDesktop() || App.isWideScreen(context) ? WideMainView() : MainView(),
       );

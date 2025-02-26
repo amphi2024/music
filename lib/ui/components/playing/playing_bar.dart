@@ -1,32 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:music/models/app_storage.dart';
+import 'package:music/ui/components/album_cover.dart';
 
-class PlayingBar extends StatefulWidget {
-  const PlayingBar({super.key});
+class PlayingBar extends StatelessWidget {
 
-  @override
-  State<PlayingBar> createState() => _PlayingBarState();
-}
+  final bool expanded;
+  final void Function() onTap;
+  const PlayingBar({super.key, required this.expanded, required this.onTap});
 
-class _PlayingBarState extends State<PlayingBar> {
   @override
   Widget build(BuildContext context) {
 
     final mediaQuery = MediaQuery.of(context);
 
     return AnimatedPositioned(
-      left: 10,
-      right: 10,
-      top: mediaQuery.size.height - 150,
-      bottom: 80,
+      left: expanded ? 0 : 15,
+      right: expanded ? 0 : 15,
+      bottom: expanded ? 0 : mediaQuery.padding.bottom + 15,
         curve: Curves.easeOutQuint,
       duration: const Duration(milliseconds: 750),
     child: GestureDetector(
+      onTap: onTap,
       onPanUpdate: (d) {
-        print("object");
+        if(d.delta.dy < -2.2) {
+          onTap();
+        }
       },
-      child: Container(
+      child: AnimatedContainer(
+        height: expanded ?  mediaQuery.size.height : 60,
+        curve: Curves.easeOutQuint,
+        duration: const Duration(milliseconds: 750),
         decoration: BoxDecoration(
-          color: Colors.red
+          color: Theme.of(context).cardColor,
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).shadowColor,
+              spreadRadius: 3,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            )
+          ],
+          borderRadius: BorderRadius.circular(15)
+        ),
+        child: Stack(
+          children: [
+            AnimatedPositioned(
+              curve: Curves.easeOutQuint,
+              duration: const Duration(milliseconds: 750),
+              child: AlbumCover(album: appStorage.music.entries.first.value.album),
+            ),
+          ],
         ),
       ),
     ));

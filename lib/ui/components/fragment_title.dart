@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class FragmentTitle extends StatefulWidget {
+
   const FragmentTitle({super.key});
 
   @override

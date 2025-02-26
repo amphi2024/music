@@ -12,6 +12,8 @@ import 'package:music/ui/fragments/home_fragment.dart';
 import 'package:music/ui/fragments/library_fragment.dart';
 import 'package:music/ui/fragments/search_fragment.dart';
 
+import '../components/floating_menu.dart';
+
 class MainView extends StatefulWidget {
   const MainView({super.key});
 
@@ -23,26 +25,46 @@ class _MainViewState extends State<MainView> {
 
   int fragmentIndex = 0;
   bool accountButtonExpanded = false;
+  bool playingBarExpanded = false;
+  bool menuShowing = false;
 
   @override
   Widget build(BuildContext context) {
 
     var fragments = [
-      HomeFragment(),
+      SongsFragment(),
       LibraryFragment(),
       SearchFragment()
     ];
 
     return PopScope(
-      canPop: !accountButtonExpanded,
+      canPop: !accountButtonExpanded && !playingBarExpanded && !menuShowing,
       onPopInvokedWithResult: (didPop, result) {
-        setState(() {
-          accountButtonExpanded = false;
-        });
+        if(playingBarExpanded) {
+          setState(() {
+            playingBarExpanded = false;
+          });
+        }
+        if(menuShowing) {
+          setState(() {
+            menuShowing = false;
+          });
+        }
+        if(accountButtonExpanded) {
+          setState(() {
+            accountButtonExpanded = false;
+          });
+        }
       },
       child: Scaffold(
         body: Stack(
           children: [
+            Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                top: 0,
+                child: fragments[fragmentIndex]),
             Positioned(
                 left: 0,
                 right: 0,
@@ -51,7 +73,14 @@ class _MainViewState extends State<MainView> {
                   height: 60,
                   child: Stack(
                     children: [
-                      FragmentTitle(),
+                      GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              menuShowing = true;
+                            });
+                          },
+                          child: FragmentTitle()
+                      ),
                       Positioned(
                         right: 60,
                         top: 0,
@@ -59,7 +88,7 @@ class _MainViewState extends State<MainView> {
                           children: [
                             IconButton(onPressed: () async {
                               var result = await FilePicker.platform.pickFiles(
-                                type: FileType.audio
+                                  type: FileType.audio
                               );
                               if(result != null) {
                                 for(var file in result.files) {
@@ -76,39 +105,14 @@ class _MainViewState extends State<MainView> {
                     ],
                   ),
                 )),
-            Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                top: 0,
-                child: fragments[fragmentIndex]),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: BottomNavigationBar(
-                  currentIndex: fragmentIndex,
-                  onTap: (index) {
-                    setState(() {
-                      fragmentIndex = index;
-                    });
-                  },
-                  items: [
-                    BottomNavigationBarItem(
-                        icon: Icon(Icons.home),
-                        label: "Home"
-                    ),
-                    BottomNavigationBarItem(
-                        icon: Icon(Icons.library_music),
-                        label: "Library"
-                    ),
-                    BottomNavigationBarItem(
-                        icon: Icon(Icons.search),
-                        label: "Search"
-                    ),
-                  ]),
+            FloatingMenu(
+              showing: menuShowing,
+              requestHide: () {
+                setState(() {
+                  menuShowing = false;
+                });
+              },
             ),
-            PlayingBar(),
             AccountButton(
               expanded: accountButtonExpanded,
               onPressed: () {
@@ -118,7 +122,15 @@ class _MainViewState extends State<MainView> {
                   });
                 }
               },
-            )
+            ),
+            PlayingBar(
+              onTap: () {
+                setState(() {
+                  playingBarExpanded = true;
+                });
+              },
+              expanded: playingBarExpanded,
+            ),
           ],
         ),
       ),
