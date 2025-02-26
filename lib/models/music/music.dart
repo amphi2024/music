@@ -25,8 +25,9 @@ class Music {
   String get album => data["album"];
   String id = "";
   String path = "";
+  List<String> files = [];
 
-  static Music created({required Tag? tag,required String artistId, required String albumId}) {
+  static Music created({required Tag? tag,required String artistId, required String albumId, required File file}) {
     var music = Music();
 
     String alphabet = randomAlphabet();
@@ -41,6 +42,10 @@ class Music {
     music.artist = artistId;
     music.album = albumId;
     music.genre["default"] = tag?.genre ?? "unknown";
+
+    var musicFilename = FilenameUtils.generatedFileName(PathUtils.extension(file.path), directory.path);
+    var musicFile = File(PathUtils.join(directory.path, musicFilename));
+    musicFile.writeAsBytesSync(file.readAsBytesSync());
 
     return music;
   }

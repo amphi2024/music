@@ -78,14 +78,7 @@ class AppStorage extends AppStorageCore {
     var album = albums[albumId]!;
     album.save();
 
-    var pictures = tag?.pictures;
-    if(pictures != null) {
-      if(pictures.isNotEmpty) {
-        //add cover
-      }
-    }
-
-    var createdMusic = Music.created(tag: tag, artistId: artistId, albumId: albumId);
+    var createdMusic = Music.created(tag: tag, artistId: artistId, albumId: albumId, file: File(filePath));
     createdMusic.save();
     music[createdMusic.id] = createdMusic;
   }

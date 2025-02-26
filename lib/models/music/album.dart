@@ -20,15 +20,14 @@ class Album {
   Map<String, dynamic> data = {
     "name": <String, String>{},
     "genre": <String, String>{},
-    "artist": "",
-    "covers": <String>[]
+    "artist": ""
   };
 
   Map<String, String> get name => data["name"];
   Map<String, String> get genre => data["genre"];
   String get artist => data["artist"];
   set artist(value) => data["artist"] = value;
-  List<String> get covers => data["covers"];
+  List<String> covers = [];
 
   late String id;
   late String path;
