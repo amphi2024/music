@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:amphi/models/app_storage_core.dart';
 import 'package:amphi/utils/path_utils.dart';
 import 'package:audiotags/audiotags.dart';
+import 'package:music/models/app_state.dart';
 import 'package:music/models/music/music.dart';
 
 import 'music/album.dart';
@@ -80,7 +81,9 @@ class AppStorage extends AppStorageCore {
 
     var createdMusic = Music.created(tag: tag, artistId: artistId, albumId: albumId, file: File(filePath));
     createdMusic.save();
-    music[createdMusic.id] = createdMusic;
+    appState.setMainViewState(() {
+      music[createdMusic.id] = createdMusic;
+    });
   }
 
   void initArtists() {

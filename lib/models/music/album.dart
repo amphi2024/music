@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
 import 'package:audiotags/audiotags.dart';
+import 'package:music/models/music/artist.dart';
 import 'package:music/utils/random_alphabet.dart';
 
 import '../app_storage.dart';
@@ -18,14 +19,14 @@ class Album {
 // val artist: String
 
   Map<String, dynamic> data = {
-    "name": <String, String>{},
-    "genre": <String, String>{},
+    "name": <String, dynamic>{},
+    "genre": <String, dynamic>{},
     "artist": ""
   };
 
-  Map<String, String> get name => data["name"];
-  Map<String, String> get genre => data["genre"];
-  String get artist => data["artist"];
+  Map<String, dynamic> get name => data["name"];
+  Map<String, dynamic> get genre => data["genre"];
+  Artist get artist => appStorage.artists[data["artist"]] ?? Artist();
   set artist(value) => data["artist"] = value;
   List<String> covers = [];
 
@@ -66,13 +67,14 @@ class Album {
     album.id = PathUtils.basename(album.path);
 
     var coversDir = Directory(PathUtils.join(directory.path, "covers"));
-    print(coversDir.path);
     if(!coversDir.existsSync()) {
       coversDir.createSync();
     }
     for(var file in coversDir.listSync()) {
       album.covers.add(file.path);
     }
+    var infoFile = File(PathUtils.join(album.path, "info.json"));
+    album.data = jsonDecode(infoFile.readAsStringSync());
 
     return album;
   }

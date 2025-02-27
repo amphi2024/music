@@ -44,11 +44,11 @@ class PlayingBar extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            AnimatedPositioned(
-              curve: Curves.easeOutQuint,
-              duration: const Duration(milliseconds: 750),
-              child: AlbumCover(album: appStorage.music.entries.first.value.album),
-            ),
+            // AnimatedPositioned(
+            //   curve: Curves.easeOutQuint,
+            //   duration: const Duration(milliseconds: 750),
+            //   child: AlbumCover(album: appStorage.music.entries.first.value.album),
+            // ),
           ],
         ),
       ),

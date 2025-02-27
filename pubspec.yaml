@@ -39,6 +39,7 @@ dependencies:
   file_picker:
   path_provider:
   audiotags:
+  flutter_staggered_grid_view:
   amphi:
     git: https://github.com/amphi2024/flutter-shared.git
 

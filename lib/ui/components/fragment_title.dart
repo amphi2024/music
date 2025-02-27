@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 
-class FragmentTitle extends StatefulWidget {
+class FragmentTitle extends StatelessWidget {
 
-  const FragmentTitle({super.key});
+  final String title;
+  const FragmentTitle({super.key, required this.title});
 
-  @override
-  State<FragmentTitle> createState() => _FragmentTitleState();
-}
-
-class _FragmentTitleState extends State<FragmentTitle> {
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -19,7 +15,7 @@ class _FragmentTitleState extends State<FragmentTitle> {
           curve: Curves.easeOutQuint,
           duration: const Duration(milliseconds: 750),
           child:
-              Text("Home", style: Theme.of(context).textTheme.headlineMedium),
+              Text(title, style: Theme.of(context).textTheme.headlineMedium),
         )
       ],
     );

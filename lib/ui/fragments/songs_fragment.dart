@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/ui/components/album_cover.dart';
 
@@ -14,20 +15,14 @@ class SongsFragment extends StatefulWidget {
 }
 
 class _SongsFragmentState extends State<SongsFragment> {
-  List<Music> musicList = [];
-  @override
-  void initState() {
-    appStorage.music.forEach((key, music) {
-      musicList.add(music);
-    });
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
-
+    List<Music> musicList = [];
     List<Widget> children = [];
-
+    appStorage.music.forEach((key, music) {
+      musicList.add(music);
+    });
     children.add(Container(
       height: 60,
     ));

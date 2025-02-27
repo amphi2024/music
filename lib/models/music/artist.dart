@@ -16,8 +16,8 @@ class Artist {
     "members": <String>[]
   };
   Map<String, dynamic> get name => data["name"];
-  List<String> get albums => data["albums"];
-  List<String> get members => data["members"];
+  List<dynamic> get albums => data["albums"];
+  List<dynamic> get members => data["members"];
   late String id;
 
   late String path;

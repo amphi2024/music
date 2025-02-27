@@ -3,16 +3,17 @@ import 'dart:io';
 import 'package:audiotags/audiotags.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/music.dart';
 import 'package:music/ui/components/account/account_button.dart';
 import 'package:music/ui/components/fragment_title.dart';
 import 'package:music/ui/components/playing/playing_bar.dart';
-import 'package:music/ui/fragments/home_fragment.dart';
-import 'package:music/ui/fragments/library_fragment.dart';
-import 'package:music/ui/fragments/search_fragment.dart';
+import 'package:music/ui/fragments/songs_fragment.dart';
+import 'package:music/ui/fragments/artists_fragment.dart';
+import 'package:music/ui/fragments/albums_fragment.dart';
 
-import '../components/floating_menu.dart';
+import '../components/menu/floating_menu.dart';
 
 class MainView extends StatefulWidget {
   const MainView({super.key});
@@ -23,18 +24,30 @@ class MainView extends StatefulWidget {
 
 class _MainViewState extends State<MainView> {
 
-  int fragmentIndex = 0;
   bool accountButtonExpanded = false;
   bool playingBarExpanded = false;
   bool menuShowing = false;
+
+  @override
+  void initState() {
+    appState.setMainViewState = (function) {
+      setState(function);
+    };
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
 
     var fragments = [
       SongsFragment(),
-      LibraryFragment(),
-      SearchFragment()
+      ArtistsFragment(),
+      AlbumsFragment()
+    ];
+    var titles = [
+      "Songs",
+      "Artists",
+      "Albums",
     ];
 
     return PopScope(
@@ -56,82 +69,93 @@ class _MainViewState extends State<MainView> {
           });
         }
       },
-      child: Scaffold(
-        body: Stack(
-          children: [
-            Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                top: 0,
-                child: fragments[fragmentIndex]),
-            Positioned(
-                left: 0,
-                right: 0,
-                top: MediaQuery.of(context).padding.top,
-                child: SizedBox(
-                  height: 60,
-                  child: Stack(
-                    children: [
-                      GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              menuShowing = true;
-                            });
-                          },
-                          child: FragmentTitle()
-                      ),
-                      Positioned(
-                        right: 60,
-                        top: 0,
-                        child: Row(
-                          children: [
-                            IconButton(onPressed: () async {
-                              var result = await FilePicker.platform.pickFiles(
-                                  type: FileType.audio
-                              );
-                              if(result != null) {
-                                for(var file in result.files) {
-                                  var filePath = file.path;
-                                  if(filePath != null && File(filePath).existsSync()) {
-                                    appStorage.createMusicAndAll(filePath);
+      child: GestureDetector(
+        onPanUpdate: (d) {
+          if(d.delta.dx > 2) {
+            setState(() {
+              menuShowing = true;
+            });
+          }
+        },
+        child: Scaffold(
+          body: Stack(
+            children: [
+              Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  top: 0,
+                  child: fragments[appState.fragmentIndex]),
+              Positioned(
+                  left: 0,
+                  right: 0,
+                  top: MediaQuery.of(context).padding.top,
+                  child: SizedBox(
+                    height: 60,
+                    child: Stack(
+                      children: [
+                        GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                menuShowing = true;
+                              });
+                            },
+                            child: FragmentTitle(
+                              title: titles[appState.fragmentIndex],
+                            )
+                        ),
+                        Positioned(
+                          right: 60,
+                          top: 0,
+                          child: Row(
+                            children: [
+                              IconButton(onPressed: () async {
+                                var result = await FilePicker.platform.pickFiles(
+                                    type: FileType.audio
+                                );
+                                if(result != null) {
+                                  for(var file in result.files) {
+                                    var filePath = file.path;
+                                    if(filePath != null && File(filePath).existsSync()) {
+                                      appStorage.createMusicAndAll(filePath);
+                                    }
                                   }
                                 }
-                              }
-                            }, icon: Icon(Icons.add))
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                )),
-            FloatingMenu(
-              showing: menuShowing,
-              requestHide: () {
-                setState(() {
-                  menuShowing = false;
-                });
-              },
-            ),
-            AccountButton(
-              expanded: accountButtonExpanded,
-              onPressed: () {
-                if(!accountButtonExpanded) {
+                              }, icon: Icon(Icons.add))
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  )),
+              FloatingMenu(
+                showing: menuShowing,
+                requestHide: () {
                   setState(() {
-                    accountButtonExpanded = true;
+                    menuShowing = false;
                   });
-                }
-              },
-            ),
-            PlayingBar(
-              onTap: () {
-                setState(() {
-                  playingBarExpanded = true;
-                });
-              },
-              expanded: playingBarExpanded,
-            ),
-          ],
+                },
+              ),
+              AccountButton(
+                expanded: accountButtonExpanded,
+                onPressed: () {
+                  if(!accountButtonExpanded) {
+                    setState(() {
+                      accountButtonExpanded = true;
+                    });
+                  }
+                },
+              ),
+              PlayingBar(
+                onTap: () {
+                  setState(() {
+                    playingBarExpanded = true;
+                  });
+                },
+                expanded: playingBarExpanded,
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -56,10 +56,6 @@ class _MyAppState extends State<MyApp> {
     if(locale == null) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
         home: Scaffold(),
       );
     }
@@ -67,16 +63,8 @@ class _MyAppState extends State<MyApp> {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
         locale: locale,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-            shadowColor: Colors.grey.withValues(alpha: 0.5)
-          // shadowColor:
-          // backgroundColor.green + backgroundColor.blue + backgroundColor.red >
-          //     381
-          //     ? Colors.grey.withValues(alpha: 0.5)
-          //     : Colors.black.withValues(alpha: 0.5)
-        ),
+        theme: appSettings.appTheme.lightTheme.toThemeData(context),
+        darkTheme: appSettings.appTheme.darkTheme.toThemeData(context),
         home: App.isDesktop() || App.isWideScreen(context) ? WideMainView() : MainView(),
       );
     }
