@@ -5,6 +5,7 @@ import 'package:amphi/utils/path_utils.dart';
 import 'package:audiotags/audiotags.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/music/music.dart';
+import 'package:music/models/music/playlist.dart';
 
 import 'music/album.dart';
 import 'music/artist.dart';
@@ -17,6 +18,7 @@ class AppStorage extends AppStorageCore {
   late String musicPath;
   late String artistsPath;
   late String albumsPath;
+  late String playlistsPath;
 
   static final _instance = AppStorage();
   static AppStorage getInstance() => _instance;
@@ -25,6 +27,7 @@ class AppStorage extends AppStorageCore {
   Map<String, Music> music = {};
   Map<String, Map<String, String>> genres = {};
   Map<String, Album> albums = {};
+  Map<String, Playlist> playlists = {};
 
   @override
   void initPaths() {
@@ -33,14 +36,22 @@ class AppStorage extends AppStorageCore {
     musicPath = PathUtils.join(selectedUser.storagePath, "music");
     artistsPath = PathUtils.join(selectedUser.storagePath, "artists");
     albumsPath = PathUtils.join(selectedUser.storagePath, "albums");
+    playlistsPath = PathUtils.join(selectedUser.storagePath, "playlists");
     createDirectoryIfNotExists(themesPath);
     createDirectoryIfNotExists(musicPath);
     createDirectoryIfNotExists(artistsPath);
     createDirectoryIfNotExists(albumsPath);
+    createDirectoryIfNotExists(playlistsPath);
   }
 
   void createMusicAndAll(String filePath) async {
-    var tag = await AudioTags.read(filePath);
+    Tag? tag;
+    try {
+      tag = await AudioTags.read(filePath);
+    }
+    catch(e) {
+      tag = null;
+    }
     print(tag?.albumArtist);
     print(tag?.trackArtist);
     var albumExists = false;
@@ -114,7 +125,23 @@ class AppStorage extends AppStorageCore {
     }
   }
 
+  void initPlaylists() {
+
+    var directory = Directory(playlistsPath);
+    // for(var subDirectory in directory.listSync()) {
+    //   if(subDirectory is Directory) {
+    //     for(var file in subDirectory.listSync()) {
+    //       if(file is Directory) {
+    //         var musicObj = Music.fromDirectory(file);
+    //         music[musicObj.id] = musicObj;
+    //       }
+    //     }
+    //   }
+    // }
+  }
+
   void initMusic() {
+    playlists[""] =  Playlist();
     var directory = Directory(musicPath);
     for(var subDirectory in directory.listSync()) {
       if(subDirectory is Directory) {
@@ -122,9 +149,14 @@ class AppStorage extends AppStorageCore {
           if(file is Directory) {
             var musicObj = Music.fromDirectory(file);
             music[musicObj.id] = musicObj;
+            playlists[""]!.queue.add(musicObj.id);
           }
         }
       }
     }
+
+    initAlbums();
+    initArtists();
+    initPlaylists();
   }
 }

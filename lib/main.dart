@@ -30,8 +30,6 @@ class _MyAppState extends State<MyApp> {
     appStorage.initialize(() {
       appSettings.getData();
       appStorage.initMusic();
-      appStorage.initArtists();
-      appStorage.initAlbums();
       setState(() {
         locale = Locale(appSettings.locale ?? PlatformDispatcher.instance.locale.languageCode);
       });

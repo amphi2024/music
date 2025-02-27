@@ -4,6 +4,9 @@ import 'dart:io';
 import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
 import 'package:audiotags/audiotags.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:music/models/music/music_file.dart';
 import 'package:music/ui/components/album_cover.dart';
 
 import '../../utils/random_alphabet.dart';
@@ -28,7 +31,7 @@ class Music {
   Album get album => appStorage.albums[data["album"]] ?? Album();
   String id = "";
   String path = "";
-  List<String> files = [];
+  Map<String, MusicFile> files = {};
 
   static Music created({required Tag? tag,required String artistId, required String albumId, required File file}) {
     var music = Music();
@@ -67,11 +70,29 @@ class Music {
     var infoFile = File(PathUtils.join(music.path, "info.json"));
     music.data = jsonDecode(infoFile.readAsStringSync());
 
+    for(var file in directory.listSync()) {
+      var nameOnly = FilenameUtils.nameOnly(file.path);
+      if(nameOnly != "info") {
+        if(FilenameUtils.extensionName(file.path) == "json") {
+          music.files.putIfAbsent(nameOnly, () => MusicFile()).infoFilePath = file.path;
+        }
+        else {
+          music.files.putIfAbsent(nameOnly, () => MusicFile()).musicFilePath = file.path;
+        }
+      }
+    }
+
     return music;
   }
 
   void save() async {
     var infoFile = File(PathUtils.join(path, "info.json"));
     await infoFile.writeAsString(jsonEncode(data));
+  }
+}
+
+extension MusicTitleExtension on Map<String, dynamic> {
+  String byLocale(BuildContext context) {
+    return this[Localizations.localeOf(context).languageCode] ?? this.putIfAbsent("default", () => "");
   }
 }
