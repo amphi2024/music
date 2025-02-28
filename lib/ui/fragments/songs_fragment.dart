@@ -31,17 +31,8 @@ class _SongsFragmentState extends State<SongsFragment> {
     for (int i = 0; i < musicList.length; i++) {
       var music = musicList[i];
       var musicWidget = GestureDetector(
-        onTap: () async {
-          var musicFilePath = music.files.entries.firstOrNull?.value.musicFilePath;
-          if(musicFilePath != null) {
-            appState.setMainViewState(() {
-              playerService.playlistKey = "";
-              playerService.index = i;
-              playerService.player.setSource(DeviceFileSource(
-                  musicFilePath
-              ));
-            });
-          }
+        onTap: () {
+         playerService.setMusic(music: music, i: i);
         },
         child: Padding(
           padding: const EdgeInsets.all(5),

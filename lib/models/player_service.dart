@@ -2,6 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/playlist.dart';
 
+import 'app_state.dart';
 import 'music/music.dart';
 
 final playerService = PlayerService.getInstance();
@@ -25,4 +26,29 @@ class PlayerService {
     }
   }
 
+  void setMusic({required Music music, required int i}) {
+    var musicFilePath = music.musicFilePath();
+    if(musicFilePath != null) {
+      appState.setMainViewState(() {
+        playerService.playlistKey = "";
+        playerService.index = i;
+
+        playerService.player.setSource(DeviceFileSource(
+            musicFilePath
+        ));
+      });
+    }
+  }
+
+  void togglePlay(void Function(bool) changeState) {
+    if (playerService.player.state ==
+        PlayerState.playing) {
+      playerService.player.pause();
+      changeState(false);
+    } else {
+      playerService.player.resume();
+      changeState(true);
+    }
+
+  }
 }

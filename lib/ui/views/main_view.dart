@@ -9,6 +9,7 @@ import 'package:music/models/music/music.dart';
 import 'package:music/ui/components/account/account_button.dart';
 import 'package:music/ui/components/fragment_title.dart';
 import 'package:music/ui/components/playing/playing_bar.dart';
+import 'package:music/ui/fragments/genres_fragment.dart';
 import 'package:music/ui/fragments/songs_fragment.dart';
 import 'package:music/ui/fragments/artists_fragment.dart';
 import 'package:music/ui/fragments/albums_fragment.dart';
@@ -42,12 +43,14 @@ class _MainViewState extends State<MainView> {
     var fragments = [
       SongsFragment(),
       ArtistsFragment(),
-      AlbumsFragment()
+      AlbumsFragment(),
+      GenresFragment()
     ];
     var titles = [
       "Songs",
       "Artists",
       "Albums",
+      "Genres"
     ];
 
     return PopScope(
@@ -153,6 +156,11 @@ class _MainViewState extends State<MainView> {
                   });
                 },
                 expanded: playingBarExpanded,
+                requestHide: () {
+                  setState(() {
+                    playingBarExpanded = false;
+                  });
+                },
               ),
             ],
           ),

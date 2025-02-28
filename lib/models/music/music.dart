@@ -32,6 +32,9 @@ class Music {
   String id = "";
   String path = "";
   Map<String, MusicFile> files = {};
+  String? musicFilePath() {
+    return files.entries.firstOrNull?.value.musicFilePath;
+  }
 
   static Music created({required Tag? tag,required String artistId, required String albumId, required File file}) {
     var music = Music();
