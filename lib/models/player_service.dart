@@ -16,6 +16,7 @@ class PlayerService {
   String playlistKey = "";
   Playlist get playlist => appStorage.playlists[playlistKey] ?? Playlist();
   int index = 0;
+  bool get isPlaying => player.state == PlayerState.playing;
 
   Music nowPlaying() {
     if(playlist.queue.isEmpty || playlist.queue.length <= index) {
@@ -26,28 +27,77 @@ class PlayerService {
     }
   }
 
-  void setMusic({required Music music, required int i}) {
+  Future<void> startPlay({required Music music, required int i}) async {
     var musicFilePath = music.musicFilePath();
     if(musicFilePath != null) {
+      playerService.playlistKey = "";
+      playerService.index = i;
+      playerService.player.setSource(DeviceFileSource(
+          musicFilePath
+      ));
+      await player.resume();
       appState.setMainViewState(() {
-        playerService.playlistKey = "";
-        playerService.index = i;
 
-        playerService.player.setSource(DeviceFileSource(
-            musicFilePath
-        ));
       });
     }
   }
 
-  void togglePlay(void Function(bool) changeState) {
+  Future<void> playPrevious(void Function(bool, double) changeState) async {
+    playerService.index--;
+    if(index < 0) {
+      index = playlist.queue.length - 1;
+    }
+    var musicFilePath = playerService.nowPlaying().musicFilePath();
+    if(musicFilePath != null) {
+      await playerService.player.setSource(DeviceFileSource(musicFilePath));
+      await playerService.player.resume();
+      var duration = (await playerService.player.getDuration())?.inMilliseconds.toDouble();
+      if(duration != null && duration > 0) {
+        changeState(true, duration);
+      }
+       else {
+        playPrevious(changeState);
+      }
+    }
+    else {
+      playPrevious(changeState);
+    }
+  }
+
+  Future<void> playNext(void Function(bool, double) changeState) async {
     if (playerService.player.state ==
         PlayerState.playing) {
       playerService.player.pause();
-      changeState(false);
+    }
+    playerService.index++;
+    if(index >= playlist.queue.length) {
+      index = 0;
+    }
+    var musicFilePath = playerService.nowPlaying().musicFilePath();
+    if(musicFilePath != null) {
+      await playerService.player.setSource(DeviceFileSource(musicFilePath));
+      await playerService.player.resume();
+     var duration = await playerService.player.getDuration();
+      if(duration != null) {
+        changeState(true, duration.inMilliseconds.toDouble());
+      }
+      else {
+        playNext(changeState);
+      }
+    }
+    else {
+      playNext(changeState);
+    }
+  }
+
+  Future<void> togglePlay() async {
+    if (playerService.player.state ==
+        PlayerState.playing) {
+      await playerService.player.pause();
+      appState.setMainViewState(() {});
     } else {
-      playerService.player.resume();
-      changeState(true);
+      await playerService.player.resume();
+      appState.setMainViewState(() {});
     }
 
   }

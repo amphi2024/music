@@ -5,6 +5,7 @@ class AppState {
   static AppState getInstance() => _instance;
 
   int fragmentIndex = 0;
+  bool playingBarExpanded = false;
 
   late void Function(void Function()) setState;
 

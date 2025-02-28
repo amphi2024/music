@@ -32,7 +32,7 @@ class _SongsFragmentState extends State<SongsFragment> {
       var music = musicList[i];
       var musicWidget = GestureDetector(
         onTap: () {
-         playerService.setMusic(music: music, i: i);
+         playerService.startPlay(music: music, i: i);
         },
         child: Padding(
           padding: const EdgeInsets.all(5),

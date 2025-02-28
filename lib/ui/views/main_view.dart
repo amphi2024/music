@@ -28,6 +28,13 @@ class _MainViewState extends State<MainView> {
   bool accountButtonExpanded = false;
   bool playingBarExpanded = false;
   bool menuShowing = false;
+  late OverlayEntry overlayEntry;
+
+  @override
+  void dispose() {
+    overlayEntry.remove();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -35,6 +42,15 @@ class _MainViewState extends State<MainView> {
       setState(function);
     };
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      print("234j3243284ldsjsdlfslkfjsdflsjf23940392493024");
+      final overlay = Overlay.of(context);
+      overlayEntry = OverlayEntry(
+        builder: (context) => PlayingBar(),
+      );
+      overlay.insert(overlayEntry);
+    });
   }
 
   @override
@@ -47,7 +63,7 @@ class _MainViewState extends State<MainView> {
       GenresFragment()
     ];
     var titles = [
-      "Songs",
+      "Songs3",
       "Artists",
       "Albums",
       "Genres"
@@ -147,19 +163,6 @@ class _MainViewState extends State<MainView> {
                       accountButtonExpanded = true;
                     });
                   }
-                },
-              ),
-              PlayingBar(
-                onTap: () {
-                  setState(() {
-                    playingBarExpanded = true;
-                  });
-                },
-                expanded: playingBarExpanded,
-                requestHide: () {
-                  setState(() {
-                    playingBarExpanded = false;
-                  });
                 },
               ),
             ],

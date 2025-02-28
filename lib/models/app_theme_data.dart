@@ -136,6 +136,8 @@ class AppThemeData {
       textTheme: TextTheme(
         bodyMedium: TextStyle(
             color: textColor, fontSize: 15, overflow: TextOverflow.ellipsis),
+        titleMedium: TextStyle(
+            color: textColor, fontSize: 15, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.bold)
       ),
       dialogTheme: DialogTheme(
           shape: RoundedRectangleBorder(
