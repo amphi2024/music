@@ -29,6 +29,7 @@ class Album {
   Artist get artist => appStorage.artists[data["artist"]] ?? Artist();
   set artist(value) => data["artist"] = value;
   List<String> covers = [];
+  List<String> music = [];
 
   late String id;
   late String path;
@@ -75,6 +76,12 @@ class Album {
     }
     var infoFile = File(PathUtils.join(album.path, "info.json"));
     album.data = jsonDecode(infoFile.readAsStringSync());
+
+    appStorage.music.forEach((key, music) {
+      if(music.albumId == album.id) {
+        album.music.add(music.id);
+      }
+    });
 
     return album;
   }

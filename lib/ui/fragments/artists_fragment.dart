@@ -30,6 +30,7 @@ class _ArtistsFragmentState extends State<ArtistsFragment> {
     for(var artist in list) {
       var artistWidget = GestureDetector(
         onTap: () {
+          Navigator.push(context, CupertinoPageRoute(builder: (context) => ArtistView()));
         },
         child: Padding(
           padding: const EdgeInsets.all(5),

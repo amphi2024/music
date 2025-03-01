@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:music/models/music/album.dart';
+import 'package:music/ui/views/album_view.dart';
 
 import '../../models/app_storage.dart';
 import '../components/album_cover.dart';
@@ -31,24 +33,29 @@ class _AlbumsFragmentState extends State<AlbumsFragment> {
       ));
     }
     for(var album in albumList) {
-      var albumWidget = Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 15),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: AlbumCover(album: album),
+      var albumWidget = GestureDetector(
+        onTap: () {
+          Navigator.push(context, CupertinoPageRoute(builder: (context) => AlbumView(album: album)));
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 15),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: AlbumCover(album: album),
+                ),
               ),
-            ),
-            Text(
-              album.name["default"] ?? ""
-            ),
-            Text(
-                album.artist.name["default"] ?? ""
-            ),
-          ],
+              Text(
+                album.name["default"] ?? ""
+              ),
+              Text(
+                  album.artist.name["default"] ?? ""
+              ),
+            ],
+          ),
         ),
       );
       children.add(albumWidget);

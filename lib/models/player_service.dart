@@ -36,7 +36,7 @@ class PlayerService {
           musicFilePath
       ));
       await player.resume();
-      appState.setMainViewState(() {
+      appState.setState(() {
 
       });
     }
@@ -94,10 +94,10 @@ class PlayerService {
     if (playerService.player.state ==
         PlayerState.playing) {
       await playerService.player.pause();
-      appState.setMainViewState(() {});
+      appState.setState(() {});
     } else {
       await playerService.player.resume();
-      appState.setMainViewState(() {});
+      appState.setState(() {});
     }
 
   }

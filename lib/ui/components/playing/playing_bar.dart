@@ -44,6 +44,8 @@ class _PlayingBarState extends State<PlayingBar> {
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
+    var themeData = Theme.of(context);
+    var textTheme = themeData.textTheme;
 
     return AnimatedPositioned(
         left: appState.playingBarExpanded ? 0 : 15,
@@ -155,8 +157,12 @@ class _PlayingBarState extends State<PlayingBar> {
                       duration: const Duration(milliseconds: 1000),
                       child: Column(
                         children: [
-                          Text(playerService.nowPlaying().title.byLocale(context)),
-                          Text(playerService.nowPlaying().artist.name.byLocale(context)),
+                          Text(
+                              playerService.nowPlaying().title.byLocale(context),
+                            style: textTheme.bodyMedium,
+                          ),
+                          Text(playerService.nowPlaying().artist.name.byLocale(context),
+                            style: textTheme.bodyMedium,),
                           // Slider(
                           //   min: 0,
                           //     max: duration,

@@ -27,6 +27,7 @@ class Music {
   Map<String, dynamic> get genre => data["genre"];
   set artist(value) => data["artist"] = value;
   Artist get artist => appStorage.artists[data["artist"]] ?? Artist();
+  String get albumId => data["album"];
   set album(value) => data["album"] = value;
   Album get album => appStorage.albums[data["album"]] ?? Album();
   String id = "";

@@ -26,7 +26,6 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> {
 
   bool accountButtonExpanded = false;
-  bool playingBarExpanded = false;
   bool menuShowing = false;
   late OverlayEntry overlayEntry;
 
@@ -63,18 +62,18 @@ class _MainViewState extends State<MainView> {
       GenresFragment()
     ];
     var titles = [
-      "Songs3",
+      "Songs",
       "Artists",
       "Albums",
       "Genres"
     ];
 
     return PopScope(
-      canPop: !accountButtonExpanded && !playingBarExpanded && !menuShowing,
+      canPop: !accountButtonExpanded && !appState.playingBarExpanded && !menuShowing,
       onPopInvokedWithResult: (didPop, result) {
-        if(playingBarExpanded) {
-          setState(() {
-            playingBarExpanded = false;
+        if(appState.playingBarExpanded) {
+          appState.setState(() {
+            appState.playingBarExpanded = false;
           });
         }
         if(menuShowing) {
