@@ -1,3 +1,4 @@
+import 'package:amphi/models/app.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/playlist.dart';

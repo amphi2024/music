@@ -7,15 +7,15 @@ class LightTheme extends AppThemeData {
 
   LightTheme(
       {
-        super.backgroundColor = AppTheme.lightGray,
+        super.backgroundColor = AppTheme.white,
         super.textColor = AppTheme.midnight,
-        super.accentColor = AppTheme.lightBlue,
+        super.accentColor = AppTheme.cherry,
         super.inactiveColor = AppTheme.inactiveGray,
         super.noteBackgroundColor = AppTheme.white,
         super.noteTextColor = AppTheme.midnight,
         super.floatingButtonBackground = AppTheme.white,
-        super.floatingButtonIconColor = AppTheme.lightBlue,
-        super.checkBoxColor = AppTheme.lightBlue,
+        super.floatingButtonIconColor = AppTheme.cherry,
+        super.checkBoxColor = AppTheme.cherry,
         super.checkBoxCheckColor = AppTheme.white,
         super.errorColor = AppTheme.red
       });

@@ -13,6 +13,7 @@ class AppTheme extends AppThemeCore {
   static const Color lightGray = Color.fromRGBO(245, 245, 245, 1);
   static const Color black = Color.fromRGBO(0, 0, 0, 1);
   static const Color lightBlue = Color.fromRGBO(0, 140, 255, 1.0);
+  static const Color cherry = Color.fromRGBO(255, 16, 80, 1.0);
   static const Color skyBlue = Color.fromRGBO(70, 180, 255, 1.0);
   static const Color midnight = Color.fromRGBO(35, 35, 35, 1.0);
   static const Color inactiveGray = Color(0xFF999999);

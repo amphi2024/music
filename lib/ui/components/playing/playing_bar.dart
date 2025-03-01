@@ -1,4 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_settings.dart';
 import 'package:music/models/app_storage.dart';
@@ -18,7 +19,7 @@ class PlayingBar extends StatefulWidget {
 
 class _PlayingBarState extends State<PlayingBar> {
 
-  double duration = 0;
+  double duration = 10;
   double position = 0;
 
   @override
@@ -34,6 +35,13 @@ class _PlayingBarState extends State<PlayingBar> {
       if(e.inMilliseconds.toDouble() < duration) {
         setState(() {
           position = e.inMilliseconds.toDouble();
+        });
+      }
+      else {
+        playerService.player.getDuration().then((_duration) {
+          setState(() {
+            duration = _duration?.inMilliseconds.toDouble() ?? 0;
+          });
         });
       }
     });
@@ -163,6 +171,16 @@ class _PlayingBarState extends State<PlayingBar> {
                           ),
                           Text(playerService.nowPlaying().artist.name.byLocale(context),
                             style: textTheme.bodyMedium,),
+                          CupertinoSlider(
+                              min: 0,
+                                max: duration,
+                                value: position,
+                                onChanged: (d) {
+                                setState(() {
+                                  playerService.player.seek(Duration(milliseconds: d.toInt()));
+                                });
+                              }
+                           ),
                           // Slider(
                           //   min: 0,
                           //     max: duration,

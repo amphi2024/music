@@ -1,13 +1,15 @@
+import 'package:amphi/models/app.dart';
 import 'package:flutter/material.dart';
 import 'package:amphi/widgets/profile_image.dart';
+import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
+import 'package:music/models/app_theme.dart';
+import 'package:music/utils/simple_shadow.dart';
 
 import '../animated_profile_image.dart';
 class AccountButton extends StatelessWidget {
-
-  final bool expanded;
-  final void Function() onPressed;
-  const AccountButton({super.key, required this.expanded, required this.onPressed});
+  
+  const AccountButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,26 +17,52 @@ class AccountButton extends StatelessWidget {
     var mediaQuery = MediaQuery.of(context);
 
     return AnimatedPositioned(
-      top: expanded ? 0 : mediaQuery.padding.top + 5,
-      right: expanded ? 0 : 15,
+      top: appState.accountButtonExpanded ? 50 : mediaQuery.padding.top + 5,
+      left: appState.accountButtonExpanded ? 15 : null,
+      right: appState.accountButtonExpanded ? 15 : 15,
       curve: Curves.easeOutQuint,
       duration: const Duration(milliseconds: 750),
       child: GestureDetector(
-        onTap: onPressed,
+        onTap: () {
+          if(!appState.accountButtonExpanded) {
+            appState.setMainViewState(() {
+              appState.accountButtonExpanded = true;
+            });
+          }
+        },
+        onVerticalDragUpdate: (d) {
+          if(appState.accountButtonExpanded) {
+            if(d.delta.dy < -2) {
+              appState.setMainViewState(() {
+                appState.accountButtonExpanded = false;
+              });
+            }
+          }
+          else {
+            if(d.delta.dy > 2) {
+              appState.setMainViewState(() {
+                appState.accountButtonExpanded = true;
+              });
+            }
+          }
+        },
         child: AnimatedContainer(
           curve: Curves.easeOutQuint,
           duration: const Duration(milliseconds: 750),
-          width: expanded ? mediaQuery.size.width : 40,
-          height: expanded ? mediaQuery.size.height : 40,
-          child: Stack(
+          width: appState.accountButtonExpanded ? mediaQuery.size.width : 40,
+          height: appState.accountButtonExpanded ? mediaQuery.size.height - 250 : 40,
+          decoration: BoxDecoration(
+            color: appState.accountButtonExpanded ? Theme.of(context).cardColor : null,
+            borderRadius: appState.accountButtonExpanded ? BorderRadius.circular(15) : BorderRadius.zero,
+            boxShadow: appState.accountButtonExpanded ? simpleShadow(context) : null
+          ),
+          child: Column(
             children: [
-              Center(
-                child: AnimatedProfileImage(
-                  user: appStorage.selectedUser,
-                  token: appStorage.selectedUser.token,
-                  size: expanded ? 80 : 40,
-                  fontSize: 15,
-                ),
+              AnimatedProfileImage(
+                user: appStorage.selectedUser,
+                token: appStorage.selectedUser.token,
+                size: appState.accountButtonExpanded ? 80 : 40,
+                fontSize: 15,
               ),
             ],
           ),

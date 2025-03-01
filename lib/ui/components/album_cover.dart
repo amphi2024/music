@@ -15,8 +15,7 @@ class AlbumCover extends StatelessWidget {
     if(coverFilePath != null) {
       var file = File(coverFilePath);
       if(!file.existsSync()) {
-        return Icon(Icons.music_note);
-        //return Image.asset("");
+        return Image.asset("assets/images/music.png", fit: fit);
       }
       return Image.file(
           file,
@@ -24,7 +23,7 @@ class AlbumCover extends StatelessWidget {
       );
     }
     else {
-      return Icon(Icons.music_note);
+      return Image.asset("assets/images/music.png", fit: fit);
     }
   }
 }

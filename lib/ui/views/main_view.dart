@@ -24,8 +24,7 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<MainView> {
-
-  bool accountButtonExpanded = false;
+  
   bool menuShowing = false;
   late OverlayEntry overlayEntry;
 
@@ -69,7 +68,7 @@ class _MainViewState extends State<MainView> {
     ];
 
     return PopScope(
-      canPop: !accountButtonExpanded && !appState.playingBarExpanded && !menuShowing,
+      canPop: !appState.accountButtonExpanded && !appState.playingBarExpanded && !menuShowing,
       onPopInvokedWithResult: (didPop, result) {
         if(appState.playingBarExpanded) {
           appState.setState(() {
@@ -81,9 +80,9 @@ class _MainViewState extends State<MainView> {
             menuShowing = false;
           });
         }
-        if(accountButtonExpanded) {
+        if(appState.accountButtonExpanded) {
           setState(() {
-            accountButtonExpanded = false;
+            appState.accountButtonExpanded = false;
           });
         }
       },
@@ -122,27 +121,6 @@ class _MainViewState extends State<MainView> {
                               title: titles[appState.fragmentIndex],
                             )
                         ),
-                        Positioned(
-                          right: 60,
-                          top: 0,
-                          child: Row(
-                            children: [
-                              IconButton(onPressed: () async {
-                                var result = await FilePicker.platform.pickFiles(
-                                    type: FileType.audio
-                                );
-                                if(result != null) {
-                                  for(var file in result.files) {
-                                    var filePath = file.path;
-                                    if(filePath != null && File(filePath).existsSync()) {
-                                      appStorage.createMusicAndAll(filePath);
-                                    }
-                                  }
-                                }
-                              }, icon: Icon(Icons.add))
-                            ],
-                          ),
-                        )
                       ],
                     ),
                   )),
@@ -152,16 +130,6 @@ class _MainViewState extends State<MainView> {
                   setState(() {
                     menuShowing = false;
                   });
-                },
-              ),
-              AccountButton(
-                expanded: accountButtonExpanded,
-                onPressed: () {
-                  if(!accountButtonExpanded) {
-                    setState(() {
-                      accountButtonExpanded = true;
-                    });
-                  }
                 },
               ),
             ],

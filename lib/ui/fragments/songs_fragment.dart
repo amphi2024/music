@@ -62,11 +62,15 @@ class _SongsFragmentState extends State<SongsFragment> {
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: TextStyle(
-                          fontWeight: FontWeight.bold
+                          fontWeight: FontWeight.bold,
+                          color: playerService.nowPlaying().id == music.id ? Theme.of(context).highlightColor : null
                         ),
                       ),
                       Text(
-                        music.artist.name["default"] ?? "unknown"
+                        music.artist.name["default"] ?? "unknown",
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: playerService.nowPlaying().id == music.id ? Theme.of(context).highlightColor : null
+                        ),
                       )
                     ],
                   )

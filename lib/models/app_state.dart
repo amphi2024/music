@@ -6,6 +6,7 @@ class AppState {
 
   int fragmentIndex = 0;
   bool playingBarExpanded = false;
+  bool accountButtonExpanded = false;
 
   late void Function(void Function()) setState;
 

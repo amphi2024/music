@@ -13,7 +13,7 @@ class FloatingMenuButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
             backgroundColor: Colors.transparent,
             shadowColor: Colors.transparent,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero)
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
         ),
         onPressed: onPressed,
         child: Row(

@@ -59,16 +59,8 @@ class Music {
     music.album = albumId;
     music.genre["default"] = tag?.genre ?? "unknown";
 
-    var musicInfoFilename = FilenameUtils.generatedFileName(".json", directory.path);
-    var musicInfoFile = File(PathUtils.join(directory.path, musicInfoFilename));
-    var musicInfo = {
-      "volume": 1.0
-    };
-    musicInfoFile.writeAsStringSync(jsonEncode(musicInfo));
-
-    var musicFilename = "${FilenameUtils.nameOnly(musicInfoFilename)}.${FilenameUtils.extensionName(file.path)}";
-    var musicFile = File(PathUtils.join(directory.path, musicFilename));
-    musicFile.writeAsBytesSync(file.readAsBytesSync());
+    var musicFile = MusicFile.created(path: directory.path, originalFile: file);
+    music.files[musicFile.id] = musicFile;
 
     return music;
   }

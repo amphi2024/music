@@ -88,6 +88,5 @@ class _MyAppState extends State<MyApp> {
         home: App.isDesktop() || App.isWideScreen(context) ? WideMainView() : MainView(),
       );
     }
-
   }
 }
