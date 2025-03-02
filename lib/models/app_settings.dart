@@ -15,14 +15,16 @@ class AppSettings {
   Map<String, dynamic> data = {
     "locale": null
   };
-  set locale(value) => data["locale"] = value;
-  String? get locale => data["locale"];
+  set localeCode(value) => data["locale"] = value;
+  String? get localeCode => data["locale"];
+  Locale? locale;
   AppTheme appTheme = AppTheme(created: DateTime.now(), modified: DateTime.now());
 
   void getData() {
     try {
       var file = File(appStorage.settingsPath);
       data = jsonDecode(file.readAsStringSync());
+      locale = Locale(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
     }
     catch(e) {
       save();

@@ -44,7 +44,7 @@ class _MyAppState extends State<MyApp> {
       appSettings.getData();
       appStorage.initMusic();
       setState(() {
-        locale = Locale(appSettings.locale ?? PlatformDispatcher.instance.locale.languageCode);
+        locale = appSettings.locale;
       });
       if(App.isDesktop()) {
         doWhenWindowReady(() {

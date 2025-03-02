@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/ui/components/menu/floating_menu_button.dart';
+import 'package:music/ui/dialogs/edit_playlist_dialog.dart';
 
 class FloatingMenu extends StatelessWidget {
   final bool showing;
@@ -118,7 +119,9 @@ class FloatingMenu extends StatelessWidget {
                           }
                         }),
                         PopupMenuItem(child: Text("Playlist"), onTap: () {
-
+                          showDialog(context: context, builder: (context) {
+                            return EditPlaylistDialog();
+                          });
                         }),
                       ];
                     },
