@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:music/models/music/music.dart';
-import 'package:music/ui/dialogs/edit_music_info_dialog.dart';
+import 'package:music/models/music/song.dart';
+import 'package:music/ui/dialogs/edit_song_info_dialog.dart';
 
 import '../../models/player_service.dart';
 import 'album_cover.dart';
 
 class MusicListItem extends StatelessWidget {
 
-  final Music music;
+  final Song song;
   final int index;
-  const MusicListItem({super.key, required this.music, required this.index});
+  const MusicListItem({super.key, required this.song, required this.index});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        playerService.startPlay(music: music, i: index);
+        playerService.startPlay(song: song, i: index);
       },
       child: Padding(
         padding: const EdgeInsets.all(5),
@@ -30,7 +30,7 @@ class MusicListItem extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: AlbumCover(
-                      album: music.album,
+                      album: song.album,
 
                     ),
                   )
@@ -41,18 +41,18 @@ class MusicListItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      music.title["default"] ?? "unknown",
+                      song.title["default"] ?? "unknown",
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: playerService.nowPlaying().id == music.id ? Theme.of(context).highlightColor : null
+                          color: playerService.nowPlaying().id == song.id ? Theme.of(context).highlightColor : null
                       ),
                     ),
                     Text(
-                      music.artist.name["default"] ?? "unknown",
+                      song.artist.name["default"] ?? "unknown",
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: playerService.nowPlaying().id == music.id ? Theme.of(context).highlightColor : null
+                          color: playerService.nowPlaying().id == song.id ? Theme.of(context).highlightColor : null
                       ),
                     )
                   ],
@@ -70,7 +70,7 @@ class MusicListItem extends StatelessWidget {
                   PopupMenuItem(child: Text("Add to Playlist")),
                   PopupMenuItem(child: Text("Edit Info"), onTap: () {
                     showDialog(context: context, builder: (context) {
-                      return EditMusicInfoDialog(musicId: music.id);
+                      return EditSongInfoDialog(songId: song.id);
                     });
                   }),
                   PopupMenuItem(child: Text("Delete")),

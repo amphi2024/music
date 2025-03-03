@@ -5,7 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
-import 'package:music/models/music/music.dart';
+import 'package:music/models/music/song.dart';
 import 'package:music/ui/components/account/account_button.dart';
 import 'package:music/ui/components/fragment_title.dart';
 import 'package:music/ui/components/playing/playing_bar.dart';

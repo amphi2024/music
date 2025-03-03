@@ -13,11 +13,15 @@ class Artist {
   Map<String, dynamic> data = {
     "name": <String, dynamic>{},
     "albums": <String>[],
-    "members": <String>[]
+    "members": <String>[],
+    "added": DateTime.now().toUtc().millisecondsSinceEpoch,
+    "modified": DateTime.now().toUtc().millisecondsSinceEpoch
   };
   Map<String, dynamic> get name => data["name"];
   List<dynamic> get albums => data["albums"];
   List<dynamic> get members => data["members"];
+  DateTime get added => DateTime.fromMillisecondsSinceEpoch(data["added"], isUtc: true).toLocal();
+  DateTime get modified => DateTime.fromMillisecondsSinceEpoch(data["modified"], isUtc: true).toLocal();
   List<String> profileImages = [];
   late String id;
 

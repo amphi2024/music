@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/album.dart';
-import 'package:music/models/music/music.dart';
+import 'package:music/models/music/song.dart';
 import 'package:music/ui/components/album_cover.dart';
 
 class AlbumView extends StatelessWidget {
@@ -13,9 +13,9 @@ class AlbumView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    List<Music> musicList = [];
+    List<Song> musicList = [];
     for(var musicId in album.music) {
-      musicList.add(appStorage.music[musicId]!);
+      musicList.add(appStorage.songs[musicId]!);
     }
 
     return Scaffold(

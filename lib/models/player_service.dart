@@ -4,7 +4,7 @@ import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/playlist.dart';
 
 import 'app_state.dart';
-import 'music/music.dart';
+import 'music/song.dart';
 
 final playerService = PlayerService.getInstance();
 
@@ -19,22 +19,22 @@ class PlayerService {
   int index = 0;
   bool get isPlaying => player.state == PlayerState.playing;
 
-  Music nowPlaying() {
+  Song nowPlaying() {
     if(playlist.queue.isEmpty || playlist.queue.length <= index) {
-      return Music();
+      return Song();
     }
     else {
-      return appStorage.music[playlist.queue[index]] ?? Music();
+      return appStorage.songs[playlist.queue[index]] ?? Song();
     }
   }
 
-  Future<void> startPlay({required Music music, required int i}) async {
-    var musicFilePath = music.musicFilePath();
-    if(musicFilePath != null) {
+  Future<void> startPlay({required Song song, required int i}) async {
+    var songFilePath = song.songFilePath();
+    if(songFilePath != null) {
       playerService.playlistKey = "";
       playerService.index = i;
       playerService.player.setSource(DeviceFileSource(
-          musicFilePath
+          songFilePath
       ));
       await player.resume();
       appState.setState(() {
@@ -48,9 +48,9 @@ class PlayerService {
     if(index < 0) {
       index = playlist.queue.length - 1;
     }
-    var musicFilePath = playerService.nowPlaying().musicFilePath();
-    if(musicFilePath != null) {
-      await playerService.player.setSource(DeviceFileSource(musicFilePath));
+    var songFilePath = playerService.nowPlaying().songFilePath();
+    if(songFilePath != null) {
+      await playerService.player.setSource(DeviceFileSource(songFilePath));
       await playerService.player.resume();
       var duration = (await playerService.player.getDuration())?.inMilliseconds.toDouble();
       if(duration != null && duration > 0) {
@@ -74,9 +74,9 @@ class PlayerService {
     if(index >= playlist.queue.length) {
       index = 0;
     }
-    var musicFilePath = playerService.nowPlaying().musicFilePath();
-    if(musicFilePath != null) {
-      await playerService.player.setSource(DeviceFileSource(musicFilePath));
+    var songFilePath = playerService.nowPlaying().songFilePath();
+    if(songFilePath != null) {
+      await playerService.player.setSource(DeviceFileSource(songFilePath));
       await playerService.player.resume();
      var duration = await playerService.player.getDuration();
       if(duration != null) {

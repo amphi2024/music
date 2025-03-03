@@ -14,14 +14,34 @@ class MusicDataInput extends StatefulWidget {
 
 class _MusicDataInputState extends State<MusicDataInput> {
   Map<String, TextEditingController> controllers = {};
-  Locale? locale;
   bool expanded = false;
-
-  @override
-  void initState() {
-    widget.data.forEach((key, value) {});
-    super.initState();
-  }
+  bool localeExpanded = false;
+  Map<String, String> localeNames = {
+    "ar": "العربية",
+    "bn": "বাংলা",
+    "da": "Dansk",
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español",
+    "fi": "Suomi",
+    "fr": "Français",
+    "el": "Ελληνικά",
+    "hi": "हिंदी",
+    "id": "Bahasa Indonesia",
+    "it": "Italiano",
+    "ja": "日本語",
+    "ko": "한국어",
+    "nl": "Nederlands",
+    "no": "Norsk",
+    "pt": "Português",
+    "ru": "Pусский",
+    "sv": "Svenska",
+    "th": "ไทย",
+    "tr": "Türkçe",
+    "vi": "Tiếng Việt",
+    "ur": "اردو",
+    "zh-Hant": "繁体中文",
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -29,32 +49,78 @@ class _MusicDataInputState extends State<MusicDataInput> {
     List<Widget> children = [];
 
     widget.data.forEach((key, value) {
-      if(key == "default") {
+      if(key != "default") {
         children.add(Row(
           children: [
-            SizedBox(
-              width: 100,
-              child: Text(Locale(key).toString()),
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    localeExpanded = !localeExpanded;
+                  });
+                },
+                child: localeExpanded ? SizedBox(
+                  width: 150,
+                  child: Text(
+                    localeNames[key]!,
+                    maxLines: 3,
+                  ),
+                ) : Icon(Icons.circle),
+              ),
             ),
             Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 60),
-                  child: TextField(),
+                child: TextField(
+                  controller: controllers.putIfAbsent(key, () => TextEditingController(text: widget.data[key])),
                 )),
+            SizedBox(
+              width: 60,
+              child: IconButton(
+                  icon: Icon( Icons.remove),
+                  onPressed: () {
+                    setState(() {
+                      widget.data.remove(key);
+                    });
+                  }),
+            )
           ],
         ));
       }
     });
 
+    children.add(PopupMenuButton(icon: Icon(Icons.add_circle_outline),
+        itemBuilder: (context) {
+      return popupMenuItems(context, (localeCode) {
+        setState(() {
+          widget.data[localeCode] = "";
+        });
+      });
+    }));
+
     return Column(
       children: [
         Row(
           children: [
-            SizedBox(
-              width: 100,
-              child: Text("Default"),
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    localeExpanded = !localeExpanded;
+                  });
+                },
+                child: localeExpanded ? SizedBox(
+                    width: 150,
+                    child: Text(
+                      "Default",
+                      maxLines: 3,
+                    ),
+                  ) : Icon(Icons.circle),
+              ),
             ),
-            Expanded(child: TextField()),
+            Expanded(child: TextField(
+              controller: controllers.putIfAbsent("default", () => TextEditingController(text: widget.data["default"])),
+            )),
             SizedBox(
               width: 60,
               child: IconButton(
@@ -79,7 +145,6 @@ class _MusicDataInputState extends State<MusicDataInput> {
 
 List<Language> items(BuildContext context) {
   return [
-    Language(label: "Default", locale: null),
     const Language(label: "العربية", locale: Locale("ar")),
     const Language(label: "বাংলা", locale: Locale("bn")),
     const Language(label: "Dansk", locale: Locale("da")),
@@ -107,10 +172,13 @@ List<Language> items(BuildContext context) {
   ];
 }
 
-List<DropdownMenuItem<Locale?>> dropdownItems(BuildContext context) {
+List<PopupMenuItem> popupMenuItems(BuildContext context, void Function(String) onTap) {
   return items(context).map((language) {
-    return DropdownMenuItem<Locale?>(
+    return PopupMenuItem(
       value: language.locale,
+      onTap: () {
+        onTap(language.locale!.languageCode);
+      },
       child: Text(
         language.label,
         overflow: TextOverflow.ellipsis,

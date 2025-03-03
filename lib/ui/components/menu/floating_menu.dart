@@ -105,7 +105,7 @@ class FloatingMenu extends StatelessWidget {
                     icon: Icon(Icons.add_circle_outline),
                     itemBuilder: (context) {
                       return [
-                        PopupMenuItem(child: Text("Music"), onTap: () async {
+                        PopupMenuItem(child: Text("Song"), onTap: () async {
                           var result = await FilePicker.platform
                               .pickFiles(type: FileType.audio);
                           if (result != null) {

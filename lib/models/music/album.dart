@@ -21,7 +21,9 @@ class Album {
   Map<String, dynamic> data = {
     "name": <String, dynamic>{},
     "genre": <String, dynamic>{},
-    "artist": ""
+    "artist": "",
+    "added": DateTime.now().toUtc().millisecondsSinceEpoch,
+    "modified": DateTime.now().toUtc().millisecondsSinceEpoch
   };
 
   Map<String, dynamic> get name => data["name"];
@@ -30,7 +32,8 @@ class Album {
   set artist(value) => data["artist"] = value;
   List<String> covers = [];
   List<String> music = [];
-
+  DateTime get added => DateTime.fromMillisecondsSinceEpoch(data["added"], isUtc: true).toLocal();
+  DateTime get modified => DateTime.fromMillisecondsSinceEpoch(data["modified"], isUtc: true).toLocal();
   late String id;
   late String path;
 
@@ -77,7 +80,7 @@ class Album {
     var infoFile = File(PathUtils.join(album.path, "info.json"));
     album.data = jsonDecode(infoFile.readAsStringSync());
 
-    appStorage.music.forEach((key, music) {
+    appStorage.songs.forEach((key, music) {
       if(music.albumId == album.id) {
         album.music.add(music.id);
       }

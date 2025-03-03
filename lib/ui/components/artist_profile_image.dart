@@ -15,8 +15,7 @@ class ArtistProfileImage extends StatelessWidget {
     if(filePath != null) {
       var file = File(filePath);
       if(!file.existsSync()) {
-        return Icon(Icons.account_circle);
-        //return Image.asset("");
+        return Image.asset("assets/images/music.png", fit: fit);
       }
       return Image.file(
         file,
@@ -24,7 +23,7 @@ class ArtistProfileImage extends StatelessWidget {
       );
     }
     else {
-      return Icon(Icons.account_circle);
+      return Image.asset("assets/images/music.png", fit: fit);
     }
   }
 }

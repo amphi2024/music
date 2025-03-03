@@ -4,7 +4,7 @@ import 'package:amphi/models/app_storage_core.dart';
 import 'package:amphi/utils/path_utils.dart';
 import 'package:audiotags/audiotags.dart';
 import 'package:music/models/app_state.dart';
-import 'package:music/models/music/music.dart';
+import 'package:music/models/music/song.dart';
 import 'package:music/models/music/playlist.dart';
 
 import 'music/album.dart';
@@ -15,7 +15,7 @@ final appStorage = AppStorage.getInstance();
 class AppStorage extends AppStorageCore {
 
   late String themesPath;
-  late String musicPath;
+  late String songsPath;
   late String artistsPath;
   late String albumsPath;
   late String playlistsPath;
@@ -24,7 +24,7 @@ class AppStorage extends AppStorageCore {
   static AppStorage getInstance() => _instance;
 
   Map<String, Artist> artists = {};
-  Map<String, Music> music = {};
+  Map<String, Song> songs = {};
   Map<String, Map<String, String>> genres = {};
   Map<String, Album> albums = {};
   Map<String, Playlist> playlists = {};
@@ -33,12 +33,12 @@ class AppStorage extends AppStorageCore {
   void initPaths() {
     super.initPaths();
     themesPath = PathUtils.join(selectedUser.storagePath, "themes");
-    musicPath = PathUtils.join(selectedUser.storagePath, "music");
+    songsPath = PathUtils.join(selectedUser.storagePath, "songs");
     artistsPath = PathUtils.join(selectedUser.storagePath, "artists");
     albumsPath = PathUtils.join(selectedUser.storagePath, "albums");
     playlistsPath = PathUtils.join(selectedUser.storagePath, "playlists");
     createDirectoryIfNotExists(themesPath);
-    createDirectoryIfNotExists(musicPath);
+    createDirectoryIfNotExists(songsPath);
     createDirectoryIfNotExists(artistsPath);
     createDirectoryIfNotExists(albumsPath);
     createDirectoryIfNotExists(playlistsPath);
@@ -90,10 +90,10 @@ class AppStorage extends AppStorageCore {
     var album = albums[albumId]!;
     album.save();
 
-    var createdMusic = Music.created(tag: tag, artistId: artistId, albumId: albumId, file: File(filePath));
+    var createdMusic = Song.created(tag: tag, artistId: artistId, albumId: albumId, file: File(filePath));
     createdMusic.save();
     appState.setMainViewState(() {
-      music[createdMusic.id] = createdMusic;
+      songs[createdMusic.id] = createdMusic;
     });
   }
 
@@ -142,13 +142,13 @@ class AppStorage extends AppStorageCore {
 
   void initMusic() {
     playlists[""] =  Playlist();
-    var directory = Directory(musicPath);
+    var directory = Directory(songsPath);
     for(var subDirectory in directory.listSync()) {
       if(subDirectory is Directory) {
         for(var file in subDirectory.listSync()) {
           if(file is Directory) {
-            var musicObj = Music.fromDirectory(file);
-            music[musicObj.id] = musicObj;
+            var musicObj = Song.fromDirectory(file);
+            songs[musicObj.id] = musicObj;
             playlists[""]!.queue.add(musicObj.id);
           }
         }

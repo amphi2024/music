@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/ui/components/music_list_item.dart';
 
-import '../../models/music/music.dart';
+import '../../models/music/song.dart';
 
 class SongsFragment extends StatefulWidget {
   const SongsFragment({super.key});
@@ -16,9 +16,9 @@ class _SongsFragmentState extends State<SongsFragment> {
 
   @override
   Widget build(BuildContext context) {
-    List<Music> musicList = [];
+    List<Song> musicList = [];
     List<Widget> children = [];
-    appStorage.music.forEach((key, music) {
+    appStorage.songs.forEach((key, music) {
       musicList.add(music);
     });
     children.add(Container(
@@ -26,7 +26,7 @@ class _SongsFragmentState extends State<SongsFragment> {
     ));
     for (int i = 0; i < musicList.length; i++) {
       var music = musicList[i];
-      children.add(MusicListItem(music: music, index: i));
+      children.add(MusicListItem(song: music, index: i));
     }
     return ListView(
       children: children,

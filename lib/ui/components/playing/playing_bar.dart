@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_settings.dart';
 import 'package:music/models/app_storage.dart';
-import 'package:music/models/music/music.dart';
+import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
 import 'package:music/ui/components/album_cover.dart';
 

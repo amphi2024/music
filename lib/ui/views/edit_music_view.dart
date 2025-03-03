@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:music/models/music/music.dart';
+import 'package:music/models/music/song.dart';
 
 class EditMusicView extends StatelessWidget {
 
-  final Music music;
+  final Song music;
   const EditMusicView({super.key, required this.music});
 
   @override
