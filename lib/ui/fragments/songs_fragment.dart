@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:music/models/app_storage.dart';
-import 'package:music/ui/components/music_list_item.dart';
+import 'package:music/ui/components/song_list_item.dart';
 
 import '../../models/music/song.dart';
 
@@ -26,7 +26,7 @@ class _SongsFragmentState extends State<SongsFragment> {
     ));
     for (int i = 0; i < musicList.length; i++) {
       var music = musicList[i];
-      children.add(MusicListItem(song: music, index: i));
+      children.add(SongListItem(song: music, index: i));
     }
     return ListView(
       children: children,

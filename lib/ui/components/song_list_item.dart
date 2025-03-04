@@ -5,11 +5,11 @@ import 'package:music/ui/dialogs/edit_song_info_dialog.dart';
 import '../../models/player_service.dart';
 import 'album_cover.dart';
 
-class MusicListItem extends StatelessWidget {
+class SongListItem extends StatelessWidget {
 
   final Song song;
   final int index;
-  const MusicListItem({super.key, required this.song, required this.index});
+  const SongListItem({super.key, required this.song, required this.index});
 
   @override
   Widget build(BuildContext context) {

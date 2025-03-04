@@ -58,7 +58,7 @@ class _PlayingBarState extends State<PlayingBar> {
     return AnimatedPositioned(
         left: appState.playingBarExpanded ? 0 : 15,
         right: appState.playingBarExpanded ? 0 : 15,
-        bottom: appState.playingBarExpanded ? 0 : mediaQuery.padding.bottom + 15,
+        bottom: appState.playingBarExpanded ? 0 : mediaQuery.padding.bottom + (appState.playingBarShowing ? 15 : -150),
         curve: Curves.easeOutQuint,
         duration: const Duration(milliseconds: 750),
         child: GestureDetector(
@@ -181,15 +181,6 @@ class _PlayingBarState extends State<PlayingBar> {
                                 });
                               }
                            ),
-                          // Slider(
-                          //   min: 0,
-                          //     max: duration,
-                          //     value: position,
-                          //     onChanged: (d) {
-                          //     setState(() {
-                          //       playerService.player.seek(Duration(milliseconds: d.toInt()));
-                          //     });
-                          // }),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [

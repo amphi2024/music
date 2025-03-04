@@ -1,9 +1,16 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
+import 'package:music/models/lyrics_editing_controller.dart';
+import 'package:music/models/music/lyrics.dart';
 import 'package:music/models/music/song.dart';
+import 'package:music/models/music/song_file.dart';
+import 'package:music/ui/components/lyrics_editor.dart';
 import 'package:music/ui/components/music_data_input.dart';
 import 'package:music/ui/dialogs/select_album_dialog.dart';
 import 'package:music/ui/dialogs/select_artist_dialog.dart';
+import 'package:music/ui/views/edit_lyrics_view.dart';
 
 class EditSongInfoDialog extends StatefulWidget {
 
@@ -27,6 +34,10 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
 
   @override
   Widget build(BuildContext context) {
+
+    var songFile = song.files.entries.firstOrNull?.value ?? SongFile();
+    print(songFile.songFilePath);
+    var lyricsEditingController = LyricsEditingController(lyrics: songFile.lyrics, readOnly: true, songFilePath: songFile.songFilePath);
     return Dialog(
       child: ConstrainedBox(
         constraints: BoxConstraints(
@@ -72,7 +83,32 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                         }, icon: Icon(Icons.edit))
                       ],
                     ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        appState.setMainViewState(() {
+                          appState.playingBarShowing = false;
+                        });
+                        Navigator.push(context, CupertinoPageRoute(builder: (context) {
+                          lyricsEditingController.readOnly = false;
+                          return EditLyricsView(lyricsEditingController: lyricsEditingController, onChanged: (lyrics) {
+                            setState(() {
+                              songFile.lyrics.lines = lyrics.lines;
+                            });
+                          });
+                        }));
+                      },
+                      child: SizedBox(
+                        height: 500,
+                        child: LyricsEditor(
+                          lyricsEditingController: lyricsEditingController,
+                        ),
+                      ),
+                    ),
                   )
+
                 ],
               ),
             ),

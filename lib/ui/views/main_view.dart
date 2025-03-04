@@ -114,7 +114,7 @@ class _MainViewState extends State<MainView> {
                         GestureDetector(
                             onTap: () {
                               setState(() {
-                                menuShowing = true;
+                                menuShowing = !menuShowing;
                               });
                             },
                             child: FragmentTitle(
