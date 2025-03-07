@@ -9,26 +9,10 @@ class FloatingMenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-        style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.transparent,
-            shadowColor: Colors.transparent,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-        ),
-        onPressed: onPressed,
-        child: Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: Icon(
-                icon,
-              ),
-            ),
-            Text(
-                label,
-              style: Theme.of(context).textTheme.bodyMedium,
-            )
-          ],
-        ));
+    return ListTile(
+      leading: Icon(icon, color: Theme.of(context).highlightColor),
+      title: Text(label),
+      onTap: onPressed, // Handles taps with built-in ripple
+    );
   }
 }

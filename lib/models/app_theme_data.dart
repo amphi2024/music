@@ -59,6 +59,13 @@ class AppThemeData {
       //     Colors.red
       //   )
       // ),
+      sliderTheme: SliderThemeData(
+         disabledActiveTrackColor: accentColor,
+        trackHeight: 3,
+        inactiveTrackColor: inactiveColor,
+        thumbColor: AppTheme.transparent
+        // thumbShape: DropSliderValueIndicatorShape()
+      ),
       dividerColor: inactiveColor,
       dropdownMenuTheme: DropdownMenuThemeData(
           textStyle: TextStyle(
@@ -134,6 +141,8 @@ class AppThemeData {
           focusColor: floatingButtonIconColor,
           iconSize: 35),
       textTheme: TextTheme(
+          bodyLarge: TextStyle(
+              color: textColor, fontSize: 20, overflow: TextOverflow.ellipsis),
         bodyMedium: TextStyle(
             color: textColor, fontSize: 15, overflow: TextOverflow.ellipsis),
         titleMedium: TextStyle(
@@ -154,40 +163,6 @@ class AppThemeData {
               backgroundColor.red - 10,
               backgroundColor.green - 10,
               backgroundColor.blue - 10)),
-    );
-  }
-}
-
-extension ThemeDataExtension on ThemeData {
-
-  ThemeData noteThemeData() {
-    Color noteBackgroundColor = brightness == Brightness.light
-        ? appSettings.appTheme.lightTheme.noteBackgroundColor
-        : appSettings.appTheme.darkTheme.noteBackgroundColor;
-    Color noteTextColor = brightness == Brightness.light
-        ? appSettings.appTheme.lightTheme.noteTextColor
-        : appSettings.appTheme.darkTheme.noteTextColor;
-
-    return copyWith(
-      scaffoldBackgroundColor: noteBackgroundColor,
-      textTheme: TextTheme(
-          bodyMedium: TextStyle(color: noteTextColor, fontSize: 15),
-          bodyLarge: TextStyle(color: noteTextColor, fontSize: 15)
-      ),
-      appBarTheme: AppBarTheme(
-          backgroundColor: noteBackgroundColor,
-          surfaceTintColor: noteBackgroundColor,
-          toolbarHeight: 40,
-          titleSpacing: 0.0,
-          iconTheme: IconThemeData(
-              color: brightness == Brightness.light
-                  ? appSettings.appTheme.lightTheme.accentColor
-                  : appSettings.appTheme.darkTheme.accentColor,
-              size: 30)),
-      iconTheme: IconThemeData(
-          color: iconTheme.color,
-          size: 30
-      ),
     );
   }
 }

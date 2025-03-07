@@ -91,13 +91,16 @@ class Song {
     song.data = jsonDecode(infoFile.readAsStringSync());
 
     for(var file in directory.listSync()) {
-      var nameOnly = FilenameUtils.nameOnly(file.path);
+      var nameOnly = FilenameUtils.nameOnly(PathUtils.basename(file.path));
       if(nameOnly != "info") {
         if(FilenameUtils.extensionName(file.path) == "json") {
-          song.files.putIfAbsent(nameOnly, () => SongFile()).infoFilePath = file.path;
+          var songFile = song.files.putIfAbsent(nameOnly, () => SongFile());
+          songFile.infoFilePath = file.path;
+          songFile.getData();
         }
         else {
-          song.files.putIfAbsent(nameOnly, () => SongFile()).songFilePath = file.path;
+          var songFile = song.files.putIfAbsent(nameOnly, () => SongFile());
+          songFile.songFilePath = file.path;
         }
       }
     }

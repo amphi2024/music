@@ -1,12 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:music/ui/components/lyrics_editor.dart';
 
 class Lyrics {
-  List<LyricLine> lines = [];
+  Map<String, List<LyricLine>> data = {};
 
   void disposeTextControllers() {
-    for(var line in lines) {
-      line.disposeTextControllers();
-    }
+    data.forEach((key, lines) {
+      for(var line in lines) {
+        line.disposeTextControllers();
+      }
+    });
+  }
+
+  Map<String, dynamic> toMap() {
+    Map<String, dynamic> map = {};
+    data.forEach((key, lines) {
+      List<Map<String, dynamic>> list = [];
+      for(var lyricLine in lines) {
+        list.add(
+            {
+              "startsAt": lyricLine.startsAt,
+              "endsAt": lyricLine.endsAt,
+              "text": lyricLine.text
+            }
+        );
+      }
+      map[key] = list;
+    });
+    return map;
   }
 }
 
@@ -33,7 +54,7 @@ class LyricLine {
       return _startTimeController!;
     }
     else {
-      _startTimeController = TextEditingController(text: "00:00.00");
+      _startTimeController = TextEditingController(text: convertMillisecondsToTimeString(startsAt));
       return _startTimeController!;
     }
   }
@@ -43,7 +64,7 @@ class LyricLine {
       return _endTimeController!;
     }
     else {
-      _endTimeController = TextEditingController(text: "00:00.00");
+      _endTimeController = TextEditingController(text: convertMillisecondsToTimeString(endsAt));
       return _endTimeController!;
     }
   }
@@ -76,4 +97,10 @@ String convertMillisecondsToTimeString(int totalMilliseconds) {
 
 String _formatTime(int timeUnit) {
   return timeUnit.toString().padLeft(2, '0');
+}
+
+extension GetDataExtension on Map<String, List<LyricLine>> {
+  List<LyricLine> get(String key) {
+    return putIfAbsent(key, () => []);
+  }
 }

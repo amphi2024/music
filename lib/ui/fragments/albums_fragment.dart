@@ -50,7 +50,12 @@ class _AlbumsFragmentState extends State<AlbumsFragment> {
                 ),
               ),
               Text(
-                album.name.byLocale(context)
+                album.name.byLocale(context),
+                maxLines: 3,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold
+                ),
+                textAlign: TextAlign.center,
               ),
               Text(
                   album.artist.name.byLocale(context)

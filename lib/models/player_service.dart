@@ -12,7 +12,8 @@ class PlayerService {
   static final PlayerService _instance = PlayerService();
   static PlayerService getInstance() => _instance;
 
-  final player = AudioPlayer();
+  final player = AudioPlayer(
+  );
 
   String playlistKey = "";
   Playlist get playlist => appStorage.playlists[playlistKey] ?? Playlist();

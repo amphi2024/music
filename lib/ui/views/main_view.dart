@@ -42,7 +42,6 @@ class _MainViewState extends State<MainView> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      print("234j3243284ldsjsdlfslkfjsdflsjf23940392493024");
       final overlay = Overlay.of(context);
       overlayEntry = OverlayEntry(
         builder: (context) => PlayingBar(),

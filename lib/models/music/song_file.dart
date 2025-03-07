@@ -9,6 +9,7 @@ class SongFile {
   String infoFilePath = "";
   String songFilePath = "";
   Lyrics lyrics = Lyrics();
+  Map<String, dynamic> data = {};
 
   String get id => FilenameUtils.nameOnly(infoFilePath!);
 
@@ -33,5 +34,41 @@ class SongFile {
       infoFilePath: songInfoFile.path,
       songFilePath: songFile.path
     );
+  }
+
+  void getData() async {
+    var infoFile = File(infoFilePath);
+    var jsonData = await infoFile.readAsString();
+    data = jsonDecode(jsonData);
+    var lyricsData = data["lyrics"];
+    if(lyricsData is List<dynamic>) {
+      for(var line in lyricsData) {
+        if(line is Map<String, dynamic>) {
+          lyrics.data.get("default").add(LyricLine(
+            startsAt: line["startsAt"],
+            endsAt: line["endsAt"],
+            text: line["text"]
+          ));
+        }
+        else {
+          lyrics.data.get("default").add(LyricLine(
+              text: line.toString()
+          ));
+        }
+      }
+    }
+    else {
+      lyrics.data.get("default").add(LyricLine(
+          text: lyricsData.toString()
+      ));
+    }
+  }
+
+  void save() async {
+    var infoFile = File(infoFilePath);
+    data["lyrics"] = lyrics.toMap();
+    print("infooooooo");
+    print(infoFilePath);
+    await infoFile.writeAsString(jsonEncode(data));
   }
 }

@@ -67,16 +67,16 @@ class _LyricsEditorState extends State<LyricsEditor> {
   Widget build(BuildContext context) {
     var readOnly = widget.lyricsEditingController.readOnly;
     var lyrics = widget.lyricsEditingController.lyrics;
-    if(lyrics.lines.isEmpty) {
+    if(lyrics.data.get("default").isEmpty) {
       if(widget.lyricsEditingController.readOnly) {
         return Text("Empty Lyrics");
       }
     }
     else if(readOnly) {
       return ListView.builder(
-          itemCount: lyrics.lines.length,
+          itemCount: lyrics.data.get("default").length,
           itemBuilder: (context, index) {
-            var text = lyrics.lines[index].text;
+            var text = lyrics.data.get("default")[index].text;
             if(text.isEmpty) {
               text = "Empty Lyrics";
             }
@@ -92,13 +92,13 @@ class _LyricsEditorState extends State<LyricsEditor> {
                 if(oldIndex < newIndex) {
                   newIndex -= 1;
                 }
-                final item = lyrics.lines.removeAt(oldIndex);
-                lyrics.lines.insert(newIndex, item);
+                final item = lyrics.data.get("default").removeAt(oldIndex);
+                lyrics.data.get("default").insert(newIndex, item);
               });
             },
-              itemCount: lyrics.lines.length,
+              itemCount: lyrics.data.get("default").length,
               itemBuilder: (context, index) {
-                var lyricLine = lyrics.lines[index];
+                var lyricLine = lyrics.data.get("default")[index];
                 var focusing = false;
                 if(lyricLine.startsAt <= position && lyricLine.endsAt >= position) {
                   focusing = true;
@@ -136,7 +136,7 @@ class _LyricsEditorState extends State<LyricsEditor> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     SizedBox(
-                      width: 100,
+                      width: 125,
                       child: TextField(
                         controller: lyricLine.startTimeController,
                         textAlign: TextAlign.center,
@@ -149,7 +149,7 @@ class _LyricsEditorState extends State<LyricsEditor> {
                       ),
                     ),
                     SizedBox(
-                      width: 100,
+                      width: 125,
                       child: TextField(
                         controller: lyricLine.endTimeController,
                         textAlign: TextAlign.center,
@@ -183,7 +183,7 @@ class _LyricsEditorState extends State<LyricsEditor> {
           visible: !readOnly,
           child: IconButton(onPressed: () {
             setState(() {
-             lyrics.lines.add(LyricLine());
+             lyrics.data.get("default").add(LyricLine());
             });
           }, icon: Icon(Icons.add_circle_outline)),
         ),

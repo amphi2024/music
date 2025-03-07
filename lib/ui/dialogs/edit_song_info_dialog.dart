@@ -95,8 +95,9 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                           lyricsEditingController.readOnly = false;
                           return EditLyricsView(lyricsEditingController: lyricsEditingController, onChanged: (lyrics) {
                             setState(() {
-                              songFile.lyrics.lines = lyrics.lines;
+                              songFile.lyrics.data["default"] = lyrics.data.get("default");
                             });
+                            songFile.save();
                           });
                         }));
                       },
