@@ -40,6 +40,9 @@ dependencies:
   path_provider:
   audiotags:
   flutter_staggered_grid_view:
+  http:
+  smooth_page_indicator:
+  web_socket_channel:
   amphi:
     git: https://github.com/amphi2024/flutter-shared.git
 

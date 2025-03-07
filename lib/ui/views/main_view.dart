@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:audiotags/audiotags.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:music/channels/app_method_channel.dart';
+import 'package:music/models/app_settings.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/song.dart';
@@ -52,6 +54,8 @@ class _MainViewState extends State<MainView> {
 
   @override
   Widget build(BuildContext context) {
+
+    appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor, appSettings.transparentNavigationBar);
 
     var fragments = [
       SongsFragment(),

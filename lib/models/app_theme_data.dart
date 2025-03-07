@@ -63,8 +63,8 @@ class AppThemeData {
          disabledActiveTrackColor: accentColor,
         trackHeight: 3,
         inactiveTrackColor: inactiveColor,
-        thumbColor: AppTheme.transparent
-        // thumbShape: DropSliderValueIndicatorShape()
+          thumbShape: RoundSliderThumbShape(enabledThumbRadius: 0.0),
+          overlayShape: SliderComponentShape.noOverlay
       ),
       dividerColor: inactiveColor,
       dropdownMenuTheme: DropdownMenuThemeData(

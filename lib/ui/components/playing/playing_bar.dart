@@ -6,11 +6,12 @@ import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
 import 'package:music/ui/components/album_cover.dart';
+import 'package:music/ui/components/playing_lyrics.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../../models/app_state.dart';
 
 class PlayingBar extends StatefulWidget {
-
   const PlayingBar({super.key});
 
   @override
@@ -18,9 +19,15 @@ class PlayingBar extends StatefulWidget {
 }
 
 class _PlayingBarState extends State<PlayingBar> {
-
   double length = 10;
   double position = 0;
+  PageController pageController = PageController();
+
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -32,12 +39,11 @@ class _PlayingBarState extends State<PlayingBar> {
       });
     });
     playerService.player.onPositionChanged.listen((e) {
-      if(e.inMilliseconds.toDouble() < length) {
+      if (e.inMilliseconds.toDouble() < length) {
         setState(() {
           position = e.inMilliseconds.toDouble();
         });
-      }
-      else {
+      } else {
         playerService.player.getDuration().then((_duration) {
           setState(() {
             length = _duration?.inMilliseconds.toDouble() ?? 0;
@@ -47,6 +53,7 @@ class _PlayingBarState extends State<PlayingBar> {
     });
     super.initState();
   }
+
   String convertMillisecondsToTimeString(int totalMilliseconds) {
     // Calculate the hours, minutes, seconds, and milliseconds from the total milliseconds
     int hours = totalMilliseconds ~/ (3600 * 1000);
@@ -63,7 +70,7 @@ class _PlayingBarState extends State<PlayingBar> {
   String _formatTime(int timeUnit) {
     return timeUnit.toString().padLeft(2, '0');
   }
-  
+
   String convertedDuration(double d) {
     int totalMilliseconds = d.toInt();
     int hours = totalMilliseconds ~/ (3600 * 1000);
@@ -72,8 +79,8 @@ class _PlayingBarState extends State<PlayingBar> {
     int remainingSeconds = remainingMinutesAndSeconds % (60 * 1000);
     int seconds = remainingSeconds ~/ 1000;
 
-    if(hours == 0) {
-      if(minutes == 0) {
+    if (hours == 0) {
+      if (minutes == 0) {
         return '0:${_formatTime(seconds)}';
       }
       return '${_formatTime(minutes)}:${_formatTime(seconds)}';
@@ -90,7 +97,10 @@ class _PlayingBarState extends State<PlayingBar> {
     return AnimatedPositioned(
         left: appState.playingBarExpanded ? 0 : 15,
         right: appState.playingBarExpanded ? 0 : 15,
-        bottom: appState.playingBarExpanded ? 0 : mediaQuery.padding.bottom + (appState.playingBarShowing ? 15 : -150),
+        bottom: appState.playingBarExpanded
+            ? 0
+            : mediaQuery.padding.bottom +
+                (appState.playingBarShowing ? 15 : -150),
         curve: Curves.easeOutQuint,
         duration: const Duration(milliseconds: 750),
         child: GestureDetector(
@@ -129,31 +139,39 @@ class _PlayingBarState extends State<PlayingBar> {
                       offset: const Offset(0, 3),
                     )
                   ],
-                  borderRadius: BorderRadius.circular(15)),
+                  borderRadius: appState.playingBarExpanded
+                      ? BorderRadius.zero
+                      : BorderRadius.circular(15)),
               child: Stack(
                 children: [
                   AnimatedPositioned(
-                    left: 10,
-                    top: appState.playingBarExpanded ? mediaQuery.padding.top + 10 : 10,
+                    left: appState.playingBarExpanded ? 30 : 10,
+                    top: appState.playingBarExpanded
+                        ? mediaQuery.padding.top + 20
+                        : 10,
                     curve: Curves.easeOutQuint,
                     duration: const Duration(milliseconds: 750),
                     child: AnimatedContainer(
                         curve: Curves.easeOutQuint,
                         duration: const Duration(milliseconds: 750),
-                        width: appState.playingBarExpanded ? mediaQuery.size.width - 20 : 40,
-                        height: appState.playingBarExpanded ? mediaQuery.size.width - 20 : 40,
+                        width: appState.playingBarExpanded
+                            ? mediaQuery.size.width - 60
+                            : 40,
+                        height: appState.playingBarExpanded
+                            ? mediaQuery.size.width - 60
+                            : 40,
                         child: ClipRRect(
                             borderRadius: BorderRadius.circular(10),
                             child: AlbumCover(
                                 album: playerService.nowPlaying().album))),
                   ),
                   Positioned(
-                    left: 60,
+                      left: 60,
                       top: 0,
                       bottom: 0,
                       right: 0,
                       child: AnimatedOpacity(
-                          opacity: appState.playingBarExpanded ? 0 : 1.0,
+                        opacity: appState.playingBarExpanded ? 0 : 1.0,
                         curve: Curves.easeOutQuint,
                         duration: const Duration(milliseconds: 750),
                         child: Row(
@@ -164,117 +182,167 @@ class _PlayingBarState extends State<PlayingBar> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    playerService.nowPlaying().title.byLocale(context),
-                                    style: Theme.of(context).textTheme.titleMedium,
+                                    playerService
+                                        .nowPlaying()
+                                        .title
+                                        .byLocale(context),
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
                                   ),
-                                  Text(playerService
-                                      .nowPlaying()
-                                      .artist
-                                      .name
-                                      .byLocale(context),
-                                    style: Theme.of(context).textTheme.titleMedium,)
+                                  Text(
+                                    playerService
+                                        .nowPlaying()
+                                        .artist
+                                        .name
+                                        .byLocale(context),
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                  )
                                 ],
                               ),
                             ),
                             IconButton(
-                                icon: Icon(
-                                    playerService.player.state == PlayerState.playing
-                                        ? Icons.pause
-                                        : Icons.play_arrow),
+                                icon: Icon(playerService.player.state ==
+                                        PlayerState.playing
+                                    ? Icons.pause
+                                    : Icons.play_arrow),
                                 onPressed: () {
                                   playerService.togglePlay();
                                 })
                           ],
                         ),
-                      )
-                  ),
+                      )),
                   Positioned(
                       left: 0,
                       right: 0,
-                      top: mediaQuery.size.width + 30,
+                      top: mediaQuery.size.width + 45,
+                      bottom: 0,
                       child: AnimatedOpacity(
                         opacity: appState.playingBarExpanded ? 1 : 0,
                         curve: Curves.easeOutQuint,
                         duration: const Duration(milliseconds: 1000),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 15.0),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        playerService.nowPlaying().title.byLocale(context),
-                                        style: textTheme.bodyLarge?.copyWith(
-                                          fontWeight: FontWeight.bold
-                                        ),
-                                      ),
-                                      Text(playerService.nowPlaying().artist.name.byLocale(context),
-                                        style: textTheme.bodyMedium,)
-                                    ],
-                                  ),
-                                ),
-                                IconButton(onPressed: () {}, icon: Icon(Icons.more_vert_outlined))
-                              ],
-                            ),
-                            Slider(
-                                min: 0,
-                                  max: length,
-                                  value: position,
-                                  onChanged: (d) {
-                                  setState(() {
-                                    playerService.player.seek(Duration(milliseconds: d.toInt()));
-                                  });
-                                }
-                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 15, right: 15),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 15.0, right: 15),
+                          child: ListView(
+                            padding: EdgeInsets.zero,
+                            children: [
+                              Text(
+                                playerService
+                                    .nowPlaying()
+                                    .title
+                                    .byLocale(context),
+                                style: textTheme.bodyLarge
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                playerService
+                                    .nowPlaying()
+                                    .artist
+                                    .name
+                                    .byLocale(context),
+                                style: textTheme.bodyMedium,
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 15, bottom: 15),
+                                child: Slider(
+                                    min: 0,
+                                    max: length,
+                                    value: position,
+                                    onChanged: (d) {
+                                      setState(() {
+                                        playerService.player.seek(
+                                            Duration(milliseconds: d.toInt()));
+                                      });
+                                    }),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(convertedDuration(position), style: textTheme.bodyMedium,),
-                                  Text(convertedDuration(length), style: textTheme.bodyMedium,)
+                                  Text(
+                                    convertedDuration(position),
+                                    style: textTheme.bodyMedium,
+                                  ),
+                                  Text(
+                                    convertedDuration(length),
+                                    style: textTheme.bodyMedium,
+                                  )
                                 ],
                               ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                IconButton(icon: Icon(Icons.fast_rewind, size: 45), onPressed: () {
-                                  playerService.playPrevious((value, d) {
-                                    setState(() {
-                                      length = d;
-                                      position = 0;
-            
-                                    });
-                                  });
-                                }),
-                                IconButton(icon: Icon(playerService.player.state == PlayerState.playing
-                                    ? Icons.pause
-                                    : Icons.play_arrow, size: 45), onPressed: () {
-                                  playerService.togglePlay();
-                                }),
-                                IconButton(icon: Icon(Icons.fast_forward, size: 45,), onPressed: () {
-                                  playerService.playNext((value, d) {
-                                    setState(() {
-                                      length = d;
-                                      position = 0;
-                                    });
-                                  });
-                                })
-                              ],
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                IconButton(onPressed: () {}, icon: Icon(Icons.lyrics, size: 30,)),
-                                IconButton(onPressed: () {}, icon: Icon(Icons.list, size: 30,))
-                              ],
-                            )
-                          ],
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  IconButton(
+                                      icon: Icon(Icons.fast_rewind, size: 45),
+                                      onPressed: () {
+                                        playerService.playPrevious((value, d) {
+                                          setState(() {
+                                            length = d;
+                                            position = 0;
+                                          });
+                                        });
+                                      }),
+                                  IconButton(
+                                      icon: Icon(
+                                          playerService.player.state ==
+                                                  PlayerState.playing
+                                              ? Icons.pause
+                                              : Icons.play_arrow,
+                                          size: 45),
+                                      onPressed: () {
+                                        playerService.togglePlay();
+                                      }),
+                                  IconButton(
+                                      icon: Icon(
+                                        Icons.fast_forward,
+                                        size: 45,
+                                      ),
+                                      onPressed: () {
+                                        playerService.playNext((value, d) {
+                                          setState(() {
+                                            length = d;
+                                            position = 0;
+                                          });
+                                        });
+                                      })
+                                ],
+                              ),
+                              SizedBox(
+                                width: mediaQuery.size.width,
+                                height: mediaQuery.size.height / 2 - 80,
+                                child: PageView(
+                                  controller: pageController,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 30, right: 30),
+                                      child: PlayingLyrics(),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 30, right: 30),
+                                      child: PlayingLyrics(),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Center(
+                                  child: SmoothPageIndicator(
+                                      controller: pageController, count: 2,
+                                    effect: WormEffect(
+                                      dotColor: Theme.of(context).dividerColor,
+                                      activeDotColor: Theme.of(context).highlightColor,
+                                      dotHeight: 15,
+                                      dotWidth: 15,
+                                    ),
+                                    onDotClicked: (index) {
+                                        pageController.animateToPage(index, duration: Duration(milliseconds: 1000), curve: Curves.easeOutQuint);
+                                    },
+                                  ))
+                            ],
+                          ),
                         ),
                       ))
                 ],

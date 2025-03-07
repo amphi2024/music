@@ -56,6 +56,10 @@ class Song {
     }
   }
 
+  SongFile playingFile() {
+    return files.entries.firstOrNull?.value ?? SongFile();
+  }
+
   static Song created({required Tag? tag,required String artistId, required String albumId, required File file}) {
     var song = Song();
 

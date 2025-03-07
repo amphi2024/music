@@ -2,11 +2,13 @@ import 'dart:io';
 
 import 'package:amphi/widgets/profile_image.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/ui/components/menu/floating_menu_button.dart';
 import 'package:music/ui/dialogs/edit_playlist_dialog.dart';
+import 'package:music/ui/views/settings_view.dart';
 
 class FloatingMenu extends StatelessWidget {
   final bool showing;
@@ -126,7 +128,11 @@ class FloatingMenu extends StatelessWidget {
                       ];
                     },
                   ),
-                  IconButton(icon: Icon(Icons.settings), onPressed: () {}),
+                  IconButton(icon: Icon(Icons.settings), onPressed: () {
+                    Navigator.push(context, CupertinoPageRoute(builder: (context) {
+                      return SettingsView();
+                    },));
+                  }),
                 ],
               )
             ],

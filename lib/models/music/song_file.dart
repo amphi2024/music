@@ -41,34 +41,44 @@ class SongFile {
     var jsonData = await infoFile.readAsString();
     data = jsonDecode(jsonData);
     var lyricsData = data["lyrics"];
-    if(lyricsData is List<dynamic>) {
-      for(var line in lyricsData) {
-        if(line is Map<String, dynamic>) {
-          lyrics.data.get("default").add(LyricLine(
-            startsAt: line["startsAt"],
-            endsAt: line["endsAt"],
-            text: line["text"]
-          ));
+    if(lyricsData is Map<String, dynamic>) {
+      lyricsData.forEach((key, value) {
+        if(value is List<dynamic>) {
+          for(var line in value) {
+            if(line is Map<String, dynamic>) {
+              lyrics.data.get("default").add(LyricLine(
+                  startsAt: line["startsAt"],
+                  endsAt: line["endsAt"],
+                  text: line["text"]
+              ));
+            }
+            else {
+              lyrics.data.get("default").add(LyricLine(
+                  text: line.toString()
+              ));
+            }
+          }
         }
         else {
           lyrics.data.get("default").add(LyricLine(
-              text: line.toString()
+              text: lyricsData.toString()
           ));
         }
-      }
+      });
+
+
     }
     else {
       lyrics.data.get("default").add(LyricLine(
           text: lyricsData.toString()
       ));
     }
+
   }
 
   void save() async {
     var infoFile = File(infoFilePath);
     data["lyrics"] = lyrics.toMap();
-    print("infooooooo");
-    print(infoFilePath);
     await infoFile.writeAsString(jsonEncode(data));
   }
 }

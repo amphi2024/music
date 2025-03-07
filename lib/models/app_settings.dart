@@ -19,6 +19,8 @@ class AppSettings {
   String? get localeCode => data["locale"];
   Locale? locale;
   AppTheme appTheme = AppTheme(created: DateTime.now(), modified: DateTime.now());
+  String get serverAddress => data.putIfAbsent("serverAddress", () => "");
+  bool get transparentNavigationBar => data.putIfAbsent("transparentNavigationBar", () => false);
 
   void getData() {
     try {

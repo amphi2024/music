@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:amphi/models/app.dart';
@@ -9,6 +10,8 @@ import 'package:music/models/app_storage.dart';
 import 'package:music/ui/views/main_view.dart';
 import 'package:music/ui/views/wide_main_view.dart';
 
+import 'channels/app_method_channel.dart';
+import 'channels/app_web_channel.dart';
 import 'ui/components/playing/playing_bar.dart';
 
 void main() {
@@ -59,16 +62,13 @@ class _MyAppState extends State<MyApp> {
       }
     });
 
-    super.initState();
+    appWebChannel.getDeviceInfo();
+    if (Platform.isAndroid) {
+      appMethodChannel.getSystemVersion();
+      appMethodChannel.configureNeedsBottomPadding();
+    }
 
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   print("234j3243284ldsjsdlfslkfjsdflsjf23940392493024");
-    //   final overlay = Overlay.of(context);
-    //   overlayEntry = OverlayEntry(
-    //     builder: (context) => PlayingBar(),
-    //   );
-    //   overlay.insert(overlayEntry);
-    // });
+    super.initState();
   }
 
   @override

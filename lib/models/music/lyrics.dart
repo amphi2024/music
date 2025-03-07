@@ -12,6 +12,11 @@ class Lyrics {
     });
   }
 
+  List<LyricLine> getLinesByLocale(BuildContext context) {
+    var localeCode = Localizations.localeOf(context).languageCode;
+    return data[localeCode] ?? data["default"] ?? [];
+  }
+
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {};
     data.forEach((key, lines) {
