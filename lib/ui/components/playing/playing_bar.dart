@@ -6,7 +6,9 @@ import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
 import 'package:music/ui/components/album_cover.dart';
-import 'package:music/ui/components/playing_lyrics.dart';
+import 'package:music/ui/components/playing/play_controls.dart';
+import 'package:music/ui/components/playing/playing_lyrics.dart';
+import 'package:music/ui/components/playing/playing_queue.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../../models/app_state.dart';
@@ -21,7 +23,7 @@ class PlayingBar extends StatefulWidget {
 class _PlayingBarState extends State<PlayingBar> {
   double length = 10;
   double position = 0;
-  PageController pageController = PageController();
+  PageController pageController = PageController(initialPage: 1);
 
   @override
   void dispose() {
@@ -32,11 +34,7 @@ class _PlayingBarState extends State<PlayingBar> {
   @override
   void initState() {
     playerService.player.onPlayerComplete.listen((d) {
-      playerService.playNext((value, d) {
-        setState(() {
-          length = d;
-        });
-      });
+      playerService.playNext();
     });
     playerService.player.onPositionChanged.listen((e) {
       if (e.inMilliseconds.toDouble() < length) {
@@ -52,40 +50,6 @@ class _PlayingBarState extends State<PlayingBar> {
       }
     });
     super.initState();
-  }
-
-  String convertMillisecondsToTimeString(int totalMilliseconds) {
-    // Calculate the hours, minutes, seconds, and milliseconds from the total milliseconds
-    int hours = totalMilliseconds ~/ (3600 * 1000);
-    int remainingMinutesAndSeconds = totalMilliseconds % (3600 * 1000);
-    int minutes = remainingMinutesAndSeconds ~/ (60 * 1000);
-    int remainingSeconds = remainingMinutesAndSeconds % (60 * 1000);
-    int seconds = remainingSeconds ~/ 1000;
-    int milliseconds = remainingSeconds % 1000;
-
-    // Format the time as "HH:mm:ss.SSS"
-    return '${_formatTime(hours)}:${_formatTime(minutes)}:${_formatTime(seconds)}.${milliseconds.toString().padLeft(3, '0')}';
-  }
-
-  String _formatTime(int timeUnit) {
-    return timeUnit.toString().padLeft(2, '0');
-  }
-
-  String convertedDuration(double d) {
-    int totalMilliseconds = d.toInt();
-    int hours = totalMilliseconds ~/ (3600 * 1000);
-    int remainingMinutesAndSeconds = totalMilliseconds % (3600 * 1000);
-    int minutes = remainingMinutesAndSeconds ~/ (60 * 1000);
-    int remainingSeconds = remainingMinutesAndSeconds % (60 * 1000);
-    int seconds = remainingSeconds ~/ 1000;
-
-    if (hours == 0) {
-      if (minutes == 0) {
-        return '0:${_formatTime(seconds)}';
-      }
-      return '${_formatTime(minutes)}:${_formatTime(seconds)}';
-    }
-    return '${_formatTime(hours)}:${_formatTime(minutes)}:${_formatTime(seconds)}';
   }
 
   @override
@@ -216,102 +180,32 @@ class _PlayingBarState extends State<PlayingBar> {
                       left: 0,
                       right: 0,
                       top: mediaQuery.size.width + 45,
-                      bottom: 0,
+                    bottom: mediaQuery.padding.bottom,
                       child: AnimatedOpacity(
                         opacity: appState.playingBarExpanded ? 1 : 0,
                         curve: Curves.easeOutQuint,
                         duration: const Duration(milliseconds: 1000),
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 15.0, right: 15),
-                          child: ListView(
-                            padding: EdgeInsets.zero,
+                          padding:  EdgeInsets.only(left: 15.0, right: 15),
+                          child: Column(
                             children: [
-                              Text(
-                                playerService
-                                    .nowPlaying()
-                                    .title
-                                    .byLocale(context),
-                                style: textTheme.bodyLarge
-                                    ?.copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                playerService
-                                    .nowPlaying()
-                                    .artist
-                                    .name
-                                    .byLocale(context),
-                                style: textTheme.bodyMedium,
-                              ),
                               Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 15, bottom: 15),
-                                child: Slider(
-                                    min: 0,
-                                    max: length,
-                                    value: position,
-                                    onChanged: (d) {
-                                      setState(() {
-                                        playerService.player.seek(
-                                            Duration(milliseconds: d.toInt()));
-                                      });
-                                    }),
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    convertedDuration(position),
-                                    style: textTheme.bodyMedium,
-                                  ),
-                                  Text(
-                                    convertedDuration(length),
-                                    style: textTheme.bodyMedium,
-                                  )
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  IconButton(
-                                      icon: Icon(Icons.fast_rewind, size: 45),
-                                      onPressed: () {
-                                        playerService.playPrevious((value, d) {
-                                          setState(() {
-                                            length = d;
-                                            position = 0;
-                                          });
-                                        });
-                                      }),
-                                  IconButton(
-                                      icon: Icon(
-                                          playerService.player.state ==
-                                                  PlayerState.playing
-                                              ? Icons.pause
-                                              : Icons.play_arrow,
-                                          size: 45),
-                                      onPressed: () {
-                                        playerService.togglePlay();
-                                      }),
-                                  IconButton(
-                                      icon: Icon(
-                                        Icons.fast_forward,
-                                        size: 45,
+                                padding: const EdgeInsets.only(bottom: 30),
+                                child: Center(
+                                    child: SmoothPageIndicator(
+                                      controller: pageController, count: 3,
+                                      effect: WormEffect(
+                                        dotColor: Theme.of(context).dividerColor,
+                                        activeDotColor: Theme.of(context).highlightColor,
+                                        dotHeight: 15,
+                                        dotWidth: 15,
                                       ),
-                                      onPressed: () {
-                                        playerService.playNext((value, d) {
-                                          setState(() {
-                                            length = d;
-                                            position = 0;
-                                          });
-                                        });
-                                      })
-                                ],
+                                      onDotClicked: (index) {
+                                        pageController.animateToPage(index, duration: Duration(milliseconds: 1000), curve: Curves.easeOutQuint);
+                                      },
+                                    )),
                               ),
-                              SizedBox(
-                                width: mediaQuery.size.width,
-                                height: mediaQuery.size.height / 2 - 80,
+                              Expanded(
                                 child: PageView(
                                   controller: pageController,
                                   children: [
@@ -320,27 +214,17 @@ class _PlayingBarState extends State<PlayingBar> {
                                           left: 30, right: 30),
                                       child: PlayingLyrics(),
                                     ),
+                                    Padding(padding: const EdgeInsets.only(left: 30, right: 30),
+                                      child: PlayControls(setState: setState, length: length, position: position),
+                                    ),
                                     Padding(
                                       padding: const EdgeInsets.only(
                                           left: 30, right: 30),
-                                      child: PlayingLyrics(),
+                                      child: PlayingQueue(),
                                     ),
                                   ],
                                 ),
                               ),
-                              Center(
-                                  child: SmoothPageIndicator(
-                                      controller: pageController, count: 2,
-                                    effect: WormEffect(
-                                      dotColor: Theme.of(context).dividerColor,
-                                      activeDotColor: Theme.of(context).highlightColor,
-                                      dotHeight: 15,
-                                      dotWidth: 15,
-                                    ),
-                                    onDotClicked: (index) {
-                                        pageController.animateToPage(index, duration: Duration(milliseconds: 1000), curve: Curves.easeOutQuint);
-                                    },
-                                  ))
                             ],
                           ),
                         ),

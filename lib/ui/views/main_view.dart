@@ -54,8 +54,8 @@ class _MainViewState extends State<MainView> {
 
   @override
   Widget build(BuildContext context) {
-
-    appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor, appSettings.transparentNavigationBar);
+    appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor, true);
+    // appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor, appSettings.transparentNavigationBar);
 
     var fragments = [
       SongsFragment(),

@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/lyrics_editing_controller.dart';
 import 'package:music/ui/components/lyrics_editor.dart';
@@ -24,6 +25,10 @@ class EditLyricsView extends StatelessWidget {
             Navigator.pop(context);
           }, icon: Icon(Icons.arrow_back_ios)),
           actions: [
+            IconButton(onPressed: () async {
+              var lyrics = await Lyrics.fromSelectedFile("default");
+              onChanged(lyrics);
+            }, icon: Icon(Icons.import_export)),
             IconButton(onPressed: () {
               onChanged(lyricsEditingController.lyrics);
               Navigator.pop(context);

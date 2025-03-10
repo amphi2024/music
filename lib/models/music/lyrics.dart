@@ -1,5 +1,11 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:music/ui/components/lyrics_editor.dart';
+
+import 'lyrics/lrc.dart';
+import 'lyrics/lrc_line.dart';
 
 class Lyrics {
   Map<String, List<LyricLine>> data = {};
@@ -33,6 +39,41 @@ class Lyrics {
       map[key] = list;
     });
     return map;
+  }
+
+  static Future<Lyrics> fromSelectedFile(String localeCode) async {
+    Lyrics lyrics = Lyrics();
+    var result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ["lrc"], allowMultiple: false);
+    var selectedFiles = result?.files;
+    if(selectedFiles != null) {
+      var pFile = selectedFiles.firstOrNull;
+      var filePath = pFile?.xFile.path;
+      if(filePath != null) {
+        return fromFile(File(filePath), localeCode);
+      }
+    }
+    return lyrics;
+  }
+
+  static Lyrics fromFile(File file, String localeCode) {
+    Lyrics lyrics = Lyrics();
+
+    var lrc = Lrc.fromFile(file);
+    List<LyricLine> lines = [];
+    for(int i = 0; i < lrc.lines.length; i++) {
+      var line = lrc.lines[i];
+      LrcLine? nextLine;
+      if(i < lrc.lines.length - 1) {
+        nextLine = lrc.lines[i + 1];
+      }
+      lines.add(LyricLine(
+        startsAt: line.startsAt,
+        endsAt: nextLine?.startsAt ?? 0,
+        text: line.text
+      ));
+      lyrics.data[localeCode] = lines;
+    }
+    return lyrics;
   }
 }
 

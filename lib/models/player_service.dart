@@ -18,14 +18,24 @@ class PlayerService {
   String playlistKey = "";
   Playlist get playlist => appStorage.playlists[playlistKey] ?? Playlist();
   int index = 0;
+  String playingSongId = "";
   bool get isPlaying => player.state == PlayerState.playing;
+
+  void shuffle() {
+    playlist.shuffle();
+    for(int i = 0 ; i < playlist.queue.length; i++) {
+      if(playlist.queue[i] == playingSongId) {
+        index = i;
+      }
+    }
+  }
 
   Song nowPlaying() {
     if(playlist.queue.isEmpty || playlist.queue.length <= index) {
       return Song();
     }
     else {
-      return appStorage.songs[playlist.queue[index]] ?? Song();
+      return appStorage.songs[playingSongId] ?? Song();
     }
   }
 
@@ -34,6 +44,7 @@ class PlayerService {
     if(songFilePath != null) {
       playerService.playlistKey = "";
       playerService.index = i;
+      playingSongId = playlist.queue[index];
       playerService.player.setSource(DeviceFileSource(
           songFilePath
       ));
@@ -44,29 +55,30 @@ class PlayerService {
     }
   }
 
-  Future<void> playPrevious(void Function(bool, double) changeState) async {
+  Future<void> playPrevious() async {
     playerService.index--;
     if(index < 0) {
       index = playlist.queue.length - 1;
     }
+    playingSongId = playlist.queue[index];
     var songFilePath = playerService.nowPlaying().songFilePath();
     if(songFilePath != null) {
       await playerService.player.setSource(DeviceFileSource(songFilePath));
       await playerService.player.resume();
       var duration = (await playerService.player.getDuration())?.inMilliseconds.toDouble();
       if(duration != null && duration > 0) {
-        changeState(true, duration);
+        appState.setState(() {});
       }
        else {
-        playPrevious(changeState);
+        playPrevious();
       }
     }
     else {
-      playPrevious(changeState);
+      playPrevious();
     }
   }
 
-  Future<void> playNext(void Function(bool, double) changeState) async {
+  Future<void> playNext() async {
     if (playerService.player.state ==
         PlayerState.playing) {
       playerService.player.pause();
@@ -75,20 +87,21 @@ class PlayerService {
     if(index >= playlist.queue.length) {
       index = 0;
     }
+    playingSongId = playlist.queue[index];
     var songFilePath = playerService.nowPlaying().songFilePath();
     if(songFilePath != null) {
       await playerService.player.setSource(DeviceFileSource(songFilePath));
       await playerService.player.resume();
      var duration = await playerService.player.getDuration();
       if(duration != null) {
-        changeState(true, duration.inMilliseconds.toDouble());
+        appState.setState(() {});
       }
       else {
-        playNext(changeState);
+        playNext();
       }
     }
     else {
-      playNext(changeState);
+      playNext();
     }
   }
 

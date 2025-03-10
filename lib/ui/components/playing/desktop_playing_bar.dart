@@ -23,9 +23,9 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
           child: Stack(
             children: [
 
-              Positioned(
-
-                  child: PlayControls())
+              // Positioned(
+              //
+              //     child: PlayControls())
             ],
           ),
     )

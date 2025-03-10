@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/music/lyrics.dart';
@@ -17,12 +19,14 @@ class _PlayingLyricsState extends State<PlayingLyrics> {
 
   @override
   void initState() {
-    playerService.player.onPositionChanged.listen((duration) {
-      setState(() {
-        position = duration.inMilliseconds;
-      });
-    });
     super.initState();
+    playerService.player.onPositionChanged.listen((duration) {
+      if(mounted) {
+        setState(() {
+          position = duration.inMilliseconds;
+        });
+      }
+    });
   }
 
   @override
@@ -32,6 +36,7 @@ class _PlayingLyricsState extends State<PlayingLyrics> {
 
     return ListView.builder(
       itemCount: lines.length,
+      padding: EdgeInsets.zero,
       itemBuilder: (context, index) {
         var focused = false;
         var line = lines[index];
@@ -40,9 +45,11 @@ class _PlayingLyricsState extends State<PlayingLyrics> {
           }
         return Text(
             lines[index].text,
+          maxLines: 5,
           style: TextStyle(
             fontSize: 20,
-            color: focused ? Theme.of(context).highlightColor : null
+            color: focused ? Theme.of(context).highlightColor : null,
+            fontWeight: focused ? FontWeight.bold : null
           ),
         );
       },
