@@ -1,0 +1,161 @@
+{
+  "@am": "午前",
+  "@created": "作成",
+  "@default_font": "デフォルト",
+  "@folder": "フォルダ",
+  "@language": "言語",
+  "@modified": "修正済み",
+  "@new_theme": "新規",
+  "@note": "ノート",
+  "@notes": "ノート",
+  "@pm": "午後",
+  "@settings": "設定",
+  "@sync_state": "同期状態",
+  "@theme": "テーマ",
+  "@title": "タイトル",
+  "@trashes": "ごみ箱",
+  "@guest": "ゲスト",
+  "@add_account": "アカウントを追加",
+  "@use_my_own_server": "自分のサーバーを使用する",
+  "@hint_theme_name": "名前",
+
+  "@register": "登録",
+  "@login": "ログイン",
+  "@who_are_you": "あなたは誰ですか?",
+  "@hello": "こんにちは!",
+  "@welcome": "ようこそ!",
+  "@change_password": "パスワードを変更する",
+  "@change_username": "名前を変更",
+  "@remove_user": "このデバイスから削除",
+
+  "@length": "長さ",
+  "@created_date": "作成日",
+  "@modified_date": "修正日",
+
+  "@failed_to_connect": "接続に失敗しました",
+  "@failed_to_auth": "認証に失敗しました",
+  "@please_set_server_address": "設定に行き、サーバーアドレスを設定してください",
+  "@can_not_open_note_from_trashes": "ごみ箱からノートを開くことはできません",
+
+  "@color_name_background_color": "背景色",
+  "@color_name_text_color": "テキストの色",
+  "@color_name_accent_color": "アクセントカラー",
+  "@color_name_inactive_color": "非アクティブの色",
+  "@color_name_note_background_color": "ノートの背景色",
+  "@color_name_note_text_color": "ノートのテキストの色",
+  "@color_name_floating_button_background": "フローティングボタンの背景色",
+  "@color_name_floating_button_icon_color": "フローティングボタンのアイコンの色",
+  "@color_name_check_box_color": "チェックボックスの背景色",
+  "@color_name_check_box_check_color": "チェックボックスのチェックの色",
+
+  "@dialog_title_logout": "本当にログアウトしますか?",
+  "@dialog_title_move_to_trash": "これらをゴミ箱に移動しますか?",
+  "@dialog_title_not_save_note": "保存しないでいいですか?",
+  "@dialog_title_delete_theme": "このテーマを削除してもよろしいですか？",
+  "@dialog_title_delete_color": "この色を削除してもよろしいですか？",
+  "@dialog_title_delete_selected_notes": "これらのアイテムを削除してもよろしいですか？",
+  "@dialog_title_remove_user": "このデバイスからユーザーを削除しますか？",
+  "@dialog_action_yes": "はい",
+  "@dialog_action_no": "いいえ",
+
+  "@popup_menu_leading_sort_by": "並び替え",
+  "@popup_menu_leading_view_as": "表示方法",
+  "@popup_menu_item_grid": "グリッド",
+  "@popup_menu_item_list": "リスト",
+
+  "@hint_server_address": "http(s)://your_address.com",
+  "@hint_id": "ID",
+  "@hint_password": "パスワード",
+  "@hint_confirm_password": "パスワードの確認",
+  "@hint_old_password": "旧パスワード",
+  "@hint_username": "ユーザー名",
+  "@hint_folder_name": "フォルダ名",
+  "@hint_password_different": "入力されたパスワードが一致しません",
+  "@hint_old_password_different": "旧パスワードが間違っています",
+  "@hint_input_id": "IDを入力してください",
+  "@hint_input_username": "名前を入力してください",
+  "@hint_input_password": "パスワードを入力してください",
+  "@hint_input_new_password": "新しいパスワードを入力してください",
+  "@hint_input_old_password": "古いパスワードを入力してください",
+  "@id_already_taken": "このIDはすでに使用されています",
+
+  "@transparent_navigation_bar": "透過型ナビゲーションバー",
+
+  "@yesterday": "昨日",
+
+  "@new_note": "新しいノート",
+  "@new_folder": "新しいフォルダー",
+
+  "@test_connection": "接続をテスト",
+  "@connection_failed": "接続に失敗しました",
+
+  "@locale_label_system": "システム",
+
+  "@editor_table_insert_text": "テキスト",
+  "@editor_table_insert_image": "画像",
+  "@editor_table_insert_video": "ビデオ",
+  "@editor_table_insert_date": "日付",
+
+  "@editor_table_add_column_before": "前に列を追加",
+  "@editor_table_add_column_after": "後に列を追加",
+  "@editor_table_add_row_above": "上に行を追加",
+  "@editor_table_add_row_below": "下に行を追加",
+  "@editor_table_delete_column": "列を削除",
+  "@editor_table_delete_row": "行を削除",
+  "@editor_table_clear_cell": "セルをクリア",
+
+  "@editor_calendar_rows_to_show": "表示する行",
+  "@editor_calendar_rows_for_date": "日付の行",
+
+  "@editor_add_image_from_photos": "写真",
+  "@editor_add_image_from_files": "ファイル",
+
+
+
+  "@editor_hint_sub_note_title": "タイトル",
+
+  "@editor_add_data_page_chart": "グラフ",
+  "@editor_add_data_page_calendar": "カレンダー",
+
+  "@editor_view_pager_height": "高さ",
+
+  "@day_name_sunday": "日曜日",
+  "@day_name_monday": "月曜日",
+  "@day_name_tuesday": "火曜日",
+  "@day_name_wednesday": "水曜日",
+  "@day_name_thursday": "木曜日",
+  "@day_name_friday": "金曜日",
+  "@day_name_saturday": "土曜日",
+
+  "@image_action_save": "保存",
+  "@image_action_zoom": "ズーム",
+  "@image_action_remove": "削除",
+  "@image_action_resize": "サイズ変更",
+  "@image_action_share": "共有",
+  "@image_action_copy": "コピー",
+
+  "@editor_chart_rows_to_show": "表示する行",
+  "@editor_chart_ascending": "昇順",
+
+  "@note_text_color": "テキストの色",
+  "@note_background_color": "背景色",
+  "@note_text_size": "テキストサイズ",
+  "@note_line_height": "行の高さ",
+
+  "@note_export_label_note": "ノート",
+  "@note_export_label_html": "HTML",
+  "@note_export_label_markdown": "Markdown",
+  "@note_export_label_word": "Word",
+  "@note_export_label_pdf": "PDF",
+
+  "@message_cannot_load_image": "画像を読み込めません",
+  "@toast_message_image_export_success": "画像が保存されました",
+  "@toast_message_file_download_success": "ダウンロードが完了しました",
+  "@toast_message_file_download_failed_error": "ダウンロードに失敗しました",
+  "@toast_message_file_download_failed_not_found": "ダウンロードに失敗しました。サーバーにファイルが見つかりません",
+  "@toast_message_file_download_failed_unauthorized": "ダウンロードに失敗しました。再度ログインしてください",
+  "@toast_message_note_export_success": "エクスポートが完了しました",
+
+  "@editor_table_text_done": "完了"
+
+}

@@ -7,51 +7,57 @@ import '../album_cover.dart';
 class PlayingQueueItem extends StatelessWidget {
 
   final Song song;
-  const PlayingQueueItem({super.key, required this.song});
+  final int index;
+  const PlayingQueueItem({super.key, required this.song, required this.index});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 5.0, bottom: 5),
-      child: Row(
-         children: [
-           Padding(
-             padding: const EdgeInsets.only(left: 0, right: 10),
-             child: SizedBox(
-                 width: 50,
-                 height: 50,
-                 child: ClipRRect(
-                   borderRadius: BorderRadius.circular(10),
-                   child: AlbumCover(
-                     album: song.album,
+    return GestureDetector(
+      onTap: () {
+        playerService.playAt(index);
+      },
+      child: Padding(
+        padding: const EdgeInsets.only(top: 5.0, bottom: 5),
+        child: Row(
+           children: [
+             Padding(
+               padding: const EdgeInsets.only(left: 0, right: 10),
+               child: SizedBox(
+                   width: 50,
+                   height: 50,
+                   child: ClipRRect(
+                     borderRadius: BorderRadius.circular(10),
+                     child: AlbumCover(
+                       album: song.album,
 
-                   ),
-                 )
-             ),
-           ),
-           Expanded(
-               child: Column(
-                 crossAxisAlignment: CrossAxisAlignment.start,
-                 children: [
-                   Text(
-                     song.title["default"] ?? "unknown",
-                     overflow: TextOverflow.ellipsis,
-                     maxLines: 1,
-                     style: TextStyle(
-                         fontWeight: FontWeight.bold,
-                         color: playerService.nowPlaying().id == song.id ? Theme.of(context).highlightColor : null
-                     ),
-                   ),
-                   Text(
-                     song.artist.name["default"] ?? "unknown",
-                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                         color: playerService.nowPlaying().id == song.id ? Theme.of(context).highlightColor : null
                      ),
                    )
-                 ],
-               )
-           ),
-         ],
+               ),
+             ),
+             Expanded(
+                 child: Column(
+                   crossAxisAlignment: CrossAxisAlignment.start,
+                   children: [
+                     Text(
+                       song.title["default"] ?? "unknown",
+                       overflow: TextOverflow.ellipsis,
+                       maxLines: 1,
+                       style: TextStyle(
+                           fontWeight: FontWeight.bold,
+                           color: playerService.nowPlaying().id == song.id ? Theme.of(context).highlightColor : null
+                       ),
+                     ),
+                     Text(
+                       song.artist.name["default"] ?? "unknown",
+                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                           color: playerService.nowPlaying().id == song.id ? Theme.of(context).highlightColor : null
+                       ),
+                     )
+                   ],
+                 )
+             ),
+           ],
+        ),
       ),
     );
   }

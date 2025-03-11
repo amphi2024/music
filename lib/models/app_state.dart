@@ -1,3 +1,5 @@
+import 'package:music/models/music/song.dart';
+
 final appState = AppState.getInstance();
 
 class AppState {
@@ -8,9 +10,13 @@ class AppState {
   bool playingBarExpanded = false;
   bool playingBarShowing = true;
   bool accountButtonExpanded = false;
+  bool fragmentTitleMinimized = false;
+
+  List<String>? selectedSongs;
 
   late void Function(void Function()) setState;
 
   late void Function(void Function()) setMainViewState;
+  void Function() requestScrollToTop = () {};
 
 }

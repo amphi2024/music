@@ -114,6 +114,23 @@ class PlayerService {
       await playerService.player.resume();
       appState.setState(() {});
     }
-
   }
+  Future<void> playAt(int i) async {
+    if (playerService.player.state ==
+        PlayerState.playing) {
+      await playerService.player.pause();
+    }
+    index = i;
+    playingSongId = playlist.queue[i];
+    var songFilePath = playerService.nowPlaying().songFilePath();
+    if(songFilePath != null) {
+      await playerService.player.setSource(DeviceFileSource(songFilePath));
+      await playerService.player.resume();
+      var duration = await playerService.player.getDuration();
+      if(duration != null) {
+        appState.setState(() {});
+      }
+    }
+  }
+
 }

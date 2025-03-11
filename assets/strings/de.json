@@ -1,0 +1,161 @@
+{
+  "@am": "AM",
+  "@created": "Erstellt",
+  "@default_font": "Standard",
+  "@folder": "Ordner",
+  "@language": "Sprache",
+  "@modified": "Geändert",
+  "@new_theme": "Neu",
+  "@note": "Notiz",
+  "@notes": "Notizen",
+  "@pm": "PM",
+  "@settings": "Einstellungen",
+  "@sync_state": "Sync-Zustand",
+  "@theme": "Thema",
+  "@title": "Titel",
+  "@trashes": "Papierkorb",
+  "@guest": "Gast",
+  "@add_account": "Konto hinzufügen",
+  "@use_my_own_server": "Eigenen Server verwenden",
+  "@hint_theme_name": "Name",
+
+  "@register": "Registrieren",
+  "@login": "Anmelden",
+  "@who_are_you": "Wer bist du?",
+  "@hello": "Hallo!",
+  "@welcome": "Willkommen!",
+  "@change_password": "Passwort ändern",
+  "@change_username": "Benutzernamen ändern",
+  "@remove_user": "Vom Gerät entfernen",
+
+  "@length": "Länge",
+  "@created_date": "Erstellungsdatum",
+  "@modified_date": "Änderungsdatum",
+
+  "@failed_to_connect": "Verbindung fehlgeschlagen",
+  "@failed_to_auth": "Authentifizierung fehlgeschlagen",
+  "@please_set_server_address": "Bitte gehen Sie zu den Einstellungen und konfigurieren Sie die Serveradresse",
+  "@can_not_open_note_from_trashes": "Sie können keine Notiz aus dem Papierkorb öffnen",
+
+  "@color_name_background_color": "Hintergrundfarbe",
+  "@color_name_text_color": "Textfarbe",
+  "@color_name_accent_color": "Akzentfarbe",
+  "@color_name_inactive_color": "Inaktive Farbe",
+  "@color_name_note_background_color": "Hintergrundfarbe der Notiz",
+  "@color_name_note_text_color": "Textfarbe der Notiz",
+  "@color_name_floating_button_background": "Hintergrundfarbe der schwebenden Schaltfläche",
+  "@color_name_floating_button_icon_color": "Symbolfarbe der schwebenden Schaltfläche",
+  "@color_name_check_box_color": "Hintergrundfarbe des Kontrollkästchens",
+  "@color_name_check_box_check_color": "Überprüfungsfarbe des Kontrollkästchens",
+
+  "@dialog_title_logout": "Möchten Sie sich wirklich abmelden?",
+  "@dialog_title_move_to_trash": "Möchten Sie diese in den Papierkorb verschieben?",
+  "@dialog_title_not_save_note": "Möchten Sie nicht speichern?",
+  "@dialog_title_delete_theme": "Möchten Sie dieses Thema löschen?",
+  "@dialog_title_delete_color": "Möchten Sie diese Farbe löschen?",
+  "@dialog_title_delete_selected_notes": "Bist du sicher, dass du diese Elemente löschen möchtest?",
+  "@dialog_title_remove_user": "Möchten Sie den Benutzer von diesem Gerät entfernen?",
+  "@dialog_action_yes": "Ja",
+  "@dialog_action_no": "Nein",
+
+  "@popup_menu_leading_sort_by": "Sortieren nach",
+  "@popup_menu_leading_view_as": "Anzeigen als",
+  "@popup_menu_item_grid": "Raster",
+  "@popup_menu_item_list": "Liste",
+
+  "@hint_server_address": "http(s)://your_address.com",
+  "@hint_id": "ID",
+  "@hint_password": "Passwort",
+  "@hint_confirm_password": "Passwort bestätigen",
+  "@hint_old_password": "Altes Passwort",
+  "@hint_username": "Name",
+  "@hint_folder_name": "Name",
+  "@hint_password_different": "Die eingegebenen Passwörter stimmen nicht überein",
+  "@hint_old_password_different": "Das alte Passwort ist falsch",
+  "@hint_input_id": "Bitte geben Sie die ID ein",
+  "@hint_input_username": "Bitte geben Sie den Namen ein",
+  "@hint_input_password": "Bitte geben Sie das Passwort ein",
+  "@hint_input_new_password": "Bitte geben Sie ein neues Passwort ein",
+  "@hint_input_old_password": "Bitte geben Sie das alte Passwort ein",
+  "@id_already_taken": "Die ID wird bereits verwendet",
+
+  "@transparent_navigation_bar": "Transparente Navigationsleiste",
+
+  "@yesterday": "Gestern",
+
+  "@new_note": "Neue Notiz",
+  "@new_folder": "Neuer Ordner",
+
+  "@test_connection": "Verbindung testen",
+  "@connection_failed": "Verbindung fehlgeschlagen",
+
+  "@locale_label_system": "System",
+
+  "@editor_table_insert_text": "Text",
+  "@editor_table_insert_image": "Bild",
+  "@editor_table_insert_video": "Video",
+  "@editor_table_insert_date": "Datum",
+
+  "@editor_table_add_column_before": "Spalte davor hinzufügen",
+  "@editor_table_add_column_after": "Spalte danach hinzufügen",
+  "@editor_table_add_row_above": "Zeile oben hinzufügen",
+  "@editor_table_add_row_below": "Zeile unten hinzufügen",
+  "@editor_table_delete_column": "Spalte löschen",
+  "@editor_table_delete_row": "Zeile löschen",
+  "@editor_table_clear_cell": "Zelle löschen",
+
+  "@editor_calendar_rows_to_show": "Zeilen anzeigen",
+  "@editor_calendar_rows_for_date": "Zeilen für Datum",
+
+  "@editor_add_image_from_photos": "Fotos",
+  "@editor_add_image_from_files": "Dateien",
+
+
+
+  "@editor_hint_sub_note_title": "Titel",
+
+  "@editor_add_data_page_chart": "Diagramm",
+  "@editor_add_data_page_calendar": "Kalender",
+
+  "@editor_view_pager_height": "Höhe",
+
+  "@day_name_sunday": "Sonntag",
+  "@day_name_monday": "Montag",
+  "@day_name_tuesday": "Dienstag",
+  "@day_name_wednesday": "Mittwoch",
+  "@day_name_thursday": "Donnerstag",
+  "@day_name_friday": "Freitag",
+  "@day_name_saturday": "Samstag",
+
+  "@image_action_save": "Speichern",
+  "@image_action_zoom": "Zoom",
+  "@image_action_remove": "Entfernen",
+  "@image_action_resize": "Größe ändern",
+  "@image_action_share": "Teilen",
+  "@image_action_copy": "Kopieren",
+
+  "@editor_chart_rows_to_show": "Anzuzeigende Zeilen",
+  "@editor_chart_ascending": "Aufsteigend",
+
+  "@note_text_color": "Textfarbe",
+  "@note_background_color": "Hintergrundfarbe",
+  "@note_text_size": "Textgröße",
+  "@note_line_height": "Zeilenhöhe",
+
+  "@note_export_label_note": "Notiz",
+  "@note_export_label_html": "HTML",
+  "@note_export_label_markdown": "Markdown",
+  "@note_export_label_word": "Word",
+  "@note_export_label_pdf": "PDF",
+
+  "@message_cannot_load_image": "Bild konnte nicht geladen werden",
+  "@toast_message_image_export_success": "Bild wurde gespeichert",
+  "@toast_message_file_download_success": "Download abgeschlossen",
+  "@toast_message_file_download_failed_error": "Download fehlgeschlagen",
+  "@toast_message_file_download_failed_not_found": "Download fehlgeschlagen, Datei auf dem Server nicht gefunden",
+  "@toast_message_file_download_failed_unauthorized": "Download fehlgeschlagen, bitte melden Sie sich erneut an",
+  "@toast_message_note_export_success": "Export abgeschlossen",
+
+  "@editor_table_text_done": "Fertig"
+
+}

@@ -4,7 +4,6 @@ import 'dart:math';
 
 import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
-import 'package:audiotags/audiotags.dart';
 import 'package:music/models/music/artist.dart';
 import 'package:music/utils/random_alphabet.dart';
 
@@ -37,7 +36,7 @@ class Album {
   late String id;
   late String path;
 
-  static Album created(Tag? tag, String artistId) {
+  static Album created(dynamic tag, String artistId) {
     var album = Album();
     String alphabet = randomAlphabet();
     var filename = FilenameUtils.generatedDirectoryNameWithChar(appStorage.albumsPath, alphabet);

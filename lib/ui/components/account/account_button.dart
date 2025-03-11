@@ -6,6 +6,11 @@ import 'package:music/models/app_storage.dart';
 import 'package:music/models/app_theme.dart';
 import 'package:music/utils/simple_shadow.dart';
 
+import '../../../channels/app_method_channel.dart';
+import '../../../channels/app_web_channel.dart';
+import '../../../models/app_settings.dart';
+import '../account_info/account_bottom_sheet.dart';
+import '../account_info/account_info.dart';
 import '../animated_profile_image.dart';
 class AccountButton extends StatelessWidget {
   
@@ -13,61 +18,50 @@ class AccountButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double iconSize = 20;
+    double profileIconSize = 20;
+    if (App.isWideScreen(context)) {
+      iconSize = 20;
+      profileIconSize = 15;
+    }
+    return IconButton(
+        icon: ProfileImage(size: iconSize, fontSize: profileIconSize, user: appStorage.selectedUser, token: appWebChannel.token),
+        onPressed: () {
+          if (!App.isWideScreen(context)) {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return Dialog(
+                    child: Container(
+                      width: 250,
+                      height: 500,
+                      child: Column(
+                        children: [
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: IconButton(
+                                icon: Icon(Icons.cancel_outlined),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                }),
+                          ),
+                          Expanded(child: AccountInfo())
+                        ],
+                      ),
+                    ),
+                  );
+                });
+          } else {
+            appMethodChannel.setNavigationBarColor(Theme.of(context).cardColor, appSettings.transparentNavigationBar);
 
-    var mediaQuery = MediaQuery.of(context);
-
-    return AnimatedPositioned(
-      top: appState.accountButtonExpanded ? 50 : mediaQuery.padding.top + 5,
-      left: appState.accountButtonExpanded ? 15 : null,
-      right: appState.accountButtonExpanded ? 15 : 15,
-      curve: Curves.easeOutQuint,
-      duration: const Duration(milliseconds: 750),
-      child: GestureDetector(
-        onTap: () {
-          if(!appState.accountButtonExpanded) {
-            appState.setMainViewState(() {
-              appState.accountButtonExpanded = true;
-            });
+            showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                return AccountBottomSheet();
+              },
+            );
           }
-        },
-        onVerticalDragUpdate: (d) {
-          if(appState.accountButtonExpanded) {
-            if(d.delta.dy < -2) {
-              appState.setMainViewState(() {
-                appState.accountButtonExpanded = false;
-              });
-            }
-          }
-          else {
-            if(d.delta.dy > 2) {
-              appState.setMainViewState(() {
-                appState.accountButtonExpanded = true;
-              });
-            }
-          }
-        },
-        child: AnimatedContainer(
-          curve: Curves.easeOutQuint,
-          duration: const Duration(milliseconds: 750),
-          width: appState.accountButtonExpanded ? mediaQuery.size.width : 40,
-          height: appState.accountButtonExpanded ? mediaQuery.size.height - 250 : 40,
-          decoration: BoxDecoration(
-            color: appState.accountButtonExpanded ? Theme.of(context).cardColor : null,
-            borderRadius: appState.accountButtonExpanded ? BorderRadius.circular(15) : BorderRadius.zero,
-            boxShadow: appState.accountButtonExpanded ? simpleShadow(context) : null
-          ),
-          child: Column(
-            children: [
-              AnimatedProfileImage(
-                user: appStorage.selectedUser,
-                token: appStorage.selectedUser.token,
-                size: appState.accountButtonExpanded ? 80 : 40,
-                fontSize: 15,
-              ),
-            ],
-          ),
-        ),
-      ),
+        }
     );
   }
 }

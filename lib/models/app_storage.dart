@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:amphi/models/app_storage_core.dart';
 import 'package:amphi/utils/path_utils.dart';
-import 'package:audiotags/audiotags.dart';
+import 'package:music/channels/app_method_channel.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/music/playlist.dart';
@@ -45,13 +45,8 @@ class AppStorage extends AppStorageCore {
   }
 
   void createMusicAndAll(String filePath) async {
-    Tag? tag;
-    try {
-      tag = await AudioTags.read(filePath);
-    }
-    catch(e) {
-      tag = null;
-    }
+    appMethodChannel.getMusicMetadata(filePath);
+    var tag;
     print(tag?.albumArtist);
     print(tag?.trackArtist);
     var albumExists = false;
@@ -128,16 +123,12 @@ class AppStorage extends AppStorageCore {
   void initPlaylists() {
 
     var directory = Directory(playlistsPath);
-    // for(var subDirectory in directory.listSync()) {
-    //   if(subDirectory is Directory) {
-    //     for(var file in subDirectory.listSync()) {
-    //       if(file is Directory) {
-    //         var musicObj = Music.fromDirectory(file);
-    //         music[musicObj.id] = musicObj;
-    //       }
-    //     }
-    //   }
-    // }
+    for(var file in directory.listSync()) {
+      if(file is File) {
+        var playlist = Playlist.fromFile(file);
+        playlists[playlist.id] = playlist;
+      }
+    }
   }
 
   void initMusic() {

@@ -1,0 +1,163 @@
+{
+  "@am": "AM",
+  "@created": "Criado",
+  "@default_font": "Padrão",
+  "@folder": "Pasta",
+  "@language": "Idioma",
+  "@modified": "Modificado",
+  "@new_theme": "Novo",
+  "@note": "Nota",
+  "@notes": "Notas",
+  "@pm": "PM",
+  "@settings": "Configurações",
+  "@sync_state": "Estado de sincronização",
+  "@theme": "Tema",
+  "@title": "Título",
+  "@trashes": "Lixo",
+  "@guest": "Convidado",
+  "@add_account": "Adicionar Conta",
+  "@use_my_own_server": "Usar meu próprio servidor",
+  "@hint_theme_name": "Nome",
+
+  "@register": "Registrar",
+  "@login": "Entrar",
+  "@who_are_you": "Quem é você?",
+  "@hello": "Olá!",
+  "@welcome": "Bem-vindo!",
+  "@change_password": "Alterar senha",
+  "@change_username": "Alterar nome",
+  "@remove_user": "Remover deste dispositivo",
+
+  "@length": "Comprimento",
+  "@created_date": "Data de criação",
+  "@modified_date": "Data de modificação",
+
+  "@failed_to_connect": "Falha na conexão",
+  "@failed_to_auth": "Falha na autenticação",
+  "@please_set_server_address": "Por favor, vá para as configurações e configure o endereço do servidor",
+  "@can_not_open_note_from_trashes": "Você não pode abrir nota do lixo",
+
+  "@color_name_background_color": "Cor de fundo",
+  "@color_name_text_color": "Cor do texto",
+  "@color_name_accent_color": "Cor de destaque",
+  "@color_name_inactive_color": "Cor inativa",
+  "@color_name_note_background_color": "Cor de fundo da nota",
+  "@color_name_note_text_color": "Cor do texto da nota",
+  "@color_name_floating_button_background": "Cor de fundo do botão flutuante",
+  "@color_name_floating_button_icon_color": "Cor do ícone do botão flutuante",
+  "@color_name_check_box_color": "Cor de fundo da caixa de seleção",
+  "@color_name_check_box_check_color": "Cor da marca de seleção",
+
+  "@dialog_title_logout": "Tem certeza de que deseja sair?",
+  "@dialog_title_move_to_trash": "Deseja mover isso para o lixo?",
+  "@dialog_title_not_save_note": "Você não gostaria de salvar?",
+  "@dialog_title_delete_theme": "Você deseja excluir este tema?",
+  "@dialog_title_delete_color": "Você deseja excluir esta cor?",
+  "@dialog_title_delete_selected_notes": "Tem certeza de que deseja excluir estes itens?",
+  "@dialog_title_remove_user": "Você quer remover o usuário deste dispositivo?",
+  "@dialog_action_yes": "Sim",
+  "@dialog_action_no": "Não",
+
+  "@popup_menu_leading_sort_by": "Ordenar por",
+  "@popup_menu_leading_view_as": "Visualizar como",
+  "@popup_menu_item_grid": "Grade",
+  "@popup_menu_item_list": "Lista",
+
+  "@hint_server_address": "http(s)://your_address.com",
+  "@hint_id": "ID",
+  "@hint_password": "Senha",
+  "@hint_confirm_password": "Confirmar senha",
+  "@hint_old_password": "Senha antiga",
+  "@hint_username": "Nome de usuário",
+  "@hint_folder_name": "Nome da pasta",
+  "@hint_password_different": "As senhas inseridas não correspondem",
+  "@hint_old_password_different": "A senha antiga está incorreta",
+  "@hint_input_id": "Por favor, insira o ID",
+  "@hint_input_username": "Por favor, insira o nome",
+  "@hint_input_password": "Por favor, insira a senha",
+  "@hint_input_new_password": "Por favor, insira uma nova senha",
+  "@hint_input_old_password": "Por favor, insira a senha antiga",
+  "@id_already_taken": "O ID já está em uso",
+
+  "@transparent_navigation_bar": "Barra de navegação transparente",
+
+  "@yesterday": "Ontem",
+
+  "@new_note": "Nova Nota",
+  "@new_folder": "Nova Pasta",
+
+  "@test_connection": "Testar Conexão",
+  "@connection_failed": "Conexão Falhou",
+
+  "@locale_label_system": "Sistema",
+
+  "@editor_table_insert_text": "Texto",
+  "@editor_table_insert_image": "Imagem",
+  "@editor_table_insert_video": "Vídeo",
+  "@editor_table_insert_date": "Data",
+
+  "@editor_table_add_column_before": "Adicionar Coluna Antes",
+  "@editor_table_add_column_after": "Adicionar Coluna Depois",
+  "@editor_table_add_row_above": "Adicionar Linha Acima",
+  "@editor_table_add_row_below": "Adicionar Linha Abaixo",
+  "@editor_table_delete_column": "Excluir Coluna",
+  "@editor_table_delete_row": "Excluir Linha",
+  "@editor_table_clear_cell": "Limpar Célula",
+
+  "@editor_calendar_rows_to_show": "Linhas para Mostrar",
+  "@editor_calendar_rows_for_date": "Linhas para Data",
+
+  "@editor_add_image_from_photos": "Fotos",
+  "@editor_add_image_from_files": "Arquivos",
+
+
+
+  "@editor_hint_sub_note_title": "Título",
+
+  "@editor_add_data_page_chart": "Gráfico",
+  "@editor_add_data_page_calendar": "Calendário",
+
+  "@editor_view_pager_height": "Altura",
+
+  "@day_name_sunday": "Domingo",
+  "@day_name_monday": "Segunda-feira",
+  "@day_name_tuesday": "Terça-feira",
+  "@day_name_wednesday": "Quarta-feira",
+  "@day_name_thursday": "Quinta-feira",
+  "@day_name_friday": "Sexta-feira",
+  "@day_name_saturday": "Sábado",
+
+  "@image_action_save": "Salvar",
+  "@image_action_zoom": "Zoom",
+  "@image_action_remove": "Remover",
+  "@image_action_resize": "Redimensionar",
+  "@image_action_share": "Compartilhar",
+  "@image_action_copy": "Copiar",
+
+
+  "@editor_chart_rows_to_show": "Linhas a Mostrar",
+  "@editor_chart_ascending": "Ascendente",
+
+  "@note_text_color": "Cor do Texto",
+  "@note_background_color": "Cor de Fundo",
+  "@note_text_size": "Tamanho do Texto",
+  "@note_line_height": "Altura da Linha",
+
+  "@note_export_label_note": "Nota",
+  "@note_export_label_html": "HTML",
+  "@note_export_label_markdown": "Markdown",
+  "@note_export_label_word": "Word",
+  "@note_export_label_pdf": "PDF",
+
+  "@message_cannot_load_image": "Não é possível carregar a imagem",
+  "@toast_message_image_export_success": "Imagem salva",
+  "@toast_message_file_download_success": "Download concluído",
+  "@toast_message_file_download_failed_error": "Falha no download",
+  "@toast_message_file_download_failed_not_found": "Falha no download, arquivo não encontrado no servidor",
+  "@toast_message_file_download_failed_unauthorized": "Falha no download, é necessário fazer login novamente",
+  "@toast_message_note_export_success": "Exportação concluída",
+
+
+  "@editor_table_text_done": "Feito"
+
+}

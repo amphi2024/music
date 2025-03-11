@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
-import 'package:audiotags/audiotags.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/music/song_file.dart';
@@ -60,7 +59,7 @@ class Song {
     return files.entries.firstOrNull?.value ?? SongFile();
   }
 
-  static Song created({required Tag? tag,required String artistId, required String albumId, required File file}) {
+  static Song created({required dynamic tag,required String artistId, required String albumId, required File file}) {
     var song = Song();
 
     String alphabet = randomAlphabet();

@@ -24,7 +24,9 @@ class _PlayingQueueState extends State<PlayingQueue> {
             itemCount: playingQueue.length,
               itemBuilder: (context, index) {
             return PlayingQueueItem(
-                song: appStorage.songs[playingQueue[index]] ?? Song());
+                song: appStorage.songs[playingQueue[index]] ?? Song(),
+              index: index,
+            );
           }),
         ),
         Padding(

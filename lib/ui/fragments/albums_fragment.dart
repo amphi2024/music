@@ -5,6 +5,7 @@ import 'package:music/models/music/album.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/ui/views/album_view.dart';
 
+import '../../models/app_state.dart';
 import '../../models/app_storage.dart';
 import '../components/album_cover.dart';
 
@@ -16,6 +17,28 @@ class AlbumsFragment extends StatefulWidget {
 }
 
 class _AlbumsFragmentState extends State<AlbumsFragment> {
+
+  var scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    scrollController.addListener(() {
+      appState.setMainViewState(() {
+        appState.fragmentTitleMinimized = scrollController.offset > 60 && appState.selectedSongs == null;
+      });
+    });
+    appState.requestScrollToTop = () {
+      scrollController.animateTo(0, duration: Duration(milliseconds: 750), curve: Curves.easeOutQuint);
+    };
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Album> albumList = [];
@@ -67,6 +90,7 @@ class _AlbumsFragmentState extends State<AlbumsFragment> {
       children.add(albumWidget);
     }
     return MasonryGridView(
+      controller: scrollController,
       gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(crossAxisCount: axisCount),
       children: children,
     );

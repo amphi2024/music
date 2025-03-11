@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:music/models/music/playlist.dart';
 
 class EditPlaylistDialog extends StatefulWidget {
-  const EditPlaylistDialog({super.key});
+
+  final void Function(Playlist) onSave;
+  const EditPlaylistDialog({super.key, required this.onSave});
 
   @override
   State<EditPlaylistDialog> createState() => _EditPlaylistDialogState();
@@ -40,13 +43,16 @@ class _EditPlaylistDialogState extends State<EditPlaylistDialog> {
                 IconButton(
                   icon: Icon(Icons.cancel_outlined),
                   onPressed: () {
-
+                    Navigator.pop(context);
                   },
                 ),
                 IconButton(
                   icon: Icon(Icons.check),
                   onPressed: () {
-
+                    var playlist = Playlist.created(controller.text);
+                    playlist.save();
+                    widget.onSave(playlist);
+                    Navigator.pop(context);
                   },
                 ),
               ],

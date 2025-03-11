@@ -31,28 +31,11 @@ class AppMethodChannel extends MethodChannel {
     }
   }
 
-  void selectImage() async {
-    await invokeMethod("select_image");
-  }
-
-  void selectImageFromFiles() async {
-    await invokeMethod("select_image_from_files");
-  }
-
-  void selectVideo() async {
-    await invokeMethod("select_video");
-  }
-
-  void rotateScreen() {
-    invokeMethod("rotate_screen");
-  }
-
-  void setLandScape() {
-    invokeMethod("set_landscape");
-  }
-
-  void setPortrait() {
-    invokeMethod("set_portrait");
+  void getMusicMetadata(String filePath) async {
+    var result = await invokeMethod("get_music_metadata", {"path": filePath});
+    print("----------------------------------------------------");
+    print(result);
+    print("----------------------------------------------------");
   }
 
   void setNavigationBarColor(Color color, bool iosLikeUi) {

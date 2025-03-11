@@ -2,8 +2,10 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:amphi/models/app.dart';
+import 'package:amphi/models/app_localizations.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:music/models/app_settings.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
@@ -82,7 +84,14 @@ class _MyAppState extends State<MyApp> {
     else {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
-        locale: locale,
+        locale: Locale("en"),
+        localizationsDelegates: const [
+          LocalizationDelegate(),
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: appSettings.appTheme.lightTheme.toThemeData(context),
         darkTheme: appSettings.appTheme.darkTheme.toThemeData(context),
         home: App.isDesktop() || App.isWideScreen(context) ? WideMainView() : MainView(),

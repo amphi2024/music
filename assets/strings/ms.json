@@ -1,0 +1,158 @@
+{
+  "@am": "AM",
+  "@created": "Dicipta",
+  "@default_font": "Lalai",
+  "@folder": "Folder",
+  "@language": "Bahasa",
+  "@modified": "Diubah",
+  "@new_theme": "Baru",
+  "@note": "Nota",
+  "@notes": "Nota-nota",
+  "@pm": "PM",
+  "@settings": "Tetapan",
+  "@sync_state": "Keadaan penyegerakan",
+  "@theme": "Tema",
+  "@title": "Tajuk",
+  "@trashes": "Sampah",
+  "@guest": "Tetamu",
+  "@add_account": "Tambah Akaun",
+  "@use_my_own_server": "Gunakan Pelayan Saya Sendiri",
+  "@hint_theme_name": "Nama",
+
+  "@register": "Daftar",
+  "@login": "Log masuk",
+  "@who_are_you": "Siapa awak?",
+  "@hello": "Helo!",
+  "@welcome": "Selamat datang!",
+  "@change_password": "Tukar Kata Laluan",
+
+  "@length": "Panjang",
+  "@created_date": "Tarikh dicipta",
+  "@modified_date": "Tarikh diubah",
+
+  "@failed_to_connect": "Gagal untuk menyambung",
+  "@failed_to_auth": "Gagal pengesahan",
+  "@please_set_server_address": "Sila pergi ke tetapan dan tetapkan alamat pelayan",
+  "@can_not_open_note_from_trashes": "Anda tidak boleh membuka nota dari sampah",
+
+  "@color_name_background_color": "Warna latar belakang",
+  "@color_name_text_color": "Warna teks",
+  "@color_name_accent_color": "Warna aksen",
+  "@color_name_inactive_color": "Warna tidak aktif",
+  "@color_name_note_background_color": "Warna latar belakang nota",
+  "@color_name_note_text_color": "Warna teks nota",
+  "@color_name_floating_button_background": "Warna latar belakang butang terapung",
+  "@color_name_floating_button_icon_color": "Warna ikon butang terapung",
+  "@color_name_check_box_color": "Warna latar belakang kotak semak",
+  "@color_name_check_box_check_color": "Warna tanda kotak semak",
+
+  "@dialog_title_logout": "Adakah anda pasti ingin log keluar?",
+  "@dialog_title_move_to_trash": "Adakah anda ingin memindahkan ini ke sampah?",
+  "@dialog_title_not_save_note": "Anda tidak mahu menyimpan?",
+  "@dialog_title_delete_theme": "Adakah anda ingin memadam tema ini?",
+  "@dialog_title_delete_color": "Adakah anda ingin memadam warna ini?",
+  "@dialog_title_delete_selected_notes": "Adakah anda pasti ingin memadam item ini?",
+  "@dialog_title_remove_user": "Adakah anda mahu menghapuskan pengguna dari peranti ini?",
+  "@dialog_action_yes": "Ya",
+  "@dialog_action_no": "Tidak",
+
+  "@popup_menu_leading_sort_by": "Susun mengikut",
+  "@popup_menu_leading_view_as": "Lihat sebagai",
+  "@popup_menu_item_grid": "Grid",
+  "@popup_menu_item_list": "Senarai",
+
+  "@hint_server_address": "http(s)://your_address.com",
+  "@hint_id": "ID",
+  "@hint_password": "Kata laluan",
+  "@hint_confirm_password": "Sahkan kata laluan",
+  "@hint_old_password": "Kata laluan lama",
+  "@hint_username": "Nama pengguna",
+  "@hint_folder_name": "Nama folder",
+  "@hint_password_different": "Kata laluan yang dimasukkan tidak sepadan",
+  "@hint_old_password_different": "Kata laluan lama tidak betul",
+  "@hint_input_id": "Sila masukkan ID",
+  "@hint_input_username": "Sila masukkan nama",
+  "@hint_input_password": "Sila masukkan kata laluan",
+  "@hint_input_new_password": "Sila masukkan kata laluan baru",
+  "@hint_input_old_password": "Sila masukkan kata laluan lama",
+  "@id_already_taken": "ID sudah diambil",
+
+  "@transparent_navigation_bar": "Bar Navigasi Lutsinar",
+
+  "@yesterday": "Semalam",
+
+  "@new_note": "Nota Baru",
+  "@new_folder": "Folder Baru",
+
+  "@test_connection": "Uji Sambungan",
+  "@connection_failed": "Sambungan Gagal",
+
+  "@locale_label_system": "Sistem",
+
+  "@editor_table_insert_text": "Teks",
+  "@editor_table_insert_image": "Imej",
+  "@editor_table_insert_video": "Video",
+  "@editor_table_insert_date": "Tarikh",
+
+  "@editor_table_add_column_before": "Tambah Kolum Sebelum",
+  "@editor_table_add_column_after": "Tambah Kolum Selepas",
+  "@editor_table_add_row_above": "Tambah Baris Di Atas",
+  "@editor_table_add_row_below": "Tambah Baris Di Bawah",
+  "@editor_table_delete_column": "Padam Kolum",
+  "@editor_table_delete_row": "Padam Baris",
+  "@editor_table_clear_cell": "Kosongkan Sel",
+
+  "@editor_calendar_rows_to_show": "Baris untuk Ditunjukkan",
+  "@editor_calendar_rows_for_date": "Baris untuk Tarikh",
+
+  "@editor_add_image_from_photos": "Gambar",
+  "@editor_add_image_from_files": "Fail",
+
+  "@editor_hint_sub_note_title": "Tajuk",
+
+  "@editor_add_data_page_chart": "Carta",
+  "@editor_add_data_page_calendar": "Kalendar",
+
+  "@editor_view_pager_height": "Tinggi",
+
+  "@day_name_sunday": "Ahad",
+  "@day_name_monday": "Isnin",
+  "@day_name_tuesday": "Selasa",
+  "@day_name_wednesday": "Rabu",
+  "@day_name_thursday": "Khamis",
+  "@day_name_friday": "Jumaat",
+  "@day_name_saturday": "Sabtu",
+
+  "@image_action_save": "Simpan",
+  "@image_action_zoom": "Zum",
+  "@image_action_remove": "Padam",
+  "@image_action_resize": "Ubah saiz",
+  "@image_action_share": "Kongsi",
+  "@image_action_copy": "Salin",
+
+
+  "@editor_chart_rows_to_show": "Baris untuk Ditunjukkan",
+  "@editor_chart_ascending": "Menaik",
+
+  "@note_text_color": "Warna Teks",
+  "@note_background_color": "Warna Latar Belakang",
+  "@note_text_size": "Saiz Teks",
+  "@note_line_height": "Tinggi Baris",
+
+  "@note_export_label_note": "Nota",
+  "@note_export_label_html": "HTML",
+  "@note_export_label_markdown": "Markdown",
+  "@note_export_label_word": "Word",
+  "@note_export_label_pdf": "PDF",
+
+  "@message_cannot_load_image": "Tidak Dapat Memuat Gambar",
+  "@toast_message_image_export_success": "Imej telah disimpan",
+  "@toast_message_file_download_success": "Muat turun selesai",
+  "@toast_message_file_download_failed_error": "Muat turun gagal",
+  "@toast_message_file_download_failed_not_found": "Muat turun gagal, fail tidak ditemui di pelayan",
+  "@toast_message_file_download_failed_unauthorized": "Muat turun gagal, anda perlu log masuk semula",
+  "@toast_message_note_export_success": "Eksport berjaya",
+
+  "@editor_table_text_done": "Selesai"
+
+}
