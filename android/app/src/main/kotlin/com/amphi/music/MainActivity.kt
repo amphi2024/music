@@ -7,6 +7,7 @@ import android.provider.Settings
 import android.view.WindowManager
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import org.json.JSONObject
 
 class MainActivity: FlutterActivity() {
     override fun onResume() {
@@ -67,6 +68,14 @@ class MainActivity: FlutterActivity() {
                 "configure_needs_bottom_padding" -> {
                     val navigationMode = Settings.Secure.getInt(contentResolver, "navigation_mode")
                     result.success(Build.VERSION.SDK_INT >= 35 && navigationMode != 2)
+                }
+
+                "get_music_metadata" -> {
+                    result.success(call.argument<String>("path")?.let { musicMetadata(filePath = it) })
+                }
+
+                "get_album_cover" -> {
+                    result.success(call.argument<String>("path")?.let { albumArt(filePath = it) })
                 }
 
                 else -> result.notImplemented()

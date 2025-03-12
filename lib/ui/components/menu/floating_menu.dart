@@ -96,7 +96,7 @@ class _FloatingMenuState extends State<FloatingMenu> {
                       return [
                         PopupMenuItem(child: Text("Song"), onTap: () async {
                           var result = await FilePicker.platform
-                              .pickFiles(type: FileType.audio);
+                              .pickFiles(type: FileType.any);
                           if (result != null) {
                             for (var file in result.files) {
                               var filePath = file.path;

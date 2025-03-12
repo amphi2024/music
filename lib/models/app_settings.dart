@@ -36,6 +36,7 @@ class AppSettings {
       locale = Locale(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
     }
     catch(e) {
+      locale = Locale(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
       save();
     }
   }

@@ -38,6 +38,13 @@ class AppMethodChannel extends MethodChannel {
     print("----------------------------------------------------");
   }
 
+  void getAlbumCover(String filePath) async {
+    var result = await invokeMethod("get_album_cover", {"path": filePath});
+    print("----------------------------------------------------");
+    print(result);
+    print("----------------------------------------------------");
+  }
+
   void setNavigationBarColor(Color color, bool iosLikeUi) {
     if(Platform.isAndroid) {
       invokeMethod("set_navigation_bar_color", {"color": color.value, "ios_like_ui": iosLikeUi});

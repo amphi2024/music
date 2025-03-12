@@ -45,5 +45,26 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+    
+    <key>UIBackgroundModes</key>
+    <array>
+       <string>fetch</string>
+       <string>remote-notification</string>
+    </array>
+    <key>NSAppleMusicUsageDescription</key>
+    <string>Explain why your app uses music</string>
+    <key>UISupportsDocumentBrowser</key>
+    <true/>
+    <key>LSSupportsOpeningDocumentsInPlace</key>
+    <true/>
+    <key>NSDocumentsFolderUsageDescription</key>
+    <string>This app requires access to the Documents folder to manage your files.</string>
+    <key>NSAppleMusicUsageDescription</key>
+    <string>This app requires access to your music library to allow file selection for music files.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>This app requires access to the photo library to manage your photos.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>This app requires access to the camera for scanning QR codes and capturing images.</string>
+
 </dict>
 </plist>

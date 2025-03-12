@@ -1,6 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/music/song.dart';
+import 'package:music/utils/duration_converter.dart';
 
 import '../../../models/player_service.dart';
 
@@ -67,11 +68,11 @@ class PlayControls extends StatelessWidget {
                 MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    convertedDuration(position),
+                    DurationConverter.convertedDuration(position),
                     style: textTheme.bodyMedium,
                   ),
                   Text(
-                    convertedDuration(length),
+                    DurationConverter.convertedDuration(length),
                     style: textTheme.bodyMedium,
                   )
                 ],
@@ -114,25 +115,4 @@ class PlayControls extends StatelessWidget {
       ],
     );
   }
-}
-
-String _formatTime(int timeUnit) {
-  return timeUnit.toString().padLeft(2, '0');
-}
-
-String convertedDuration(double d) {
-  int totalMilliseconds = d.toInt();
-  int hours = totalMilliseconds ~/ (3600 * 1000);
-  int remainingMinutesAndSeconds = totalMilliseconds % (3600 * 1000);
-  int minutes = remainingMinutesAndSeconds ~/ (60 * 1000);
-  int remainingSeconds = remainingMinutesAndSeconds % (60 * 1000);
-  int seconds = remainingSeconds ~/ 1000;
-
-  if (hours == 0) {
-    if (minutes == 0) {
-      return '0:${_formatTime(seconds)}';
-    }
-    return '${_formatTime(minutes)}:${_formatTime(seconds)}';
-  }
-  return '${_formatTime(hours)}:${_formatTime(minutes)}:${_formatTime(seconds)}';
 }

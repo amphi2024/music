@@ -25,10 +25,10 @@ class _WideMainViewState extends State<WideMainView> {
         children: [
           Positioned(
             top: 0,
-            left: 0,
+            left: 300,
             right: 0,
             child: SizedBox(
-              height: 30,
+              height: 50,
               child: Row(
                 children: [
                   Expanded(

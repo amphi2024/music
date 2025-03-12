@@ -46,50 +46,51 @@ class AppStorage extends AppStorageCore {
 
   void createMusicAndAll(String filePath) async {
     appMethodChannel.getMusicMetadata(filePath);
-    var tag;
-    print(tag?.albumArtist);
-    print(tag?.trackArtist);
-    var albumExists = false;
-    var artistExists = false;
-    String artistId = "";
-          var albumId = "";
-    artists.forEach((id, artist) {
-      if(artist.name.containsValue(tag?.albumArtist)) {
-        artistExists = true;
-        artistId = artist.id;
-
-        for(String id in artist.albums) {
-          if(appStorage.albums[id]!.name.containsValue(tag?.album)) {
-            albumExists = true;
-            albumId = id;
-          }
-        }
-      }
-    });
-
-    if(!artistExists) {
-      var artist = Artist.created(tag);
-      artistId = artist.id;
-      artists[artistId] = artist;
-    }
-
-    if(!albumExists) {
-      var album = Album.created(tag, artistId);
-      albumId = album.id;
-      artists[artistId]?.albums.add(albumId);
-      albums[albumId] = album;
-    }
-
-    var artist = artists[artistId]!;
-    artist.save();
-    var album = albums[albumId]!;
-    album.save();
-
-    var createdMusic = Song.created(tag: tag, artistId: artistId, albumId: albumId, file: File(filePath));
-    createdMusic.save();
-    appState.setMainViewState(() {
-      songs[createdMusic.id] = createdMusic;
-    });
+    appMethodChannel.getAlbumCover(filePath);
+    // var tag;
+    // print(tag?.albumArtist);
+    // print(tag?.trackArtist);
+    // var albumExists = false;
+    // var artistExists = false;
+    // String artistId = "";
+    //       var albumId = "";
+    // artists.forEach((id, artist) {
+    //   if(artist.name.containsValue(tag?.albumArtist)) {
+    //     artistExists = true;
+    //     artistId = artist.id;
+    //
+    //     for(String id in artist.albums) {
+    //       if(appStorage.albums[id]!.name.containsValue(tag?.album)) {
+    //         albumExists = true;
+    //         albumId = id;
+    //       }
+    //     }
+    //   }
+    // });
+    //
+    // if(!artistExists) {
+    //   var artist = Artist.created(tag);
+    //   artistId = artist.id;
+    //   artists[artistId] = artist;
+    // }
+    //
+    // if(!albumExists) {
+    //   var album = Album.created(tag, artistId);
+    //   albumId = album.id;
+    //   artists[artistId]?.albums.add(albumId);
+    //   albums[albumId] = album;
+    // }
+    //
+    // var artist = artists[artistId]!;
+    // artist.save();
+    // var album = albums[albumId]!;
+    // album.save();
+    //
+    // var createdMusic = Song.created(tag: tag, artistId: artistId, albumId: albumId, file: File(filePath));
+    // createdMusic.save();
+    // appState.setMainViewState(() {
+    //   songs[createdMusic.id] = createdMusic;
+    // });
   }
 
   void initArtists() {
