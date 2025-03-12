@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:amphi/models/app.dart';
+import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_theme.dart';
 
@@ -11,6 +15,21 @@ class NavigationMenu extends StatefulWidget {
 class _NavigationMenuState extends State<NavigationMenu> {
   @override
   Widget build(BuildContext context) {
+
+    List<Widget> children = [
+      _MenuItem(title: "Songs", icon: Icons.music_note, onPressed: () {}),
+      _MenuItem(title: "Artists", icon: Icons.people, onPressed: () {}),
+      _MenuItem(title: "Albums", icon: Icons.album, onPressed: () {}),
+      _MenuItem(title: "Genres", icon: Icons.music_note, onPressed: () {}),
+    ];
+
+    if(App.isDesktop() && !appWindow.isMaximized) {
+      children.insert(0, SizedBox(
+        height: 30,
+        child: MoveWindow(),
+      ));
+    }
+
     return Positioned(
         left: 0,
         top: 0,
@@ -18,20 +37,17 @@ class _NavigationMenuState extends State<NavigationMenu> {
         child: Container(
           width: 200,
           decoration: BoxDecoration(
-            color: AppTheme.lightGray
+            color: AppTheme.lightGray,
+            border: Border(
+              right: BorderSide(
+                color: Theme.of(context).shadowColor,
+                //color: Color.fromRGBO(240, 240, 240, 1),
+                width: 1
+              )
+            )
           ),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 30),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  _MenuItem(title: "Songs", icon: Icons.music_note, onPressed: () {}),
-                  _MenuItem(title: "Artists", icon: Icons.people, onPressed: () {}),
-                  _MenuItem(title: "Albums", icon: Icons.album, onPressed: () {}),
-                  _MenuItem(title: "Genres", icon: Icons.music_note, onPressed: () {}),
-                ],
-              ),
-            ),
+          child: ListView(
+            children: children
           ),
         )
     );
