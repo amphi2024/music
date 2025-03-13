@@ -1,12 +1,18 @@
+import 'dart:io';
+
 import 'package:amphi/widgets/menu/popup/show_menu.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
+import 'package:music/ui/components/account/account_button.dart';
 import 'package:music/ui/components/fragment_title.dart';
 import 'package:music/ui/components/navigation_menu.dart';
 import 'package:music/ui/components/playing/desktop_playing_bar.dart';
 import 'package:music/ui/fragments/songs_fragment.dart';
 
+import '../../models/app_storage.dart';
+import '../dialogs/edit_playlist_dialog.dart';
 import '../fragments/albums_fragment.dart';
 import '../fragments/artists_fragment.dart';
 import '../fragments/genres_fragment.dart';
@@ -26,7 +32,12 @@ class _WideMainViewState extends State<WideMainView> {
     });
   }
 
-
+  var titles = [
+    "Songs",
+    "Artists",
+    "Albums",
+    "Genres"
+  ];
 
   List<Widget> fragments = [
     SongsFragment(),
@@ -34,6 +45,14 @@ class _WideMainViewState extends State<WideMainView> {
     AlbumsFragment(),
     GenresFragment()
   ];
+
+  @override
+  void initState() {
+    appState.setMainViewState = (fun) {
+      setState(fun);
+    };
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,19 +67,29 @@ class _WideMainViewState extends State<WideMainView> {
               height: 50,
               child: Row(
                 children: [
-                  Text("Songs"),
+                  FragmentTitle(title: titles[appState.fragmentIndex],),
                   Expanded(
                       child: MoveWindow()
                   ),
-                  // PopupMenuButton(icon: Icon(Icons.add_circle_outline),
-                  //     itemBuilder: (context) {
-                  //   return [
-                  //     PopupMenuItem(child: Text("Song"), onTap: () {}),
-                  //     PopupMenuItem(child: Text("Playlist"), onTap: () {}),
-                  //   ];
-                  // }),
-                  // IconButton(onPressed: () {}, icon: Icon(Icons.lyrics)),
-                  // IconButton(onPressed: () {}, icon: Icon(Icons.list)),
+                  AccountButton(),
+                  PopupMenuButton(icon: Icon(Icons.add_circle_outline),
+                      itemBuilder: (context) {
+                    return [
+                      PopupMenuItem(child: Text("Song"), onTap: () async {
+                        appStorage.selectMusicFilesAndSave();
+                      }),
+                      PopupMenuItem(child: Text("Playlist"), onTap: () {
+                        showDialog(context: context, builder: (context) {
+                          return EditPlaylistDialog(onSave: (playlist) {
+                            appState.setMainViewState(() {
+                              appStorage.playlists[playlist.id] = playlist;
+                            });
+                          });
+                        });
+                      }),
+                    ];
+                  }),
+                  IconButton(onPressed: () {}, icon: Icon(Icons.settings)),
                   MinimizeWindowButton(),
                   appWindow.isMaximized
                       ? RestoreWindowButton(

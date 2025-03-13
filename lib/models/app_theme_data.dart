@@ -49,7 +49,7 @@ class AppThemeData {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5)),
               textStyle: TextStyle(
-                  color: accentColor,
+                  color: textColor,
                   fontSize: 20,
                   fontWeight: FontWeight.bold))),
       dialogBackgroundColor: backgroundColor,

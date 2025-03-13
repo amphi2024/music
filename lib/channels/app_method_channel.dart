@@ -31,18 +31,31 @@ class AppMethodChannel extends MethodChannel {
     }
   }
 
-  void getMusicMetadata(String filePath) async {
+  Future<Map> getMusicMetadata(String filePath) async {
     var result = await invokeMethod("get_music_metadata", {"path": filePath});
-    print("----------------------------------------------------");
-    print(result);
-    print("----------------------------------------------------");
+    if(result is Map) {
+      return result;
+    }
+    else {
+      return {};
+    }
   }
 
-  void getAlbumCover(String filePath) async {
+  Future<List<int>> getAlbumCover(String filePath) async {
     var result = await invokeMethod("get_album_cover", {"path": filePath});
-    print("----------------------------------------------------");
-    print(result);
-    print("----------------------------------------------------");
+    if(result is List) {
+      return result.map((e) {
+        if(e is int) {
+         return e;
+        }
+        else {
+          return 0;
+        }
+      }).toList();
+    }
+    else {
+      return [];
+    }
   }
 
   void setNavigationBarColor(Color color, bool iosLikeUi) {

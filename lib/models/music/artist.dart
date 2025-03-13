@@ -37,7 +37,7 @@ class Artist {
     return artist;
   }
 
-  static Artist created(dynamic tag) {
+  static Artist created(Map metadata) {
     var artist = Artist();
     var alphabet = randomAlphabet();
     var filename = FilenameUtils.generatedDirectoryNameWithChar(appStorage.artistsPath, alphabet);
@@ -45,7 +45,7 @@ class Artist {
     directory.createSync(recursive: true);
     artist.path = directory.path;
     artist.id = filename;
-    artist.name["default"] = tag?.trackArtist ?? "";
+    artist.name["default"] = metadata["artist"];
 
     return artist;
   }

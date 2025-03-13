@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:amphi/models/app_storage_core.dart';
 import 'package:amphi/utils/path_utils.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:music/channels/app_method_channel.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/music/song.dart';
@@ -44,53 +45,75 @@ class AppStorage extends AppStorageCore {
     createDirectoryIfNotExists(playlistsPath);
   }
 
+  void selectMusicFilesAndSave() async {
+    var result = await FilePicker.platform
+        .pickFiles(type: FileType.custom, allowMultiple: true, allowedExtensions: [
+      "mp3", "flac", "m4a", "wav", "aac", "ogg", "wma",
+      "mp4", "mkv", "avi", "mov", "wmv", "flv", "webm", "mpeg"
+    ]);
+    if (result != null) {
+      for (var file in result.files) {
+        var filePath = file.path;
+        if (filePath != null &&
+            File(filePath).existsSync()) {
+          createMusicAndAll(filePath);
+        }
+      }
+    }
+  }
+
   void createMusicAndAll(String filePath) async {
-    appMethodChannel.getMusicMetadata(filePath);
-    appMethodChannel.getAlbumCover(filePath);
-    // var tag;
-    // print(tag?.albumArtist);
-    // print(tag?.trackArtist);
-    // var albumExists = false;
-    // var artistExists = false;
-    // String artistId = "";
-    //       var albumId = "";
-    // artists.forEach((id, artist) {
-    //   if(artist.name.containsValue(tag?.albumArtist)) {
-    //     artistExists = true;
-    //     artistId = artist.id;
-    //
-    //     for(String id in artist.albums) {
-    //       if(appStorage.albums[id]!.name.containsValue(tag?.album)) {
-    //         albumExists = true;
-    //         albumId = id;
-    //       }
-    //     }
-    //   }
-    // });
-    //
-    // if(!artistExists) {
-    //   var artist = Artist.created(tag);
-    //   artistId = artist.id;
-    //   artists[artistId] = artist;
-    // }
-    //
-    // if(!albumExists) {
-    //   var album = Album.created(tag, artistId);
-    //   albumId = album.id;
-    //   artists[artistId]?.albums.add(albumId);
-    //   albums[albumId] = album;
-    // }
-    //
-    // var artist = artists[artistId]!;
-    // artist.save();
-    // var album = albums[albumId]!;
-    // album.save();
-    //
-    // var createdMusic = Song.created(tag: tag, artistId: artistId, albumId: albumId, file: File(filePath));
-    // createdMusic.save();
-    // appState.setMainViewState(() {
-    //   songs[createdMusic.id] = createdMusic;
-    // });
+    var metadata = await appMethodChannel.getMusicMetadata(filePath);
+    var albumCover = await appMethodChannel.getAlbumCover(filePath);
+    var albumExists = false;
+    var artistExists = false;
+    String artistId = "";
+          var albumId = "";
+    artists.forEach((id, artist) {
+      if(metadata.containsKey("artist")) {
+      if(artist.name.containsValue(metadata["artist"])) {
+        artistExists = true;
+        artistId = artist.id;
+
+        for(String id in artist.albums) {
+          if(metadata.containsKey("album")) {
+            if (appStorage.albums[id]!.name.containsValue(metadata["album"])) {
+              albumExists = true;
+              albumId = id;
+            }
+          }
+        }
+      }
+      }
+    });
+
+    if(!artistExists) {
+      var artist = Artist.created(metadata);
+      artistId = artist.id;
+      artists[artistId] = artist;
+    }
+
+    if(!albumExists) {
+      var album = Album.created(
+        metadata: metadata,
+        artistId: artistId,
+        albumCover: albumCover
+      );
+      albumId = album.id;
+      artists[artistId]?.albums.add(albumId);
+      albums[albumId] = album;
+    }
+
+    var artist = artists[artistId]!;
+    artist.save();
+    var album = albums[albumId]!;
+    album.save();
+
+    var createdMusic = Song.created(metadata: metadata, artistId: artistId, albumId: albumId, file: File(filePath));
+    createdMusic.save();
+    appState.setMainViewState(() {
+      songs[createdMusic.id] = createdMusic;
+    });
   }
 
   void initArtists() {

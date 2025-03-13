@@ -95,17 +95,7 @@ class _FloatingMenuState extends State<FloatingMenu> {
                     itemBuilder: (context) {
                       return [
                         PopupMenuItem(child: Text("Song"), onTap: () async {
-                          var result = await FilePicker.platform
-                              .pickFiles(type: FileType.any);
-                          if (result != null) {
-                            for (var file in result.files) {
-                              var filePath = file.path;
-                              if (filePath != null &&
-                                  File(filePath).existsSync()) {
-                                appStorage.createMusicAndAll(filePath);
-                              }
-                            }
-                          }
+                         appStorage.selectMusicFilesAndSave();
                         }),
                         PopupMenuItem(child: Text("Playlist"), onTap: () {
                           showDialog(context: context, builder: (context) {

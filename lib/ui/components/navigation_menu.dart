@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:amphi/models/app.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
+import 'package:music/models/app_state.dart';
 import 'package:music/models/app_theme.dart';
 
 class NavigationMenu extends StatefulWidget {
@@ -17,10 +18,26 @@ class _NavigationMenuState extends State<NavigationMenu> {
   Widget build(BuildContext context) {
 
     List<Widget> children = [
-      _MenuItem(title: "Songs", icon: Icons.music_note, onPressed: () {}),
-      _MenuItem(title: "Artists", icon: Icons.people, onPressed: () {}),
-      _MenuItem(title: "Albums", icon: Icons.album, onPressed: () {}),
-      _MenuItem(title: "Genres", icon: Icons.music_note, onPressed: () {}),
+      _MenuItem(title: "Songs", icon: Icons.music_note, onPressed: () {
+        appState.setMainViewState(() {
+          appState.fragmentIndex = 0;
+        });
+      }),
+      _MenuItem(title: "Artists", icon: Icons.people, onPressed: () {
+        appState.setMainViewState(() {
+          appState.fragmentIndex = 1;
+        });
+      }),
+      _MenuItem(title: "Albums", icon: Icons.album, onPressed: () {
+        appState.setMainViewState(() {
+          appState.fragmentIndex = 2;
+        });
+      }),
+      _MenuItem(title: "Genres", icon: Icons.music_note, onPressed: () {
+        appState.setMainViewState(() {
+          appState.fragmentIndex = 3;
+        });
+      }),
     ];
 
     if(App.isDesktop() && !appWindow.isMaximized) {
@@ -63,28 +80,33 @@ class _MenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.zero,
-          side: BorderSide.none,
-        ),
-        backgroundColor: AppTheme.transparent,
-        shadowColor: AppTheme.transparent
-      ),
-      onPressed: onPressed,
-      child: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Icon(icon),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(title, style: Theme.of(context).textTheme.bodyMedium,),
-          )
-        ],
-      ),
+    return ListTile(
+      leading: Icon(icon, color: Theme.of(context).highlightColor, size: 15,),
+      title: Text(title, style: Theme.of(context).textTheme.bodyMedium,),
+      onTap: onPressed,
     );
+    // return ElevatedButton(
+    //   style: ElevatedButton.styleFrom(
+    //     shape: RoundedRectangleBorder(
+    //       borderRadius: BorderRadius.zero,
+    //       side: BorderSide.none,
+    //     ),
+    //     backgroundColor: AppTheme.transparent,
+    //     shadowColor: AppTheme.transparent
+    //   ),
+    //   onPressed: onPressed,
+    //   child: Row(
+    //     children: [
+    //       Padding(
+    //         padding: const EdgeInsets.all(8.0),
+    //         child: Icon(icon),
+    //       ),
+    //       Padding(
+    //         padding: const EdgeInsets.all(8.0),
+    //         child: Text(title),
+    //       )
+    //     ],
+    //   ),
+    // );
   }
 }

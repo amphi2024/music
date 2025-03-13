@@ -12,7 +12,7 @@ class FloatingMenuButton extends StatelessWidget {
     return ListTile(
       leading: Icon(icon, color: Theme.of(context).highlightColor),
       title: Text(label),
-      onTap: onPressed, // Handles taps with built-in ripple
+      onTap: onPressed,
     );
   }
 }

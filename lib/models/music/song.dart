@@ -59,7 +59,7 @@ class Song {
     return files.entries.firstOrNull?.value ?? SongFile();
   }
 
-  static Song created({required dynamic tag,required String artistId, required String albumId, required File file}) {
+  static Song created({required Map metadata, required String artistId, required String albumId, required File file}) {
     var song = Song();
 
     String alphabet = randomAlphabet();
@@ -68,18 +68,19 @@ class Song {
     var directory = Directory(PathUtils.join(appStorage.songsPath , alphabet ,filename));
     directory.createSync(recursive: true);
 
-    song.title["default"] = tag?.title ?? "unknown";
+    song.title["default"] = metadata["title"];
     song.id = filename;
     song.path = directory.path;
     song.artist = artistId;
     song.album = albumId;
-    song.genre["default"] = tag?.genre ?? "unknown";
+    song.genre["default"] = metadata["genre"];
 
     var songFile = SongFile.created(path: directory.path, originalFile: file);
     song.files[songFile.id] = songFile;
 
-    var releasedYear = tag?.year;
-    if(releasedYear != null) {
+    var releasedYear = metadata["year"];
+
+    if(releasedYear != null && releasedYear is int) {
       song.released = DateTime(releasedYear);
     }
 

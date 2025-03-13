@@ -19,6 +19,28 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
   double position = 0;
 
   @override
+  void initState() {
+    playerService.player.onPlayerComplete.listen((d) {
+      playerService.playNext();
+    });
+    playerService.player.onPositionChanged.listen((e) {
+      if (e.inMilliseconds.toDouble() < length) {
+        setState(() {
+          position = e.inMilliseconds.toDouble();
+        });
+      } else {
+        playerService.player.getDuration().then((_duration) {
+          setState(() {
+            length = _duration?.inMilliseconds.toDouble() ?? 0;
+          });
+        });
+      }
+    });
+    super.initState();
+  }
+
+
+  @override
   Widget build(BuildContext context) {
     return Positioned(
       left: 200,
@@ -62,11 +84,8 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
                 ],
               ),
               Expanded(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minWidth: 100,
-                    maxWidth: 200
-                  ),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 50, right: 50),
                   child: DesktopPlayControls(
                     length: length,
                     position: position,

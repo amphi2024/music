@@ -54,8 +54,8 @@ class _MyAppState extends State<MyApp> {
       if(App.isDesktop()) {
         doWhenWindowReady(() {
           final win = appWindow;
-          const initialSize = Size(600, 450);
-          win.minSize = Size(450, 300);
+          const initialSize = Size(800, 450);
+          win.minSize = Size(500, 300);
           win.size = initialSize;
           win.alignment = Alignment.center;
           win.title = "";
@@ -84,7 +84,7 @@ class _MyAppState extends State<MyApp> {
     else {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
-        locale: Locale("en"),
+        locale: appSettings.locale,
         localizationsDelegates: const [
           LocalizationDelegate(),
           GlobalMaterialLocalizations.delegate,

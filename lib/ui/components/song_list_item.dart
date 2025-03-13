@@ -29,7 +29,7 @@ class SongListItem extends StatelessWidget {
           height: 55,
           child: Stack(
             children: [
-              AnimatedOpacity(opacity: 1,
+              AnimatedOpacity(opacity: appState.selectedSongs != null ? 1 : 0,
                   curve: Curves.easeOutQuint, duration: Duration(milliseconds: 1000), child: Checkbox(value: appState.selectedSongs?.contains(song.id) ?? false, onChanged: (value) {
                     if(appState.selectedSongs?.contains(song.id) == true) {
                       appState.setMainViewState(() {

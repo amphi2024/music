@@ -27,6 +27,11 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             IconButton(
+                icon: Icon(Icons.shuffle, size: 20),
+                onPressed: () {
+                  playerService.playPrevious();
+                }),
+            IconButton(
                 icon: Icon(Icons.fast_rewind, size: 20),
                 onPressed: () {
                   playerService.playPrevious();
@@ -48,7 +53,12 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
                 ),
                 onPressed: () {
                   playerService.playNext();
-                })
+                }),
+            IconButton(
+                icon: Icon(Icons.loop, size: 20),
+                onPressed: () {
+                  playerService.playPrevious();
+                }),
           ],
         ),
         Row(

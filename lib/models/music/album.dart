@@ -36,7 +36,7 @@ class Album {
   late String id;
   late String path;
 
-  static Album created(dynamic tag, String artistId) {
+  static Album created({required Map metadata, required String artistId, required List<int> albumCover}) {
     var album = Album();
     String alphabet = randomAlphabet();
     var filename = FilenameUtils.generatedDirectoryNameWithChar(appStorage.albumsPath, alphabet);
@@ -48,16 +48,14 @@ class Album {
     album.path = directory.path;
     album.id = filename;
 
-    album.name["default"] = tag?.album ?? "";
-    album.genre["default"] = tag?.genre ?? "";
+    album.name["default"] = metadata["album"];
+    album.genre["default"] = metadata["genre"];
     album.artist = artistId;
 
-    var cover = tag?.pictures.firstOrNull;
-
-    if(cover != null) {
+    if(albumCover.isNotEmpty) {
       var coverFilename = FilenameUtils.generatedFileName(".jpg", PathUtils.join(album.path, "covers"));
       var coverFile = File(PathUtils.join(album.path, "covers", coverFilename));
-      coverFile.writeAsBytes(tag!.pictures.first.bytes);
+      coverFile.writeAsBytes(albumCover);
       album.covers.add(coverFile.path);
     }
 
