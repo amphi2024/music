@@ -92,8 +92,9 @@ class Song {
     song.path = directory.path;
     song.id = PathUtils.basename(directory.path);
     var infoFile = File(PathUtils.join(song.path, "info.json"));
-    song.data = jsonDecode(infoFile.readAsStringSync());
-
+    if(infoFile.existsSync()) {
+      song.data = jsonDecode(infoFile.readAsStringSync());
+    }
     for(var file in directory.listSync()) {
       var nameOnly = FilenameUtils.nameOnly(PathUtils.basename(file.path));
       if(nameOnly != "info") {

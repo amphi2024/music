@@ -42,8 +42,9 @@ class AppMethodChannel extends MethodChannel {
   }
 
   Future<List<int>> getAlbumCover(String filePath) async {
+    if(!Platform.isWindows) {
     var result = await invokeMethod("get_album_cover", {"path": filePath});
-    if(result is List) {
+    if(result is List && result.length > 4) {
       return result.map((e) {
         if(e is int) {
          return e;
@@ -52,6 +53,10 @@ class AppMethodChannel extends MethodChannel {
           return 0;
         }
       }).toList();
+    }
+    else {
+      return [];
+    }
     }
     else {
       return [];
