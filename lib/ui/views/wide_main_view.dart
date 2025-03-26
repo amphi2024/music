@@ -48,9 +48,7 @@ class _WideMainViewState extends State<WideMainView> {
 
   @override
   void initState() {
-    appState.setMainViewState = (fun) {
-      setState(fun);
-    };
+    appState.setMainViewState = setState;
     super.initState();
   }
 
@@ -59,6 +57,12 @@ class _WideMainViewState extends State<WideMainView> {
     return Scaffold(
       body: Stack(
         children: [
+          AnimatedPositioned(
+              left: 200,
+              top: 0,
+              bottom: 80,
+              right: 0,
+              duration: Duration(milliseconds: 1000), curve: Curves.easeOutQuint, child: fragments[appState.fragmentIndex]),
           Positioned(
             top: 0,
             left: 200,
@@ -67,10 +71,10 @@ class _WideMainViewState extends State<WideMainView> {
               height: 50,
               child: Row(
                 children: [
-                  FragmentTitle(title: titles[appState.fragmentIndex],),
-                  Expanded(
-                      child: MoveWindow()
-                  ),
+                  Expanded(child: MoveWindow(child: FragmentTitle(title: titles[appState.fragmentIndex],))),
+                  // Expanded(
+                  //     child: MoveWindow()
+                  // ),
                   AccountButton(),
                   PopupMenuButton(icon: Icon(Icons.add_circle_outline),
                       itemBuilder: (context) {
@@ -105,12 +109,6 @@ class _WideMainViewState extends State<WideMainView> {
           ),
           DesktopPlayingBar(),
           NavigationMenu(),
-          AnimatedPositioned(
-              left: 200,
-              top: 50,
-              bottom: 80,
-              right: 0,
-              duration: Duration(milliseconds: 1000), curve: Curves.easeOutQuint, child: fragments[appState.fragmentIndex])
         ],
       ),
     );

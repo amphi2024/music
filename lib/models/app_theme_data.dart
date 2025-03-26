@@ -31,6 +31,9 @@ class AppThemeData {
   });
 
   ThemeData themeData({required Brightness brightness, required BuildContext context}) {
+
+    var isWideScreen = App.isWideScreen(context);
+
     return ThemeData(
       brightness: brightness,
       inputDecorationTheme: InputDecorationTheme(
@@ -52,7 +55,6 @@ class AppThemeData {
                   color: textColor,
                   fontSize: 20,
                   fontWeight: FontWeight.bold))),
-      dialogBackgroundColor: backgroundColor,
       // scrollbarTheme: ScrollbarThemeData(
       //   trackColor: WidgetStateColor.transparent,
       //   thumbColor: WidgetStatePropertyAll(
@@ -146,7 +148,10 @@ class AppThemeData {
         bodyMedium: TextStyle(
             color: textColor, fontSize: 15, overflow: TextOverflow.ellipsis),
         titleMedium: TextStyle(
-            color: textColor, fontSize: 15, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.bold)
+            color: textColor, fontSize: 15, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.bold),
+        headlineMedium: TextStyle(
+            color: textColor, fontSize: isWideScreen ? 20 : 25, overflow: TextOverflow.ellipsis
+        )
       ),
       dialogTheme: DialogTheme(
           shape: RoundedRectangleBorder(

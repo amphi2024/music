@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:music/models/music/song.dart';
 
 final appMethodChannel = AppMethodChannel.getInstance();
 
@@ -8,6 +9,12 @@ class AppMethodChannel extends MethodChannel {
   AppMethodChannel._internal(super.name) {
     setMethodCallHandler((call) async {
       switch (call.method) {
+        case "apply_playback_position":
+          break;
+        case "play_previous":
+          break;
+        case "play_next":
+          break;
         default:
           break;
       }
@@ -71,4 +78,14 @@ class AppMethodChannel extends MethodChannel {
   void configureNeedsBottomPadding() async {
     needsBottomPadding = await invokeMethod("configure_needs_bottom_padding");
   }
+
+  void resumeMusic(Song song) async {
+    await invokeMethod("resume_music", {
+      "path": song.playingFile(),
+    });
+  }
+
+  // void resumeMusic() async {
+  //   await invokeMethod("resume_music");
+  // }
 }

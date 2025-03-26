@@ -180,7 +180,7 @@ class _AccountInfoState extends State<AccountInfo> {
                         (Route<dynamic> route) => route.isFirst,
                       );
                       appStorage.removeUser(() {
-                        appStorage.saveSelectedUser(unselectedUsers[0]);
+                        //appStorage.saveSelectedUser(unselectedUsers[0]);
                         appStorage.users.remove(appStorage.selectedUser);
                         appStorage.selectedUser = unselectedUsers[0];
 
@@ -219,7 +219,7 @@ class _AccountInfoState extends State<AccountInfo> {
                                 context,
                                 (Route<dynamic> route) => route.isFirst,
                               );
-                              await appStorage.saveSelectedUser(unselectedUsers[index]);
+                           //   await appStorage.saveSelectedUser(unselectedUsers[index]);
                               appStorage.selectedUser = unselectedUsers[index];
                               appStorage.initPaths();
                               appSettings.getData();
@@ -243,7 +243,7 @@ class _AccountInfoState extends State<AccountInfo> {
                                     context,
                                     (Route<dynamic> route) => route.isFirst,
                                   );
-                                  await appStorage.saveSelectedUser(user);
+                               //   await appStorage.saveSelectedUser(user);
                                   appStorage.selectedUser = user;
                                   appStorage.users.add(user);
                                   appStorage.initPaths();

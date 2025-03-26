@@ -3,8 +3,12 @@ import 'dart:io';
 import 'package:amphi/models/app.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
+import 'package:music/models/app_cache.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/app_theme.dart';
+
+import '../../models/app_storage.dart';
+import '../../models/music/playlist.dart';
 
 class NavigationMenu extends StatefulWidget {
   const NavigationMenu({super.key});
@@ -14,37 +18,124 @@ class NavigationMenu extends StatefulWidget {
 }
 
 class _NavigationMenuState extends State<NavigationMenu> {
+
+  void saveWindowSize() {
+    appCacheData.windowHeight = appWindow.size.height;
+    appCacheData.windowWidth = appWindow.size.width;
+    appCacheData.save();
+  }
+
   @override
   Widget build(BuildContext context) {
-
+    //Color borderColor = Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.2);
     List<Widget> children = [
+      //_MenuDivider(title: "Library"),
+      // Padding(
+      //   padding: const EdgeInsets.all(8.0),
+      //   child: SizedBox(
+      //     height: 30,
+      //     child: TextField(
+      //       style: TextStyle(
+      //         fontSize: 12.5
+      //       ),
+      //       decoration: InputDecoration(
+      //         prefixIcon: Icon(
+      //           Icons.search,
+      //           size: 15,
+      //           color: borderColor.withValues(alpha: 0.2),
+      //         ),
+      //         contentPadding: EdgeInsets.only(left: 5, right: 5),
+      //         enabledBorder: OutlineInputBorder(
+      //           borderRadius: BorderRadius.circular(5),
+      //           borderSide: BorderSide(
+      //               color: borderColor,
+      //               style: BorderStyle.solid,
+      //               width: 1),
+      //         ),
+      //         border: OutlineInputBorder(
+      //           borderRadius: BorderRadius.circular(5),
+      //           borderSide: BorderSide(
+      //               color: borderColor,
+      //               style: BorderStyle.solid,
+      //               width: 1),
+      //         ),
+      //         focusedBorder: OutlineInputBorder(
+      //           borderRadius: BorderRadius.circular(5),
+      //           borderSide: BorderSide(
+      //               color: Theme.of(context).colorScheme.primary,
+      //               style: BorderStyle.solid,
+      //               width: 2),
+      //         ),
+      //       ),
+      //     ),
+      //   ),
+      // ),
       _MenuItem(title: "Songs", icon: Icons.music_note, onPressed: () {
         appState.setMainViewState(() {
           appState.fragmentIndex = 0;
         });
+        if(App.isDesktop()) {
+          saveWindowSize();
+        }
       }),
       _MenuItem(title: "Artists", icon: Icons.people, onPressed: () {
         appState.setMainViewState(() {
           appState.fragmentIndex = 1;
         });
+        if(App.isDesktop()) {
+          saveWindowSize();
+        }
       }),
       _MenuItem(title: "Albums", icon: Icons.album, onPressed: () {
         appState.setMainViewState(() {
           appState.fragmentIndex = 2;
         });
+        if(App.isDesktop()) {
+          saveWindowSize();
+        }
       }),
       _MenuItem(title: "Genres", icon: Icons.music_note, onPressed: () {
         appState.setMainViewState(() {
           appState.fragmentIndex = 3;
         });
+        if(App.isDesktop()) {
+          saveWindowSize();
+        }
       }),
     ];
 
     if(App.isDesktop() && !appWindow.isMaximized) {
       children.insert(0, SizedBox(
-        height: 30,
-        child: MoveWindow(),
+        height: 50,
+        child: Row(
+          children: [
+            Expanded(child: MoveWindow()),
+            // IconButton(onPressed: () {
+            //
+            // }, icon: Icon(Icons.refresh))
+          ],
+        ),
       ));
+    }
+
+    //children.add(_MenuDivider(title: "Playlists"));
+
+    List<Playlist> playlists = [];
+    appStorage.playlists.forEach((id, playlist) {
+      if(id != "") {
+        playlists.add(playlist);
+      }
+    });
+
+    for(var playlist in playlists) {
+      children.add(_MenuItem(title: playlist.title, icon: Icons.playlist_play, onPressed: () {
+        appState.setMainViewState(() {
+          appState.fragmentIndex = 3;
+        });
+        if(App.isDesktop()) {
+          saveWindowSize();
+        }
+      }));
     }
 
     return Positioned(
@@ -58,7 +149,6 @@ class _NavigationMenuState extends State<NavigationMenu> {
             border: Border(
               right: BorderSide(
                 color: Theme.of(context).shadowColor,
-                //color: Color.fromRGBO(240, 240, 240, 1),
                 width: 1
               )
             )
@@ -110,3 +200,31 @@ class _MenuItem extends StatelessWidget {
     // );
   }
 }
+
+class _MenuDivider extends StatelessWidget {
+
+  final String title;
+  const _MenuDivider({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(child: Divider(
+            color: Theme.of(context).dividerColor,
+          )),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0, right: 8),
+            child: Text(title),
+          ),
+          Expanded(child: Divider(
+            color: Theme.of(context).dividerColor,
+          )),
+        ],
+      ),
+    );
+  }
+}
+

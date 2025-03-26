@@ -1,15 +1,32 @@
 package com.amphi.music
 
+import android.content.Intent
 import io.flutter.embedding.android.FlutterActivity
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.WindowManager
+import com.amphi.music.NavigationBar.setNavigationBarColor
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import org.json.JSONObject
 
 class MainActivity: FlutterActivity() {
+
+    override fun onStart() {
+        super.onStart()
+
+        val serviceIntent = Intent(this, MusicService::class.java)
+        startService(serviceIntent)
+    }
+
+    override fun onStop() {
+        super.onStop()
+
+        val serviceIntent = Intent(this, MusicService::class.java)
+        stopService(serviceIntent)
+    }
+
     override fun onResume() {
         super.onResume()
         setNavigationBarColor(
@@ -71,11 +88,11 @@ class MainActivity: FlutterActivity() {
                 }
 
                 "get_music_metadata" -> {
-                    result.success(call.argument<String>("path")?.let { musicMetadata(filePath = it) })
+                    result.success(call.argument<String>("path")?.let { MusicMetaDataUtils.musicMetadata(filePath = it) })
                 }
 
                 "get_album_cover" -> {
-                    result.success(call.argument<String>("path")?.let { albumArt(filePath = it) })
+                    result.success(call.argument<String>("path")?.let { MusicMetaDataUtils.albumArt(filePath = it) })
                 }
 
                 else -> result.notImplemented()

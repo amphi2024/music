@@ -18,7 +18,6 @@ import 'ui/components/playing/playing_bar.dart';
 
 void main() {
   runApp(const MyApp());
-
 }
 
 class MyApp extends StatefulWidget {

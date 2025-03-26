@@ -8,6 +8,11 @@ class FragmentTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    var themeData = Theme.of(context);
+    var textTheme = themeData.textTheme;
+    double scaleValue = (textTheme.bodyMedium?.fontSize ?? 15) / ( textTheme.headlineMedium?.fontSize ?? 20);
+
     return Container(
       height: 60,
       decoration: BoxDecoration(
@@ -21,7 +26,11 @@ class FragmentTitle extends StatelessWidget {
               alignment: appState.fragmentTitleMinimized ? Alignment.center : Alignment.centerLeft,
               curve: Curves.easeOutQuint,
               duration: const Duration(milliseconds: 750),
-              child: appState.selectedSongs == null ? Text(title, style: Theme.of(context).textTheme.headlineMedium) : IconButton(onPressed: () {
+              child: appState.selectedSongs == null ? AnimatedScale(
+                scale: appState.fragmentTitleMinimized ? scaleValue : 1,
+                  curve: Curves.easeOutQuint,
+                  duration: const Duration(milliseconds: 750),
+                  child: Text(title, style: Theme.of(context).textTheme.headlineMedium)) : IconButton(onPressed: () {
                 appState.setMainViewState(() {
                  appState.selectedSongs = null;
                 });
