@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
 import 'package:music/models/app_storage.dart';
-import 'package:music/models/music/album.dart';
 import 'package:music/utils/random_alphabet.dart';
 
 class Artist {

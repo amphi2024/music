@@ -3,8 +3,7 @@ abstract class DurationConverter {
     return timeUnit.toString().padLeft(2, '0');
   }
 
-  static String convertedDuration(double d) {
-    int totalMilliseconds = d.toInt();
+  static String convertedDuration(int totalMilliseconds) {
     int hours = totalMilliseconds ~/ (3600 * 1000);
     int remainingMinutesAndSeconds = totalMilliseconds % (3600 * 1000);
     int minutes = remainingMinutesAndSeconds ~/ (60 * 1000);

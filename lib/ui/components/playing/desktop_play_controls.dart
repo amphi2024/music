@@ -1,21 +1,41 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 
+import '../../../channels/app_method_channel.dart';
 import '../../../models/player_service.dart';
 import '../../../utils/duration_converter.dart';
 
 class DesktopPlayControls extends StatefulWidget {
 
   final void Function(void Function()) setState;
-  final double length;
-  final double position;
-  const DesktopPlayControls({super.key, required this.setState, required this.length, required this.position});
+  const DesktopPlayControls({super.key, required this.setState});
 
   @override
   State<DesktopPlayControls> createState() => _DesktopPlayControlsState();
 }
 
 class _DesktopPlayControlsState extends State<DesktopPlayControls> {
+
+  bool changingPosition = false;
+
+  void playbackListener(int position) {
+    if(!changingPosition) {
+      setState(() {
+
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    appMethodChannel.playbackListeners.remove(playbackListener);
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    appMethodChannel.playbackListeners.add(playbackListener);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,13 +58,27 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
                 }),
             IconButton(
                 icon: Icon(
-                    playerService.player.state ==
-                        PlayerState.playing
+                    playerService.isPlaying
                         ? Icons.pause
                         : Icons.play_arrow,
                     size: 30),
                 onPressed: () {
-                  playerService.togglePlay();
+                  if(playerService.isPlaying) {
+                    appMethodChannel.pauseMusic();
+                    if(mounted) {
+                      setState(() {
+                        playerService.isPlaying = false;
+                      });
+                    }
+                  }
+                  else {
+                    appMethodChannel.resumeMusic();
+                    if(mounted) {
+                      setState(() {
+                        playerService.isPlaying = true;
+                      });
+                    }
+                  }
                 }),
             IconButton(
                 icon: Icon(
@@ -66,25 +100,32 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              DurationConverter.convertedDuration(widget.position),
+              DurationConverter.convertedDuration(playerService.playbackPosition),
             ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Slider(
                     min: 0,
-                    max: widget.length,
-                    value: widget.position,
+                    max: playerService.musicDuration.toDouble(),
+                    value: playerService.playbackPosition.toDouble(),
+                    onChangeStart: (d) {
+                      changingPosition = true;
+                    },
                     onChanged: (d) {
                       setState(() {
-                        playerService.player.seek(
-                            Duration(milliseconds: d.toInt()));
+                        playerService.playbackPosition = d.toInt();
                       });
-                    }),
+                    },
+                  onChangeEnd: (d) {
+                    appMethodChannel.applyPlaybackPosition(d.toInt());
+                    changingPosition = false;
+                  },
+                    ),
               ),
             ),
             Text(
-              DurationConverter.convertedDuration(widget.length),
+              DurationConverter.convertedDuration(playerService.musicDuration),
             ),
           ],
         )

@@ -1,4 +1,3 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/lyrics_editing_controller.dart';
 import 'package:music/models/music/lyrics.dart';
@@ -14,41 +13,6 @@ class LyricsEditor extends StatefulWidget {
 
 class _LyricsEditorState extends State<LyricsEditor> {
 
-  AudioPlayer? audioPlayer;
-  double position = 0;
-  double duration = 0;
-
-  Future<void> initAudioPlayer() async {
-    audioPlayer = AudioPlayer();
-    await audioPlayer?.setSource(DeviceFileSource(
-        widget.lyricsEditingController.songFilePath
-    ));
-    var d = await audioPlayer?.getDuration();
-    setState(() {
-      duration = d?.inMilliseconds.toDouble() ?? 0;
-    });
-    audioPlayer?.onPositionChanged.listen((value) {
-      var p = value.inMilliseconds.toDouble();
-      if(p < duration) {
-        setState(() {
-          position = p;
-        });
-      }
-    });
-  }
-
-  Future<void> togglePlay() async {
-    if(audioPlayer?.state == PlayerState.playing) {
-      await audioPlayer?.pause();
-    }
-    else {
-      await audioPlayer?.resume();
-    }
-    setState(() {
-
-    });
-  }
-
   @override
   void dispose() {
     widget.lyricsEditingController.lyrics.disposeTextControllers();
@@ -57,9 +21,6 @@ class _LyricsEditorState extends State<LyricsEditor> {
 
   @override
   void initState() {
-    if(!widget.lyricsEditingController.readOnly) {
-      initAudioPlayer();
-    }
     super.initState();
   }
 
@@ -99,10 +60,6 @@ class _LyricsEditorState extends State<LyricsEditor> {
               itemCount: lyrics.data.get("default").length,
               itemBuilder: (context, index) {
                 var lyricLine = lyrics.data.get("default")[index];
-                var focusing = false;
-                if(lyricLine.startsAt <= position && lyricLine.endsAt >= position) {
-                  focusing = true;
-                }
             return Column(
               key: Key(index.toString()),
               children: [
@@ -116,10 +73,6 @@ class _LyricsEditorState extends State<LyricsEditor> {
                           onChanged: (text) {
                             lyricLine.text = text;
                           },
-                          style: TextStyle(
-                              color: focusing ? Theme.of(context).highlightColor : null,
-                            fontWeight: focusing ? FontWeight.bold : null
-                          ),
                           decoration: InputDecoration(
                             hintText: "Lyrics"
                           ),
@@ -167,27 +120,6 @@ class _LyricsEditorState extends State<LyricsEditor> {
             );
           }),
         ),
-        Visibility(
-          visible: !readOnly,
-          child: Slider(value: position, max: duration, min: 0, onChanged: (value) {
-            audioPlayer?.seek(Duration(milliseconds: value.toInt()));
-          }),
-        ),
-        Visibility(
-          visible: !readOnly,
-          child: IconButton(onPressed: () {
-            togglePlay();
-          }, icon: Icon(audioPlayer?.state == PlayerState.playing ? Icons.pause : Icons.play_arrow)),
-        ),
-        Visibility(
-          visible: !readOnly,
-          child: IconButton(onPressed: () {
-            setState(() {
-             lyrics.data.get("default").add(LyricLine());
-            });
-          }, icon: Icon(Icons.add_circle_outline)),
-        ),
-
       ],
     );
   }

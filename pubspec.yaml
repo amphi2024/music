@@ -37,7 +37,6 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   bitsdojo_window:
-  audioplayers:
   file_picker:
   path_provider:
   flutter_staggered_grid_view:

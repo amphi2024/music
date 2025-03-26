@@ -1,17 +1,13 @@
 import 'package:amphi/models/app.dart';
 import 'package:flutter/material.dart';
 import 'package:amphi/widgets/profile_image.dart';
-import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
-import 'package:music/models/app_theme.dart';
-import 'package:music/utils/simple_shadow.dart';
 
 import '../../../channels/app_method_channel.dart';
 import '../../../channels/app_web_channel.dart';
 import '../../../models/app_settings.dart';
 import '../account_info/account_bottom_sheet.dart';
 import '../account_info/account_info.dart';
-import '../animated_profile_image.dart';
 class AccountButton extends StatelessWidget {
   
   const AccountButton({super.key});

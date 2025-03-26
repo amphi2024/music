@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 import '../../../channels/app_method_channel.dart';
 import '../../../channels/app_web_channel.dart';
 import '../../../models/app_settings.dart';
-import '../../../models/app_state.dart';
 import '../../../models/app_storage.dart';
 import '../../dialogs/login_view_dialog.dart';
 import '../../views/login_view.dart';

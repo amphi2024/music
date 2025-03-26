@@ -14,7 +14,6 @@ import 'package:music/ui/views/wide_main_view.dart';
 
 import 'channels/app_method_channel.dart';
 import 'channels/app_web_channel.dart';
-import 'ui/components/playing/playing_bar.dart';
 
 void main() {
   runApp(const MyApp());

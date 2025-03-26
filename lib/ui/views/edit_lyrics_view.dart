@@ -1,4 +1,3 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/lyrics_editing_controller.dart';
 import 'package:music/ui/components/lyrics_editor.dart';

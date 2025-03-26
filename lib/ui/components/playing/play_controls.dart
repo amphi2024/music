@@ -1,16 +1,37 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/utils/duration_converter.dart';
 
+import '../../../channels/app_method_channel.dart';
 import '../../../models/player_service.dart';
 
-class PlayControls extends StatelessWidget {
+class PlayControls extends StatefulWidget {
 
-  final void Function(void Function()) setState;
-  final double length;
-  final double position;
-  const PlayControls({super.key, required this.setState, required this.length, required this.position});
+  const PlayControls({super.key});
+
+  @override
+  State<PlayControls> createState() => _PlayControlsState();
+}
+
+class _PlayControlsState extends State<PlayControls> {
+
+  void playbackListener(position) {
+    setState(() {
+
+    });
+  }
+
+  @override
+  void dispose() {
+    appMethodChannel.playbackListeners.remove(playbackListener);
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    appMethodChannel.playbackListeners.add(playbackListener);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,25 +75,27 @@ class PlayControls extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 8, bottom: 8),
                 child: Slider(
                     min: 0,
-                    max: length,
-                    value: position,
-                    onChanged: (d) {
-                      setState(() {
-                        playerService.player.seek(
-                            Duration(milliseconds: d.toInt()));
-                      });
-                    }),
+                    max: playerService.musicDuration.toDouble(),
+                    value: playerService.playbackPosition.toDouble(),
+                  onChanged: (d) {
+                    setState(() {
+                      playerService.playbackPosition = d.toInt();
+                    });
+                  },
+                  onChangeEnd: (d) {
+                    appMethodChannel.applyPlaybackPosition(d.toInt());
+                  },),
               ),
               Row(
                 mainAxisAlignment:
                 MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    DurationConverter.convertedDuration(position),
+                    DurationConverter.convertedDuration(playerService.playbackPosition),
                     style: textTheme.bodyMedium,
                   ),
                   Text(
-                    DurationConverter.convertedDuration(length),
+                    DurationConverter.convertedDuration(playerService.musicDuration),
                     style: textTheme.bodyMedium,
                   )
                 ],
@@ -93,13 +116,27 @@ class PlayControls extends StatelessWidget {
                   }),
               IconButton(
                   icon: Icon(
-                      playerService.player.state ==
-                          PlayerState.playing
+                      playerService.isPlaying
                           ? Icons.pause
                           : Icons.play_arrow,
                       size: 60),
-                  onPressed: () {
-                    playerService.togglePlay();
+                  onPressed: ()  {
+                    if(playerService.isPlaying) {
+                      appMethodChannel.pauseMusic();
+                      if(mounted) {
+                        setState(() {
+                          playerService.isPlaying = false;
+                        });
+                      }
+                    }
+                    else {
+                       appMethodChannel.resumeMusic();
+                      if(mounted) {
+                        setState(() {
+                          playerService.isPlaying = true;
+                        });
+                      }
+                    }
                   }),
               IconButton(
                   icon: Icon(

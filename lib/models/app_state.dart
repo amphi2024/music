@@ -1,4 +1,3 @@
-import 'package:music/models/music/song.dart';
 
 final appState = AppState.getInstance();
 

@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:music/ui/components/lyrics_editor.dart';
 
 import 'lyrics/lrc.dart';
 import 'lyrics/lrc_line.dart';

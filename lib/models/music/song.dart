@@ -3,10 +3,8 @@ import 'dart:io';
 
 import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/music/song_file.dart';
-import 'package:music/ui/components/album_cover.dart';
 
 import '../../utils/random_alphabet.dart';
 import '../app_storage.dart';

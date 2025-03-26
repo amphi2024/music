@@ -66,7 +66,6 @@ class _MainViewState extends State<MainView> {
     ];
 
      List<Song> songList = [];
-     List<Widget> children = [];
      appStorage.songs.forEach((key, music) {
        songList.add(music);
      });

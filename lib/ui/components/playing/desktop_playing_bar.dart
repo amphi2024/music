@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
 import 'package:music/ui/components/album_cover.dart';
-import 'package:music/ui/components/playing/play_controls.dart';
 
 import 'desktop_play_controls.dart';
 
@@ -14,31 +13,6 @@ class DesktopPlayingBar extends StatefulWidget {
 }
 
 class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
-
-  double length = 10;
-  double position = 0;
-
-  @override
-  void initState() {
-    playerService.player.onPlayerComplete.listen((d) {
-      playerService.playNext();
-    });
-    playerService.player.onPositionChanged.listen((e) {
-      if (e.inMilliseconds.toDouble() < length) {
-        setState(() {
-          position = e.inMilliseconds.toDouble();
-        });
-      } else {
-        playerService.player.getDuration().then((_duration) {
-          setState(() {
-            length = _duration?.inMilliseconds.toDouble() ?? 0;
-          });
-        });
-      }
-    });
-    super.initState();
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -87,8 +61,6 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
                 child: Padding(
                   padding: const EdgeInsets.only(left: 50, right: 50),
                   child: DesktopPlayControls(
-                    length: length,
-                    position: position,
                     setState: setState,
                   ),
                 ),

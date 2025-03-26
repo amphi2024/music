@@ -1,8 +1,4 @@
-import 'package:audioplayers/audioplayers.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:music/models/app_settings.dart';
-import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
 import 'package:music/ui/components/album_cover.dart';
@@ -11,6 +7,7 @@ import 'package:music/ui/components/playing/playing_lyrics.dart';
 import 'package:music/ui/components/playing/playing_queue.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../../channels/app_method_channel.dart';
 import '../../../models/app_state.dart';
 
 class PlayingBar extends StatefulWidget {
@@ -21,8 +18,7 @@ class PlayingBar extends StatefulWidget {
 }
 
 class _PlayingBarState extends State<PlayingBar> {
-  double length = 10;
-  double position = 0;
+
   PageController pageController = PageController(initialPage: 1);
 
   @override
@@ -32,31 +28,10 @@ class _PlayingBarState extends State<PlayingBar> {
   }
 
   @override
-  void initState() {
-    playerService.player.onPlayerComplete.listen((d) {
-      playerService.playNext();
-    });
-    playerService.player.onPositionChanged.listen((e) {
-      if (e.inMilliseconds.toDouble() < length) {
-        setState(() {
-          position = e.inMilliseconds.toDouble();
-        });
-      } else {
-        playerService.player.getDuration().then((_duration) {
-          setState(() {
-            length = _duration?.inMilliseconds.toDouble() ?? 0;
-          });
-        });
-      }
-    });
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    var themeData = Theme.of(context);
-    var textTheme = themeData.textTheme;
+    //var themeData = Theme.of(context);
+   // var textTheme = themeData.textTheme;
 
     return AnimatedPositioned(
         left: appState.playingBarExpanded ? 0 : 15,
@@ -166,12 +141,26 @@ class _PlayingBarState extends State<PlayingBar> {
                               ),
                             ),
                             IconButton(
-                                icon: Icon(playerService.player.state ==
-                                        PlayerState.playing
+                                icon: Icon(playerService.isPlaying
                                     ? Icons.pause
                                     : Icons.play_arrow),
                                 onPressed: () {
-                                  playerService.togglePlay();
+                                  if(playerService.isPlaying) {
+                                    appMethodChannel.pauseMusic();
+                                    if(mounted) {
+                                      setState(() {
+                                        playerService.isPlaying = false;
+                                      });
+                                    }
+                                  }
+                                  else {
+                                    appMethodChannel.resumeMusic();
+                                    if(mounted) {
+                                      setState(() {
+                                        playerService.isPlaying = true;
+                                      });
+                                    }
+                                  }
                                 })
                           ],
                         ),
@@ -215,7 +204,7 @@ class _PlayingBarState extends State<PlayingBar> {
                                       child: PlayingLyrics(),
                                     ),
                                     Padding(padding: const EdgeInsets.only(left: 30, right: 30),
-                                      child: PlayControls(setState: setState, length: length, position: position),
+                                      child: PlayControls(),
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(

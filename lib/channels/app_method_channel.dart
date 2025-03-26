@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:music/models/app_settings.dart';
 import 'package:music/models/music/song.dart';
+import 'package:music/models/player_service.dart';
 
 final appMethodChannel = AppMethodChannel.getInstance();
 
@@ -9,24 +11,32 @@ class AppMethodChannel extends MethodChannel {
   AppMethodChannel._internal(super.name) {
     setMethodCallHandler((call) async {
       switch (call.method) {
-        case "apply_playback_position":
+        case "on_playback_changed":
+          playerService.playbackPosition = call.arguments["position"];
+          if(playerService.playbackPosition < playerService.musicDuration) {
+            for (var fun in playbackListeners) {
+              fun(playerService.playbackPosition);
+            }
+          }
+          else {
+            playerService.musicDuration = await appMethodChannel.getMusicDuration();
+          }
           break;
         case "play_previous":
+          playerService.playPrevious();
           break;
         case "play_next":
+          playerService.playNext();
           break;
         default:
           break;
-      }
-      for(Function function in listeners) {
-        function(call);
       }
     });
   }
 
   static AppMethodChannel getInstance() => _instance;
 
-  List<Function> listeners = [];
+  List<void Function(int)> playbackListeners = [];
 
   int systemVersion = 0;
   bool needsBottomPadding = false;
@@ -72,7 +82,7 @@ class AppMethodChannel extends MethodChannel {
 
   void setNavigationBarColor(Color color, bool iosLikeUi) {
     if(Platform.isAndroid) {
-      invokeMethod("set_navigation_bar_color", {"color": color.value, "ios_like_ui": iosLikeUi});
+      invokeMethod("set_navigation_bar_color", {"color": color.value, "transparent_navigation_bar": appSettings.transparentNavigationBar});
     }
   }
 
@@ -84,13 +94,33 @@ class AppMethodChannel extends MethodChannel {
     needsBottomPadding = await invokeMethod("configure_needs_bottom_padding");
   }
 
-  void resumeMusic(Song song) async {
-    await invokeMethod("resume_music", {
-      "path": song.playingFile(),
+  Future<void> resumeMusic() async {
+    await invokeMethod("resume_music");
+  }
+
+  Future<void> pauseMusic() async {
+    await invokeMethod("pause_music");
+  }
+
+  Future<bool> isMusicPlaying() async {
+    return await invokeMethod("is_music_playing");
+  }
+
+  Future<void> setMediaSource(Song song, {bool playNow = true}) async {
+    await invokeMethod("set_media_source", {
+      "path": song.songFilePath(),
+      "play_now": playNow
     });
   }
 
-  // void resumeMusic() async {
-  //   await invokeMethod("resume_music");
-  // }
+  Future<void> applyPlaybackPosition(int position) async {
+    await invokeMethod("apply_playback_position", {
+      "position": position
+    });
+  }
+
+  Future<int> getMusicDuration() async {
+    print(await invokeMethod("get_music_duration"));
+    return await invokeMethod("get_music_duration");
+  }
 }

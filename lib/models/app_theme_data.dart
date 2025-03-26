@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:amphi/models/app.dart';
 
-import 'app_settings.dart';
 import 'app_theme.dart';
 class AppThemeData {
   Color backgroundColor;

@@ -1,10 +1,8 @@
-import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:music/models/app_state.dart';
-import 'package:music/models/music/lyrics.dart';
-import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
+
+import '../../../channels/app_method_channel.dart';
 
 class PlayingLyrics extends StatefulWidget {
   const PlayingLyrics({super.key});
@@ -15,18 +13,24 @@ class PlayingLyrics extends StatefulWidget {
 
 class _PlayingLyricsState extends State<PlayingLyrics> {
 
-  int position = -1;
+  void playbackListener(int position) {
+
+      setState(() {
+
+      });
+
+  }
+
+  @override
+  void dispose() {
+    appMethodChannel.playbackListeners.remove(playbackListener);
+    super.dispose();
+  }
 
   @override
   void initState() {
+    appMethodChannel.playbackListeners.add(playbackListener);
     super.initState();
-    playerService.player.onPositionChanged.listen((duration) {
-      if(mounted) {
-        setState(() {
-          position = duration.inMilliseconds;
-        });
-      }
-    });
   }
 
   @override
@@ -40,7 +44,7 @@ class _PlayingLyricsState extends State<PlayingLyrics> {
       itemBuilder: (context, index) {
         var focused = false;
         var line = lines[index];
-          if(line.startsAt <= position && line.endsAt >= position) {
+          if(line.startsAt <= playerService.playbackPosition && line.endsAt >= playerService.playbackPosition) {
             focused = true;
           }
         return Text(

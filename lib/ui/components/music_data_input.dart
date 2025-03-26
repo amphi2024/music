@@ -1,7 +1,5 @@
-import 'package:amphi/models/app_localizations.dart';
 import 'package:amphi/widgets/settings/language.dart';
 import 'package:flutter/material.dart';
-import 'package:music/models/app_settings.dart';
 
 class MusicDataInput extends StatefulWidget {
   final Map<String, dynamic> data;

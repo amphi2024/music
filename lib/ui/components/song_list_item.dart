@@ -21,7 +21,10 @@ class SongListItem extends StatelessWidget {
         });
       },
       onTap: () {
-        playerService.startPlay(song: song, i: index);
+        appState.setState(() {
+          playerService.isPlaying = true;
+          playerService.startPlay(song: song, i: index);
+        });
       },
       child: Padding(
         padding: const EdgeInsets.all(5),

@@ -1,5 +1,4 @@
 import 'package:music/models/music/lyrics.dart';
-import 'package:music/models/music/song_file.dart';
 
 class LyricsEditingController {
   Lyrics lyrics;

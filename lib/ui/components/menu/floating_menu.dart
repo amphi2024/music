@@ -1,7 +1,4 @@
-import 'dart:io';
 
-import 'package:amphi/widgets/profile_image.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
