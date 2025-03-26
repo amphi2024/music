@@ -9,6 +9,7 @@ import 'package:music/ui/components/account/account_button.dart';
 import 'package:music/ui/components/fragment_title.dart';
 import 'package:music/ui/components/navigation_menu.dart';
 import 'package:music/ui/components/playing/desktop_playing_bar.dart';
+import 'package:music/ui/dialogs/settings_dialog.dart';
 import 'package:music/ui/fragments/songs_fragment.dart';
 
 import '../../models/app_storage.dart';
@@ -93,7 +94,9 @@ class _WideMainViewState extends State<WideMainView> {
                       }),
                     ];
                   }),
-                  IconButton(onPressed: () {}, icon: Icon(Icons.settings)),
+                  IconButton(onPressed: () {
+                    showDialog(context: context, builder: (context) => SettingsDialog());
+                  }, icon: Icon(Icons.settings)),
                   MinimizeWindowButton(),
                   appWindow.isMaximized
                       ? RestoreWindowButton(

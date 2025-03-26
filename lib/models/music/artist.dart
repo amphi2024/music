@@ -32,8 +32,9 @@ class Artist {
     artist.path = directory.path;
     artist.id = PathUtils.basename(directory.path);
     var infoFile = File(PathUtils.join(artist.path, "info.json"));
-    artist.data = jsonDecode(infoFile.readAsStringSync());
-
+    if(infoFile.existsSync()) {
+      artist.data = jsonDecode(infoFile.readAsStringSync());
+    }
     return artist;
   }
 

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:music/models/app_settings.dart';
 import 'package:music/ui/components/settings/server_settings_component.dart';
@@ -44,17 +46,20 @@ class _SettingsViewState extends State<SettingsView> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            Row(
-              children: [
-                Text("Transparent Navigation Bar"),
-                Checkbox(value: appSettings.transparentNavigationBar, onChanged: (value) {
-                  if(value != null) {
-                    setState(() {
-                      appSettings.transparentNavigationBar = value;
-                    });
-                  }
-                })
-              ],
+            Visibility(
+              visible: Platform.isAndroid,
+              child: Row(
+                children: [
+                  Text("Transparent Navigation Bar"),
+                  Checkbox(value: appSettings.transparentNavigationBar, onChanged: (value) {
+                    if(value != null) {
+                      setState(() {
+                        appSettings.transparentNavigationBar = value;
+                      });
+                    }
+                  })
+                ],
+              ),
             ),
             Row(
               children: [
