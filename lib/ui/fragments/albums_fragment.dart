@@ -73,7 +73,7 @@ class _AlbumsFragmentState extends State<AlbumsFragment> {
                 ),
               ),
               Text(
-                album.name.byLocale(context),
+                album.name.byContext(context),
                 maxLines: 3,
                 style: TextStyle(
                   fontWeight: FontWeight.bold
@@ -81,7 +81,7 @@ class _AlbumsFragmentState extends State<AlbumsFragment> {
                 textAlign: TextAlign.center,
               ),
               Text(
-                  album.artist.name.byLocale(context)
+                  album.artist.name.byContext(context)
               ),
             ],
           ),

@@ -62,7 +62,7 @@ class _SelectArtistDialogState extends State<SelectArtistDialog> {
                         child: ArtistProfileImage(artist: artist),
                       ),
                     ),
-                    Text(artist.name.byLocale(context))
+                    Text(artist.name.byContext(context))
                   ]),
                 ),
               );

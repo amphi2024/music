@@ -6,7 +6,7 @@ import android.view.Window
 import android.view.WindowInsetsController
 import android.view.WindowManager
 
-object NavigationBar {
+
     @Suppress("DEPRECATION")
     fun setNavigationBarColor(window: Window, navigationBarColor: Int, iosLikeUi: Boolean) {
 
@@ -48,4 +48,3 @@ object NavigationBar {
         }
 
     }
-}

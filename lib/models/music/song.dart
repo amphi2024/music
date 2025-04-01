@@ -118,8 +118,12 @@ class Song {
 }
 
 extension MusicTitleExtension on Map<String, dynamic> {
-  String byLocale(BuildContext context) {
-    String value = this[Localizations.localeOf(context).languageCode] ?? this["default"] ?? "";
+  String byContext(BuildContext context) {
+    return byLocaleCode(Localizations.localeOf(context).languageCode);
+  }
+
+  String byLocaleCode(String code) {
+    String value = this[code] ?? this["default"] ?? "";
     if(value.isNotEmpty) {
       return value;
     }

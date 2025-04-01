@@ -5,30 +5,29 @@ import org.jaudiotagger.tag.FieldKey
 import org.json.JSONObject
 import java.io.File
 
-object MusicMetaDataUtils {
-    fun musicMetadata(filePath: String) : String {
-        val jsonObject = JSONObject()
+    fun musicMetadata(filePath: String) : HashMap<String, Any> {
+        val map: HashMap<String, Any> = HashMap()
         try {
             val tag = AudioFileIO.read(File(filePath)).tag
-            jsonObject.put("title", tag.getFirst(FieldKey.TITLE))
-            jsonObject.put("artist", tag.getFirst(FieldKey.ARTIST))
-            jsonObject.put("albumArtist", tag.getFirst(FieldKey.ALBUM_ARTIST))
-            jsonObject.put("album", tag.getFirst(FieldKey.ALBUM))
-            jsonObject.put("genre", tag.getFirst(FieldKey.GENRE))
-            jsonObject.put("year", tag.getFirst(FieldKey.YEAR))
-            jsonObject.put("track", tag.getFirst(FieldKey.TRACK))
-            jsonObject.put("discNumber", tag.getFirst(FieldKey.DISC_NO))
-            jsonObject.put("comment", tag.getFirst(FieldKey.COMMENT))
-            jsonObject.put("composer", tag.getFirst(FieldKey.COMPOSER))
-            jsonObject.put("encoder", tag.getFirst(FieldKey.ENCODER))
-            jsonObject.put("lyricist", tag.getFirst(FieldKey.LYRICIST))
-            jsonObject.put("lyrics", tag.getFirst(FieldKey.LYRICS))
+            map["title"] = tag.getFirst(FieldKey.TITLE) ?: ""
+            map["artist"] = tag.getFirst(FieldKey.ARTIST) ?: ""
+            map["albumArtist"] = tag.getFirst(FieldKey.ALBUM_ARTIST) ?: ""
+            map["album"] = tag.getFirst(FieldKey.ALBUM) ?: ""
+            map["genre"] = tag.getFirst(FieldKey.GENRE) ?: ""
+            map["year"] = tag.getFirst(FieldKey.YEAR) ?: ""
+            map["track"] = tag.getFirst(FieldKey.TRACK) ?: ""
+            map["discNumber"] = tag.getFirst(FieldKey.DISC_NO) ?: ""
+            map["comment"] = tag.getFirst(FieldKey.COMMENT) ?: ""
+            map["composer"] = tag.getFirst(FieldKey.COMPOSER) ?: ""
+            map["encoder"] = tag.getFirst(FieldKey.ENCODER) ?: ""
+            map["lyricist"] = tag.getFirst(FieldKey.LYRICIST) ?: ""
+            map["lyrics"] = tag.getFirst(FieldKey.LYRICS) ?: ""
         }
         catch (e: Exception) {
-            return "error"
+            return HashMap()
         }
 
-        return jsonObject.toString()
+        return map
     }
 
     fun albumArt(filePath: String) : ByteArray {
@@ -41,4 +40,3 @@ object MusicMetaDataUtils {
         }
 
     }
-}

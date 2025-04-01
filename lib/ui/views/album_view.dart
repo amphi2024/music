@@ -25,7 +25,7 @@ class AlbumView extends StatelessWidget {
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
-                  album.name.byLocale(context),
+                  album.name.byContext(context),
                 style: TextStyle(
                   fontSize: 15
                 ),
@@ -44,7 +44,7 @@ class AlbumView extends StatelessWidget {
           SliverList(
             delegate: SliverChildBuilderDelegate(
                   (context, index) => ListTile(
-                title: Text(musicList[index].title.byLocale(context)),
+                title: Text(musicList[index].title.byContext(context)),
               ),
               childCount: musicList.length,  // Number of songs
             ),

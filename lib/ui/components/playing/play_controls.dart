@@ -49,7 +49,7 @@ class _PlayControlsState extends State<PlayControls> {
                   playerService
                       .nowPlaying()
                       .title
-                      .byLocale(context),
+                      .byContext(context),
                   style: textTheme.bodyLarge
                       ?.copyWith(fontWeight: FontWeight.bold, fontSize: 25),
                 ),
@@ -61,7 +61,7 @@ class _PlayControlsState extends State<PlayControls> {
                     .nowPlaying()
                     .artist
                     .name
-                    .byLocale(context),
+                    .byContext(context),
                 style: textTheme.bodyMedium,
               ),
             ),
@@ -112,7 +112,7 @@ class _PlayControlsState extends State<PlayControls> {
               IconButton(
                   icon: Icon(Icons.fast_rewind, size: 45),
                   onPressed: () {
-                    playerService.playPrevious();
+                    playerService.playPrevious(Localizations.localeOf(context).languageCode);
                   }),
               IconButton(
                   icon: Icon(
@@ -144,7 +144,7 @@ class _PlayControlsState extends State<PlayControls> {
                     size: 45,
                   ),
                   onPressed: () {
-                    playerService.playNext();
+                    playerService.playNext(Localizations.localeOf(context).languageCode);
                   })
             ],
           ),

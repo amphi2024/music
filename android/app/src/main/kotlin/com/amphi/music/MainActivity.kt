@@ -1,20 +1,26 @@
 package com.amphi.music
 
+import android.app.Service
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.net.Uri
 import io.flutter.embedding.android.FlutterActivity
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.provider.Settings
 import android.util.Log
 import android.view.WindowManager
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultDataSourceFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
-import com.amphi.music.NavigationBar.setNavigationBarColor
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.*
@@ -22,26 +28,43 @@ import java.io.File
 
 class MainActivity: FlutterActivity() {
 
-    val scope = CoroutineScope(Dispatchers.Main)
-    var isTracking = false
+    private val scope = CoroutineScope(Dispatchers.Main)
+    private var isTracking = false
+    private var musicService: MusicService? = null
+    private var isBound = false
+
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as MusicService.LocalBinder
+            musicService = binder.getService()
+            isBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            isBound = false
+        }
+    }
+
+    private lateinit var serviceIntent: Intent
 
     override fun onStart() {
         super.onStart()
+        serviceIntent = Intent(this, MusicService::class.java)
 
-        val serviceIntent = Intent(this, MusicService::class.java)
         startService(serviceIntent)
+        bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         stopProgressTracking()
+        stopService(serviceIntent)
     }
 
     override fun onStop() {
         super.onStop()
 
-        val serviceIntent = Intent(this, MusicService::class.java)
-        stopService(serviceIntent)
+        unbindService(connection)
     }
 
     override fun onResume() {
@@ -96,15 +119,17 @@ class MainActivity: FlutterActivity() {
                 }
 
                 "resume_music" -> {
-                    MusicPlayer.resume(context)
+                    musicService?.player?.play()
+                    musicService?.isPlaying = true
                 }
 
                 "pause_music" -> {
-                    MusicPlayer.pause(context)
+                    musicService?.player?.play()
+                    musicService?.isPlaying = false
                 }
 
                 "is_music_playing" -> {
-                    result.success(MusicPlayer.getInstance(context).isPlaying)
+                    result.success(musicService?.isPlaying ?: false)
                 }
                 "set_media_source" -> {
                     call.argument<String>("path")?.let { filePath ->
@@ -114,31 +139,41 @@ class MainActivity: FlutterActivity() {
                         val mediaItem = MediaItem.fromUri(uri)
 
                         // Prepare the media source
-                        val mediaSource: MediaSource = ProgressiveMediaSource.Factory(DefaultDataSourceFactory(this, "exoMusicPlayer.getPlayer(context)"))
-                            .createMediaSource(mediaItem)
-                        MusicPlayer.getPlayer(context).setMediaItem(mediaItem)
-                        MusicPlayer.getPlayer(context).prepare()
+//                        val mediaSource: MediaSource = ProgressiveMediaSource.Factory(DefaultDataSourceFactory(this, "exoMusicPlayer.getPlayer(context)"))
+//                            .createMediaSource(mediaItem)
+                        musicService?.let { service ->
+                            service.player.setMediaItem(mediaItem)
+                            service.player.prepare()
+                            service.title = call.argument<String>("title") ?: ""
+                            service.artist = call.argument<String>("artist") ?: ""
+                            service.albumCoverFilePath = call.argument<String>("album_cover")
+                            val playNow = call.argument<Any>("play_now")
+                            if(playNow == true) {
+                                service.player.play()
+                            }
 
-                        val playNow = call.argument<Any>("play_now")
-                        if(playNow == true) {
-                            MusicPlayer.getPlayer(context).play()
+                            if(isBound) {
+                                musicService?.showMediaNotification()
+                            }
                         }
+
+
                     }
                 }
 
                 "apply_playback_position" -> {
                     val position = call.argument<Any>("position")
                     if(position is Int) {
-                        MusicPlayer.getPlayer(context).seekTo(position.toLong())
+                        musicService?.player?.seekTo(position.toLong())
                     }
                     else if(position is Long) {
-                        MusicPlayer.getPlayer(context).seekTo(position)
+                        musicService?.player?.seekTo(position)
                     }
 
                 }
 
                 "get_music_duration" -> {
-                    result.success(MusicPlayer.getPlayer(context).duration)
+                    result.success(musicService?.player?.duration ?: 0)
                 }
 
                 "get_system_version" -> {
@@ -151,11 +186,11 @@ class MainActivity: FlutterActivity() {
                 }
 
                 "get_music_metadata" -> {
-                    result.success(call.argument<String>("path")?.let { MusicMetaDataUtils.musicMetadata(filePath = it) })
+                    result.success(call.argument<String>("path")?.let { musicMetadata(filePath = it) })
                 }
 
                 "get_album_cover" -> {
-                    result.success(call.argument<String>("path")?.let { MusicMetaDataUtils.albumArt(filePath = it) })
+                    result.success(call.argument<String>("path")?.let { albumArt(filePath = it) })
                 }
 
                 else -> result.notImplemented()
@@ -169,12 +204,13 @@ class MainActivity: FlutterActivity() {
         isTracking = true
         scope.launch {
             while (isTracking) {
-                val currentPosition = MusicPlayer.getPlayer(context).currentPosition
+                musicService?.let { service ->
+                    val currentPosition = service.player.currentPosition
 
-                methodChannel.invokeMethod("on_playback_changed", mapOf(
-                    "position" to currentPosition
-                ))
-
+                    methodChannel.invokeMethod("on_playback_changed", mapOf(
+                        "position" to currentPosition
+                    ))
+                }
                 delay(1000L)
             }
         }

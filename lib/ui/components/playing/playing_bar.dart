@@ -124,7 +124,7 @@ class _PlayingBarState extends State<PlayingBar> {
                                     playerService
                                         .nowPlaying()
                                         .title
-                                        .byLocale(context),
+                                        .byContext(context),
                                     style:
                                         Theme.of(context).textTheme.titleMedium,
                                   ),
@@ -133,7 +133,7 @@ class _PlayingBarState extends State<PlayingBar> {
                                         .nowPlaying()
                                         .artist
                                         .name
-                                        .byLocale(context),
+                                        .byContext(context),
                                     style:
                                         Theme.of(context).textTheme.titleMedium,
                                   )

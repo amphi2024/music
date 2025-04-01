@@ -49,12 +49,12 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
             IconButton(
                 icon: Icon(Icons.shuffle, size: 20),
                 onPressed: () {
-                  playerService.playPrevious();
+                  playerService.playPrevious(Localizations.localeOf(context).languageCode);
                 }),
             IconButton(
                 icon: Icon(Icons.fast_rewind, size: 20),
                 onPressed: () {
-                  playerService.playPrevious();
+                  playerService.playPrevious(Localizations.localeOf(context).languageCode);
                 }),
             IconButton(
                 icon: Icon(
@@ -86,12 +86,12 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
                   size: 20,
                 ),
                 onPressed: () {
-                  playerService.playNext();
+                  playerService.playNext(Localizations.localeOf(context).languageCode);
                 }),
             IconButton(
                 icon: Icon(Icons.loop, size: 20),
                 onPressed: () {
-                  playerService.playPrevious();
+                  playerService.playPrevious(Localizations.localeOf(context).languageCode);
                 }),
           ],
         ),

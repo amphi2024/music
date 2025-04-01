@@ -77,7 +77,7 @@ class _ArtistsFragmentState extends State<ArtistsFragment> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                          artist.name.byLocale(context)
+                          artist.name.byContext(context)
                       )
                     ],
                   )

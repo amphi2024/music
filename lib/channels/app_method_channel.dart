@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:amphi/models/app_localizations.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:music/models/app_settings.dart';
 import 'package:music/models/music/song.dart';
@@ -23,10 +25,10 @@ class AppMethodChannel extends MethodChannel {
           }
           break;
         case "play_previous":
-          playerService.playPrevious();
+          playerService.playPrevious(localeCode);
           break;
         case "play_next":
-          playerService.playNext();
+          playerService.playNext(localeCode);
           break;
         default:
           break;
@@ -40,6 +42,7 @@ class AppMethodChannel extends MethodChannel {
 
   int systemVersion = 0;
   bool needsBottomPadding = false;
+  String? localeCode;
 
   void createDirectoryIfNotExists(String path) {
     Directory directory = Directory(path);
@@ -106,10 +109,13 @@ class AppMethodChannel extends MethodChannel {
     return await invokeMethod("is_music_playing");
   }
 
-  Future<void> setMediaSource(Song song, {bool playNow = true}) async {
+  Future<void> setMediaSource({required Song song, String? localeCode, bool playNow = true}) async {
     await invokeMethod("set_media_source", {
       "path": song.songFilePath(),
-      "play_now": playNow
+      "play_now": playNow,
+      "title": song.title.byLocaleCode(this.localeCode ?? "default"),
+      "artist": song.artist.name.byLocaleCode(this.localeCode ?? "default"),
+      "album_cover": song.album.covers.firstOrNull
     });
   }
 
@@ -120,7 +126,6 @@ class AppMethodChannel extends MethodChannel {
   }
 
   Future<int> getMusicDuration() async {
-    print(await invokeMethod("get_music_duration"));
     return await invokeMethod("get_music_duration");
   }
 }

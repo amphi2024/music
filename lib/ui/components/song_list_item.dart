@@ -23,7 +23,7 @@ class SongListItem extends StatelessWidget {
       onTap: () {
         appState.setState(() {
           playerService.isPlaying = true;
-          playerService.startPlay(song: song, i: index);
+          playerService.startPlay(song: song, i: index, localeCode: Localizations.localeOf(context).languageCode);
         });
       },
       child: Padding(

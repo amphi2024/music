@@ -58,7 +58,7 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
-                        Expanded(child: Text(song.artist.name.byLocale(context))),
+                        Expanded(child: Text(song.artist.name.byContext(context))),
                         IconButton(onPressed: () {
                           showDialog(context: context, builder: (context) {
                             return SelectArtistDialog(excepting: song.artistId, onSelected: (artistId) {
@@ -75,7 +75,7 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
-                        Expanded(child: Text(song.album.name.byLocale(context))),
+                        Expanded(child: Text(song.album.name.byContext(context))),
                         IconButton(onPressed: () {
                           showDialog(context: context, builder: (context) {
                             return SelectAlbumDialog(excepting: song.albumId, onSelected: (albumId) {});

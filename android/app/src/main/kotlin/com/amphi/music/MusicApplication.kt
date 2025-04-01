@@ -18,14 +18,14 @@ class MusicApplication : Application() {
 
     private fun createNotificationChannel() {
         if(Build.VERSION.SDK_INT >= 26) {
-            val channelName = "Music Notifications" // Name of the channel
-            val channelDescription = "Notifications for music playback" // Description of the channel
-            val importance = NotificationManager.IMPORTANCE_LOW // Set notification importance
+            val channelName = "Music Notifications"
+            val channelDescription = "Notifications for music playback"
+            val importance = NotificationManager.IMPORTANCE_LOW
 
             val channel = NotificationChannel(
-                MUSIC_NOTIFICATION_CHANNEL_ID, // The channel ID
-                channelName,                    // The channel name
-                importance                      // Importance level
+                MUSIC_NOTIFICATION_CHANNEL_ID,
+                channelName,
+                importance
             ).apply {
                 description = channelDescription
             }

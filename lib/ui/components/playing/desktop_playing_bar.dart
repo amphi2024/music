@@ -51,8 +51,8 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(playerService.nowPlaying().title.byLocale(context)),
-                      Text(playerService.nowPlaying().artist.name.byLocale(context))
+                      Text(playerService.nowPlaying().title.byContext(context)),
+                      Text(playerService.nowPlaying().artist.name.byContext(context))
                     ],
                   )
                 ],

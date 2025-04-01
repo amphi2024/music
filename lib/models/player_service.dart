@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:music/channels/app_method_channel.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/playlist.dart';
@@ -37,18 +38,21 @@ class PlayerService {
     }
   }
 
-  Future<void> startPlay({required Song song, required int i}) async {
+  Future<void> startPlay({required Song song, String? localeCode, required int i}) async {
     var songFilePath = song.songFilePath();
     if(songFilePath != null) {
       playlistKey = "";
       index = i;
       playingSongId = playlist.queue[index];
-      await appMethodChannel.setMediaSource(song, playNow: true);
+      if(localeCode != null) {
+        appMethodChannel.localeCode = localeCode;
+      }
+      await appMethodChannel.setMediaSource(song: song, playNow: true);
       musicDuration = await appMethodChannel.getMusicDuration();
     }
   }
 
-  Future<void> playPrevious() async {
+  Future<void> playPrevious(String? localeCode) async {
     playerService.index--;
     if(index < 0) {
       index = playlist.queue.length - 1;
@@ -56,18 +60,21 @@ class PlayerService {
     playingSongId = playlist.queue[index];
     var songFilePath = playerService.nowPlaying().songFilePath();
     if(songFilePath != null) {
-      await appMethodChannel.setMediaSource(nowPlaying(), playNow: true);
+      if(localeCode != null) {
+        appMethodChannel.localeCode = localeCode;
+      }
+      await appMethodChannel.setMediaSource(song: nowPlaying(), playNow: true);
       musicDuration = await appMethodChannel.getMusicDuration();
      appState.setState(() {
        isPlaying = true;
      });
     }
     else {
-      playPrevious();
+      playPrevious(localeCode);
     }
   }
 
-  Future<void> playNext() async {
+  Future<void> playNext(String? localeCode) async {
     await pauseMusicIfPlaying();
 
     index++;
@@ -77,7 +84,10 @@ class PlayerService {
     playingSongId = playlist.queue[index];
     var songFilePath = playerService.nowPlaying().songFilePath();
     if(songFilePath != null) {
-      await appMethodChannel.setMediaSource(nowPlaying());
+      if(localeCode != null) {
+        appMethodChannel.localeCode = localeCode;
+      }
+      await appMethodChannel.setMediaSource(song: nowPlaying());
       await appMethodChannel.resumeMusic();
       musicDuration = await appMethodChannel.getMusicDuration();
       appState.setState(() {
@@ -85,7 +95,7 @@ class PlayerService {
       });
     }
     else {
-      playNext();
+      playNext(localeCode);
     }
   }
 
@@ -102,7 +112,7 @@ class PlayerService {
     playingSongId = playlist.queue[i];
     var songFilePath = playerService.nowPlaying().songFilePath();
     if(songFilePath != null) {
-      await appMethodChannel.setMediaSource(nowPlaying());
+      await appMethodChannel.setMediaSource(song: nowPlaying());
       await appMethodChannel.resumeMusic();
       musicDuration = await appMethodChannel.getMusicDuration();
      appState.setState(() {});
