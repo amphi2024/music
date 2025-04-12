@@ -7,7 +7,7 @@ import android.os.IBinder
 
 class MediaButtonReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        val serviceIntent = Intent(context, MediaPlayerService::class.java)
+        val serviceIntent = Intent(context, MusicService::class.java)
 
         intent?.let {
             serviceIntent.action = it.action
