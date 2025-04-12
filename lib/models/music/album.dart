@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
+import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/music/artist.dart';
 import 'package:music/utils/random_alphabet.dart';
 
@@ -80,8 +81,15 @@ class Album {
     return album;
   }
 
-  void save() async {
+  Future<void> save({bool upload = true}) async {
     var infoFile = File(PathUtils.join(path, "info.json"));
     await infoFile.writeAsString(jsonEncode(data));
+
+    if(upload) {
+      appWebChannel.uploadAlbumInfo(album: this);
+      // for(var filePath in covers) {
+      //
+      // }
+    }
   }
 }

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
+import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/utils/random_alphabet.dart';
 
@@ -50,9 +51,13 @@ class Artist {
     return artist;
   }
 
-  void save() async {
+  void save({bool upload = true}) async {
     var infoFile = File(PathUtils.join(path, "info.json"));
     await infoFile.writeAsString(jsonEncode(data));
+
+    if(upload) {
+      appWebChannel.uploadArtistInfo(artist: this);
+    }
   }
 }
 

@@ -39,25 +39,31 @@ import AVFoundation
           }
           
       case "set_media_source":
-          let path = arguments["path"] as String
-          let fileURL = URL(fileURLWithPath: path)
+          print("working")
+          if let arguments = call.arguments as? [String: Any],
+              let path = arguments["path"] as? String {
+              print(path)
+              var audioPlayer: AVAudioPlayer?
+              let fileURL = URL(fileURLWithPath: path)
 
-                  // 해당 경로에 파일이 있는지 확인
-                  if FileManager.default.fileExists(atPath: fileURL.path) {
-                      do {
-                          // AVAudioPlayer로 FLAC 파일 재생
-                          audioPlayer = try AVAudioPlayer(contentsOf: fileURL)
-                          audioPlayer?.prepareToPlay()
-                          audioPlayer?.play()
-                          print("🎵 FLAC 파일 재생 시작: \(fileURL.path)")
-                      } catch {
-                          print("❌ FLAC 파일 재생 실패: \(error.localizedDescription)")
+                      // 해당 경로에 파일이 있는지 확인
+                      if FileManager.default.fileExists(atPath: fileURL.path) {
+                          do {
+                              // AVAudioPlayer로 FLAC 파일 재생
+                              audioPlayer = try AVAudioPlayer(contentsOf: fileURL)
+                              audioPlayer?.prepareToPlay()
+                              audioPlayer?.play()
+                              print("🎵 FLAC 파일 재생 시작: \(fileURL.path)")
+                          } catch {
+                              print("❌ FLAC 파일 재생 실패: \(error.localizedDescription)")
+                          }
+                      } else {
+                          print("⚠️ 파일을 찾을 수 없음: \(fileURL.path)")
                       }
-                  } else {
-                      print("⚠️ 파일을 찾을 수 없음: \(fileURL.path)")
-                  }
-          
-//          
+              
+          }
+       
+//
 //          Future<void> resumeMusic() async {
 //            await invokeMethod("resume_music");
 //          }

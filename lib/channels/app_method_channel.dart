@@ -83,7 +83,7 @@ class AppMethodChannel extends MethodChannel {
     }
   }
 
-  void setNavigationBarColor(Color color, bool iosLikeUi) {
+  void setNavigationBarColor(Color color) {
     if(Platform.isAndroid) {
       invokeMethod("set_navigation_bar_color", {"color": color.value, "transparent_navigation_bar": appSettings.transparentNavigationBar});
     }

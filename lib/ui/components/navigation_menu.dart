@@ -144,7 +144,8 @@ class _NavigationMenuState extends State<NavigationMenu> {
         child: Container(
           width: 200,
           decoration: BoxDecoration(
-            color: AppTheme.lightGray,
+            //color: AppTheme.lightGray,
+            color: Theme.of(context).cardColor,
             border: Border(
               right: BorderSide(
                 color: Theme.of(context).shadowColor,

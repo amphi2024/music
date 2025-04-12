@@ -99,6 +99,12 @@ class MainActivity: FlutterActivity() {
         methodChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
         methodChannel!!.setMethodCallHandler { call, result ->
             val window = this@MainActivity.window
+
+            musicService?.let {
+                if(it.methodChannel == null) {
+                    it.methodChannel = methodChannel
+                }
+            }
             when (call.method) {
                 "set_navigation_bar_color" -> {
                     val color = call.argument<Long>("color")
@@ -124,7 +130,7 @@ class MainActivity: FlutterActivity() {
                 }
 
                 "pause_music" -> {
-                    musicService?.player?.play()
+                    musicService?.player?.pause()
                     musicService?.isPlaying = false
                 }
 

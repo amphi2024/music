@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
+import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/app_storage.dart';
 
 class Playlist {
@@ -54,9 +55,13 @@ class Playlist {
     return map;
   }
 
-  void save() async {
+  void save({bool upload = true}) async {
     var file = File(path);
     await file.writeAsString(jsonEncode(toMap()));
+
+    if(upload) {
+      appWebChannel.uploadPlaylist(playlist: this);
+    }
   }
 
   void shuffle() {

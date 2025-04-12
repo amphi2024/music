@@ -7,7 +7,12 @@ import android.os.IBinder
 
 class MediaButtonReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
+        val serviceIntent = Intent(context, MediaPlayerService::class.java)
 
+        intent?.let {
+            serviceIntent.action = it.action
+            context?.startService(serviceIntent)
+        }
     }
 
     override fun peekService(myContext: Context?, service: Intent?): IBinder {

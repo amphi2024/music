@@ -23,6 +23,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSession.Callback
 import androidx.media3.session.MediaStyleNotificationHelper
+import io.flutter.plugin.common.MethodChannel
 import java.io.File
 
 class MusicService : Service() {
@@ -36,7 +37,7 @@ class MusicService : Service() {
     var artist = ""
     var albumCoverFilePath: String? = null
     lateinit var mediaSession: MediaSession
-
+    var methodChannel: MethodChannel? = null
     inner class LocalBinder : Binder() {
         fun getService(): MusicService = this@MusicService
     }
@@ -62,19 +63,49 @@ class MusicService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // Create and display a media notification
         showMediaNotification()
-
-        // Handle playback logic (play, pause, etc.) here if needed
-
-        return START_STICKY // Keep the service running until explicitly stopped
+        intent?.let {
+            when (it.action) {
+                "PLAY_PREVIOUS" -> {
+                    if(player.currentPosition > 0) {
+                        player.seekTo(0)
+                    }
+                    else {
+                        methodChannel?.invokeMethod("play_previous", {})
+                    }
+                }
+                "PLAY_NEXT" -> {
+                    methodChannel?.invokeMethod("play_next", {})
+                }
+                "PAUSE" -> {
+                    if(isPlaying) {
+                        player.pause()
+                    }
+                    else {
+                        player.play()
+                    }
+                }
+                else -> {}
+            }
+        }
+        return START_STICKY
     }
 
     @OptIn(UnstableApi::class)
     fun showMediaNotification() {
+        val previousIntent = PendingIntent.getBroadcast(
+            this, 0, Intent(this, MediaButtonReceiver::class.java).apply {
+                action = "PLAY_PREVIOUS"
+            }, PendingIntent.FLAG_IMMUTABLE
+        )
+        val nextIntent = PendingIntent.getBroadcast(
+            this, 0, Intent(this, MediaButtonReceiver::class.java).apply {
+                action = "PLAY_NEXT"
+            }, PendingIntent.FLAG_IMMUTABLE
+        )
         val playPauseIntent = PendingIntent.getBroadcast(
             this, 0, Intent(this, MediaButtonReceiver::class.java).apply {
-                action = "PAUSE_ACTION"
+                action = "PAUSE"
             }, PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -86,13 +117,13 @@ class MusicService : Service() {
             .setContentText(artist)
             .setSmallIcon(androidx.core.R.drawable.notification_bg)
             .addAction(NotificationCompat.Action(
-                androidx.core.R.drawable.notification_bg, "Pause", playPauseIntent
+                androidx.core.R.drawable.notification_bg, "Previous", previousIntent
             ))
             .addAction(NotificationCompat.Action(
                 androidx.core.R.drawable.notification_bg, "Pause", playPauseIntent
             ))
             .addAction(NotificationCompat.Action(
-                androidx.core.R.drawable.notification_bg, "Pause", playPauseIntent
+                androidx.core.R.drawable.notification_bg, "Pause", nextIntent
             ))
             .setStyle(MediaStyleNotificationHelper.MediaStyle(mediaSession).setShowActionsInCompactView(1))
             .setOngoing(true)

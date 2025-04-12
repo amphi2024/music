@@ -94,7 +94,7 @@ class AppDelegate: FlutterAppDelegate {
             }
         }
         
-        return metadataDict.isEmpty ? ["title": "Unknown", "artist": "Unknown"] : metadataDict
+        return metadataDict
     }
     
     private func getMusicAlbumCover(filePath: String ) -> [UInt8] {

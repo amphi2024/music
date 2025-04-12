@@ -25,7 +25,7 @@ class _SettingsViewState extends State<SettingsView> {
 
   @override
   Widget build(BuildContext context) {
-    appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor, appSettings.transparentNavigationBar);
+    appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor);
 
     return Scaffold(
       appBar: AppBar(

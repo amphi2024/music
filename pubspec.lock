@@ -4,12 +4,10 @@ packages:
   amphi:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: ad4a42b5ad8261b7afebe6cc39e27983eba4b3e5
-      url: "https://github.com/amphi2024/flutter-shared.git"
-    source: git
-    version: "1.1.1"
+      path: "../amphi"
+      relative: true
+    source: path
+    version: "1.1.0"
   archive:
     dependency: transitive
     description:
@@ -182,10 +180,10 @@ packages:
     dependency: "direct main"
     description:
       name: file_picker
-      sha256: "8d938fd5c11dc81bf1acd4f7f0486c683fe9e79a0b13419e27730f9ce4d8a25b"
+      sha256: "5d7966f0e0c6fcd04f70a474e9321a589263d3c80120e8751f754f59138237b3"
       url: "https://pub.dev"
     source: hosted
-    version: "9.2.1"
+    version: "10.1.1"
   fixnum:
     dependency: transitive
     description:
@@ -474,10 +472,10 @@ packages:
     dependency: "direct main"
     description:
       name: percent_indicator
-      sha256: "0d77d5c6fa9b7f60202cedf748b568ba9ba38d3f30405d6ceae4da76f5185462"
+      sha256: "157d29133bbc6ecb11f923d36e7960a96a3f28837549a20b65e5135729f0f9fd"
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.4"
+    version: "4.2.5"
   petitparser:
     dependency: transitive
     description:
@@ -663,18 +661,18 @@ packages:
     dependency: transitive
     description:
       name: volume_controller
-      sha256: "4c2a873c242da6ce69ae1d17c256c5626e0c481be1824d6c5fc95e68c31f3b36"
+      sha256: e82fd689bb8e1fe8e64be3fa5946ff8699058f8cf9f4c1679acdba20cda7f5bd
       url: "https://pub.dev"
     source: hosted
-    version: "3.3.2"
+    version: "3.3.3"
   wakelock_plus:
     dependency: transitive
     description:
       name: wakelock_plus
-      sha256: "36c88af0b930121941345306d259ec4cc4ecca3b151c02e3a9e71aede83c615e"
+      sha256: b90fbcc8d7bdf3b883ea9706d9d76b9978cb1dfa4351fcc8014d6ec31a493354
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.10"
+    version: "1.2.11"
   wakelock_plus_platform_interface:
     dependency: transitive
     description:

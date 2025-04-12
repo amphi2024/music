@@ -6,16 +6,16 @@ import 'package:amphi/utils/path_utils.dart';
 import 'package:music/models/music/lyrics.dart';
 
 class SongFile {
-  String infoFilePath = "";
-  String songFilePath = "";
+  String infoFilepath = "";
+  String mediaFilepath = "";
   Lyrics lyrics = Lyrics();
   Map<String, dynamic> data = {};
 
-  String get id => FilenameUtils.nameOnly(infoFilePath!);
+  late String id;
 
   SongFile({
-    this.infoFilePath = "",
-    this.songFilePath = ""
+    this.infoFilepath = "",
+    this.mediaFilepath = ""
   });
 
   static SongFile created({required String path, required File originalFile}) {
@@ -30,14 +30,18 @@ class SongFile {
     var songFile = File(PathUtils.join(path, songFilename));
     songFile.writeAsBytesSync(originalFile.readAsBytesSync());
 
-    return SongFile(
-      infoFilePath: songInfoFile.path,
-      songFilePath: songFile.path
+    var result = SongFile(
+      infoFilepath: songInfoFile.path,
+      mediaFilepath: songFile.path
     );
+    result.id = FilenameUtils.nameOnly(songFilename);
+    return result;
   }
 
   void getData() async {
-    var infoFile = File(infoFilePath);
+    var infoFilename = PathUtils.basename(infoFilepath);
+    id = FilenameUtils.nameOnly(infoFilename);
+    var infoFile = File(infoFilepath);
     var jsonData = await infoFile.readAsString();
     data = jsonDecode(jsonData);
     var lyricsData = data["lyrics"];
@@ -77,7 +81,7 @@ class SongFile {
   }
 
   void save() async {
-    var infoFile = File(infoFilePath);
+    var infoFile = File(infoFilepath);
     data["lyrics"] = lyrics.toMap();
     await infoFile.writeAsString(jsonEncode(data));
   }

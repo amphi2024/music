@@ -14,7 +14,6 @@ import 'music/artist.dart';
 final appStorage = AppStorage.getInstance();
 
 class AppStorage extends AppStorageCore {
-
   late String themesPath;
   late String songsPath;
   late String artistsPath;
@@ -22,6 +21,7 @@ class AppStorage extends AppStorageCore {
   late String playlistsPath;
 
   static final _instance = AppStorage();
+
   static AppStorage getInstance() => _instance;
 
   Map<String, Artist> artists = {};
@@ -46,16 +46,14 @@ class AppStorage extends AppStorageCore {
   }
 
   void selectMusicFilesAndSave() async {
-    var result = await FilePicker.platform
-        .pickFiles(type: FileType.custom, allowMultiple: true, allowedExtensions: [
-      "mp3", "flac", "m4a", "wav", "aac", "ogg", "wma",
-      "mp4", "mkv", "avi", "mov", "wmv", "flv", "webm", "mpeg"
-    ]);
+    var result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowMultiple: true,
+        allowedExtensions: ["mp3", "flac", "m4a", "wav", "aac", "ogg", "wma", "mp4", "mkv", "avi", "mov", "wmv", "flv", "webm", "mpeg"]);
     if (result != null) {
       for (var file in result.files) {
         var filePath = file.path;
-        if (filePath != null &&
-            File(filePath).existsSync()) {
+        if (filePath != null && File(filePath).existsSync()) {
           createMusicAndAll(filePath);
         }
       }
@@ -67,51 +65,17 @@ class AppStorage extends AppStorageCore {
     var albumCover = await appMethodChannel.getAlbumCover(filePath);
     print(metadata);
     print(albumCover.length);
-    var albumExists = false;
-    var artistExists = false;
-    String artistId = "";
-          var albumId = "";
-    artists.forEach((id, artist) {
-      if(metadata.containsKey("artist")) {
-      if(artist.name.containsValue(metadata["artist"])) {
-        artistExists = true;
-        artistId = artist.id;
 
-        for(String id in artist.albums) {
-          if(metadata.containsKey("album")) {
-            if (appStorage.albums[id]!.name.containsValue(metadata["album"])) {
-              albumExists = true;
-              albumId = id;
-            }
-          }
-        }
-      }
-      }
-    });
-
-    if(!artistExists) {
-      var artist = Artist.created(metadata);
-      artistId = artist.id;
-      artists[artistId] = artist;
-    }
-
-    if(!albumExists) {
-      var album = Album.created(
-        metadata: metadata,
-        artistId: artistId,
-        albumCover: albumCover
-      );
-      albumId = album.id;
-      artists[artistId]?.albums.add(albumId);
-      albums[albumId] = album;
-    }
-
-    var artist = artists[artistId]!;
+    var artist = Artist.created(metadata);
+    artists[artist.id] = artist;
     artist.save();
-    var album = albums[albumId]!;
+
+    var album = Album.created(metadata: metadata, artistId: artist.id, albumCover: albumCover);
+    artists[album.id]?.albums.add(album.id);
+    albums[album.id] = album;
     album.save();
 
-    var createdMusic = Song.created(metadata: metadata, artistId: artistId, albumId: albumId, file: File(filePath));
+    var createdMusic = Song.created(metadata: metadata, artistId: artist.id, albumId: album.id, file: File(filePath));
     createdMusic.save();
     appState.setMainViewState(() {
       songs[createdMusic.id] = createdMusic;
@@ -120,10 +84,10 @@ class AppStorage extends AppStorageCore {
 
   void initArtists() {
     var directory = Directory(artistsPath);
-    for(var subDirectory in directory.listSync()) {
-      if(subDirectory is Directory) {
-        for(var file in subDirectory.listSync()) {
-          if(file is Directory) {
+    for (var subDirectory in directory.listSync()) {
+      if (subDirectory is Directory) {
+        for (var file in subDirectory.listSync()) {
+          if (file is Directory) {
             var artist = Artist.fromDirectory(file);
             artists[artist.id] = artist;
           }
@@ -134,10 +98,10 @@ class AppStorage extends AppStorageCore {
 
   void initAlbums() {
     var directory = Directory(albumsPath);
-    for(var subDirectory in directory.listSync()) {
-      if(subDirectory is Directory) {
-        for(var file in subDirectory.listSync()) {
-          if(file is Directory) {
+    for (var subDirectory in directory.listSync()) {
+      if (subDirectory is Directory) {
+        for (var file in subDirectory.listSync()) {
+          if (file is Directory) {
             var album = Album.fromDirectory(file);
             albums[album.id] = album;
           }
@@ -147,10 +111,9 @@ class AppStorage extends AppStorageCore {
   }
 
   void initPlaylists() {
-
     var directory = Directory(playlistsPath);
-    for(var file in directory.listSync()) {
-      if(file is File) {
+    for (var file in directory.listSync()) {
+      if (file is File) {
         var playlist = Playlist.fromFile(file);
         playlists[playlist.id] = playlist;
       }
@@ -158,12 +121,13 @@ class AppStorage extends AppStorageCore {
   }
 
   void initMusic() {
-    playlists[""] =  Playlist();
+    print(songsPath);
+    playlists[""] = Playlist();
     var directory = Directory(songsPath);
-    for(var subDirectory in directory.listSync()) {
-      if(subDirectory is Directory) {
-        for(var file in subDirectory.listSync()) {
-          if(file is Directory) {
+    for (var subDirectory in directory.listSync()) {
+      if (subDirectory is Directory) {
+        for (var file in subDirectory.listSync()) {
+          if (file is Directory) {
             var musicObj = Song.fromDirectory(file);
             songs[musicObj.id] = musicObj;
             playlists[""]!.queue.add(musicObj.id);

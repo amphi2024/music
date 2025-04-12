@@ -18,7 +18,7 @@ class AppThemeData {
   AppThemeData({
     this.backgroundColor = AppTheme.midnight,
     this.textColor = AppTheme.white,
-    this.accentColor = AppTheme.lightBlue,
+    this.accentColor = AppTheme.cherry,
     this.inactiveColor = AppTheme.inactiveGray,
     this.noteBackgroundColor = AppTheme.charCoal,
     this.noteTextColor = AppTheme.white,
@@ -62,7 +62,7 @@ class AppThemeData {
       // ),
       sliderTheme: SliderThemeData(
          disabledActiveTrackColor: accentColor,
-        trackHeight: 3,
+        trackHeight: 5,
         inactiveTrackColor: inactiveColor,
           thumbShape: RoundSliderThumbShape(enabledThumbRadius: 0.0),
           overlayShape: SliderComponentShape.noOverlay

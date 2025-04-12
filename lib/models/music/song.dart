@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:music/channels/app_web_channel.dart';
+import 'package:music/models/music/lyrics.dart';
 import 'package:music/models/music/song_file.dart';
 
 import '../../utils/random_alphabet.dart';
@@ -17,6 +19,7 @@ class Song {
     "title": <String, dynamic>{},
     "genre": <String, dynamic>{},
     "artist": "",
+    "albumArtist": "",
     "album": "",
     "added": DateTime.now().toUtc().millisecondsSinceEpoch,
     "modified": DateTime.now().toUtc().millisecondsSinceEpoch,
@@ -29,9 +32,13 @@ class Song {
   set artist(value) => data["artist"] = value;
   Artist get artist => appStorage.artists[data["artist"]] ?? Artist();
   String get artistId => data["artist"];
+
+  Artist get albumArtist => appStorage.artists[data["albumArtist"]] ?? Artist();
+  String get albumArtistId => data["albumArtistId"];
   String get albumId => data["album"];
   set album(value) => data["album"] = value;
   Album get album => appStorage.albums[data["album"]] ?? Album();
+
   String id = "";
   String path = "";
   DateTime get added => DateTime.fromMillisecondsSinceEpoch(data["added"], isUtc: true).toLocal();
@@ -42,9 +49,24 @@ class Song {
   set released(DateTime value) => data["released"] = value.toUtc().millisecondsSinceEpoch;
   Artist get composer => appStorage.artists[data["composer"]] ?? Artist();
   String get composerId => data["composer"];
+
+  Artist? get lyricist => appStorage.artists[data["lyricist"]];
+
+  Artist? get arranger => appStorage.artists[data["arranger"]];
+
+  Artist? get producer => appStorage.artists[data["producer"]];
+
+  Artist? get encoder => appStorage.artists[data["encoder"]];
+
+  int get trackNumber => data["trackNumber"] ?? 0;
+  set trackNumber(int value) => data["trackNumber"] = value;
+
+  int get discNumber => data["discNumber"] ?? 0;
+  set discNumber(int value) => data["discNumber"] = value;
+
   Map<String, SongFile> files = {};
   String? songFilePath() {
-    var path = files.entries.firstOrNull?.value.songFilePath;
+    var path = files.entries.firstOrNull?.value.mediaFilepath;
     if(path != null && File(path).existsSync()) {
       return path;
     }
@@ -73,8 +95,25 @@ class Song {
     song.album = albumId;
     song.genre["default"] = metadata["genre"];
 
+    var discNumber = metadata["discNumber"];
+    if(discNumber is String && discNumber.isNotEmpty) {
+      song.discNumber = int.tryParse(discNumber) ?? 0;
+    }
+
+    var trackNumber = metadata["trackNumber"];
+    if(trackNumber is String && trackNumber.isNotEmpty) {
+      song.trackNumber = int.tryParse(trackNumber) ?? 0;
+    }
+
+
+
     var songFile = SongFile.created(path: directory.path, originalFile: file);
+    var lyrics = Lyrics();
+    lyrics.data.get("default").add(LyricLine(text: metadata["lyrics"] ?? ""));
+    songFile.lyrics = lyrics;
+    songFile.save();
     song.files[songFile.id] = songFile;
+    song.data["files"] = [songFile.id];
 
     var releasedYear = metadata["year"];
 
@@ -98,12 +137,12 @@ class Song {
       if(nameOnly != "info") {
         if(FilenameUtils.extensionName(file.path) == "json") {
           var songFile = song.files.putIfAbsent(nameOnly, () => SongFile());
-          songFile.infoFilePath = file.path;
+          songFile.infoFilepath = file.path;
           songFile.getData();
         }
         else {
           var songFile = song.files.putIfAbsent(nameOnly, () => SongFile());
-          songFile.songFilePath = file.path;
+          songFile.mediaFilepath = file.path;
         }
       }
     }
@@ -111,9 +150,47 @@ class Song {
     return song;
   }
 
-  void save() async {
+  Future<void> save({bool upload = true}) async {
     var infoFile = File(PathUtils.join(path, "info.json"));
     await infoFile.writeAsString(jsonEncode(data));
+
+    if(upload) {
+      appWebChannel.uploadSongInfo(song: this);
+      // appWebChannel.getSongFiles(songId: id, onSuccess: (list) {
+      //     files.forEach((key, songFile) {
+      //       bool infoExists = false;
+      //       bool mediaExists = false;
+      //       for(var map in list) {
+      //         var filename = map["filename"];
+      //         if(filename == PathUtils.basename(songFile.mediaFilepath)) {
+      //           // my-music.mp3 == my-music.mp3
+      //           mediaExists = true;
+      //           break;
+      //         }
+      //         if(filename == PathUtils.basename(songFile.infoFilepath)) {
+      //           // my-music.json == my-music.json
+      //           infoExists = true;
+      //           break;
+      //         }
+      //       }
+      //       if(!infoExists) {
+      //         appWebChannel.uploadSongFile(songId: id, filePath: songFile.infoFilepath);
+      //       }
+      //       if(!mediaExists) {
+      //         appWebChannel.uploadSongFile(songId: id, filePath: songFile.mediaFilepath, onSuccess: () {
+      //           // If metadata is empty
+      //           if(title["default"] == null) {
+      //             appWebChannel.getSongInfo(songId: id, onSuccess: (map) async {
+      //               title["default"] = map["title"]["default"];
+      //               await infoFile.writeAsString(jsonEncode(data));
+      //             });
+      //           }
+      //         });
+      //       }
+      //     });
+      // });
+
+    }
   }
 }
 

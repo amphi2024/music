@@ -36,8 +36,8 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
   Widget build(BuildContext context) {
 
     var songFile = song.files.entries.firstOrNull?.value ?? SongFile();
-    print(songFile.songFilePath);
-    var lyricsEditingController = LyricsEditingController(lyrics: songFile.lyrics, readOnly: true, songFilePath: songFile.songFilePath);
+    print(songFile.mediaFilepath);
+    var lyricsEditingController = LyricsEditingController(lyrics: songFile.lyrics, readOnly: true, songFilePath: songFile.mediaFilepath);
     return Dialog(
       child: ConstrainedBox(
         constraints: BoxConstraints(

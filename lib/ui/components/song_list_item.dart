@@ -92,10 +92,10 @@ class SongListItem extends StatelessWidget {
                           ],
                         )
                     ),
-                    Icon(
-                      Icons.arrow_downward_outlined,
-                      size: 13,
-                    ),
+                    // Icon(
+                    //   Icons.arrow_downward_outlined,
+                    //   size: 13,
+                    // ),
                     PopupMenuButton(
                       icon: Icon(Icons.more_vert),
                       itemBuilder: (context) {

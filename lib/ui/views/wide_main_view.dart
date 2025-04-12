@@ -9,6 +9,7 @@ import 'package:music/ui/components/playing/desktop_playing_bar.dart';
 import 'package:music/ui/dialogs/settings_dialog.dart';
 import 'package:music/ui/fragments/songs_fragment.dart';
 
+import '../../channels/app_method_channel.dart';
 import '../../models/app_storage.dart';
 import '../dialogs/edit_playlist_dialog.dart';
 import '../fragments/albums_fragment.dart';
@@ -52,6 +53,8 @@ class _WideMainViewState extends State<WideMainView> {
 
   @override
   Widget build(BuildContext context) {
+    appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor);
+
     return Scaffold(
       body: Stack(
         children: [

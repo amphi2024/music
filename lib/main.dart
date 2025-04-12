@@ -59,6 +59,7 @@ class _MyAppState extends State<MyApp> {
           win.title = "";
           win.show();
         });
+
       }
     });
 

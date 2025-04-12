@@ -9,7 +9,8 @@ class DarkTheme extends AppThemeData {
       {
         super.backgroundColor = AppTheme.midnight,
         super.textColor = AppTheme.white,
-        super.accentColor = AppTheme.lightBlue,
+        //super.accentColor = AppTheme.lightBlue,
+        super.accentColor = AppTheme.cherry,
         super.inactiveColor = AppTheme.inactiveGray,
         super.noteBackgroundColor = AppTheme.charCoal,
         super.noteTextColor = AppTheme.white,
