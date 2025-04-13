@@ -52,6 +52,10 @@ class Artist {
   }
 
   void save({bool upload = true}) async {
+    var directory = Directory(path);
+    if(!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
     var infoFile = File(PathUtils.join(path, "info.json"));
     await infoFile.writeAsString(jsonEncode(data));
 

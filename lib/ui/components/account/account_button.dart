@@ -101,5 +101,5 @@ void onLoggedIn({required String id, required String token, required String user
   appStorage.selectedUser.name = username;
   appStorage.selectedUser.token = token;
   await appStorage.saveSelectedUserInformation();
-  //appWebChannel.syncMissingFiles();
+  appStorage.syncMissingData();
 }

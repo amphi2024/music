@@ -38,7 +38,6 @@ class Album {
     var directory = Directory(PathUtils.join(appStorage.albumsPath , alphabet , filename));
     directory.createSync(recursive: true);
 
-    Directory(PathUtils.join(directory.path, "covers")).createSync();
     album.path = directory.path;
     album.id = filename;
 
@@ -47,8 +46,8 @@ class Album {
     album.artist = artistId;
 
     if(albumCover.isNotEmpty) {
-      var coverFilename = FilenameUtils.generatedFileName(".jpg", PathUtils.join(album.path, "covers"));
-      var coverFile = File(PathUtils.join(album.path, "covers", coverFilename));
+      var coverFilename = FilenameUtils.generatedFileName(".jpg", album.path);
+      var coverFile = File(PathUtils.join(album.path, coverFilename));
       coverFile.writeAsBytes(albumCover);
       album.covers.add(coverFile.path);
     }
@@ -61,12 +60,10 @@ class Album {
     album.path = directory.path;
     album.id = PathUtils.basename(album.path);
 
-    var coversDir = Directory(PathUtils.join(directory.path, "covers"));
-    if(!coversDir.existsSync()) {
-      coversDir.createSync();
-    }
-    for(var file in coversDir.listSync()) {
-      album.covers.add(file.path);
+    for(var file in directory.listSync()) {
+      if(!file.path.endsWith(".json")) {
+        album.covers.add(file.path);
+      }
     }
     var infoFile = File(PathUtils.join(album.path, "info.json"));
     if(infoFile.existsSync()) {
@@ -82,14 +79,33 @@ class Album {
   }
 
   Future<void> save({bool upload = true}) async {
+    var directory = Directory(path);
+    if(!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
     var infoFile = File(PathUtils.join(path, "info.json"));
     await infoFile.writeAsString(jsonEncode(data));
 
     if(upload) {
       appWebChannel.uploadAlbumInfo(album: this);
-      // for(var filePath in covers) {
-      //
-      // }
+      appWebChannel.getAlbumCovers(id: id, onSuccess: (list) {
+
+          for(var filePath in covers) {
+            bool exists = false;
+            for(var fileInfo in list) {
+              var filename = PathUtils.basename(filePath);
+              if (filename == fileInfo["filename"]) {
+                exists = true;
+                break;
+              }
+            }
+            if(!exists) {
+              appWebChannel.uploadAlbumCover(albumId: id, filePath: filePath);
+            }
+          }
+
+      });
+
     }
   }
 }

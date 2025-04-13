@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:amphi/models/app_web_channel_core.dart';
 import 'package:amphi/models/update_event.dart';
 import 'package:amphi/utils/path_utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:music/models/music/playlist.dart';
 import 'package:web_socket_channel/io.dart';
@@ -43,9 +44,7 @@ class AppWebChannel extends AppWebChannelCore {
       Map<String, dynamic> jsonData = jsonDecode(message);
       UpdateEvent updateEvent = UpdateEvent.fromJson(jsonData);
 
-      switch (updateEvent.action) {
-
-      }
+      switch (updateEvent.action) {}
       appWebChannel.acknowledgeEvent(updateEvent);
     }, onDone: () {
       connected = false;
@@ -54,7 +53,7 @@ class AppWebChannel extends AppWebChannelCore {
     }, cancelOnError: true);
   }
 
-  void getItems({required String url, void Function(int?)? onFailed, void Function(List<Map<String, dynamic>>)? onSuccess}) async {
+  void getFiles({required String url, void Function(int?)? onFailed, void Function(List<Map<String, dynamic>>)? onSuccess}) async {
     try {
       final response = await get(
         Uri.parse(url),
@@ -76,15 +75,11 @@ class AppWebChannel extends AppWebChannelCore {
   }
 
   void getSongFiles({required String songId, void Function(int?)? onFailed, void Function(List<Map<String, dynamic>>)? onSuccess}) async {
-    getItems(url: "$serverAddress/music/songs/$songId/files", onFailed: onFailed, onSuccess: onSuccess);
+    getFiles(url: "$serverAddress/music/songs/$songId/files", onFailed: onFailed, onSuccess: onSuccess);
   }
 
   void getThemes({void Function(int?)? onFailed, void Function(List<Map<String, dynamic>>)? onSuccess}) async {
-    getItems(url: "$serverAddress/music/themes", onFailed: onFailed, onSuccess: onSuccess);
-  }
-
-  void getFiles({required String noteName , void Function(int?)? onFailed, void Function(List<Map<String, dynamic>>)? onSuccess}) async {
-    getItems(url: "$serverAddress/notes/$noteName/files", onSuccess: onSuccess, onFailed: onFailed);
+    getFiles(url: "$serverAddress/music/themes", onFailed: onFailed, onSuccess: onSuccess);
   }
 
   void acknowledgeEvent(UpdateEvent updateEvent) async {
@@ -111,7 +106,8 @@ class AppWebChannel extends AppWebChannelCore {
     if (response.statusCode == HttpStatus.ok) {
       List<dynamic> decoded = jsonDecode(utf8.decode(response.bodyBytes));
       for (Map<String, dynamic> map in decoded) {
-        UpdateEvent updateEvent = UpdateEvent(action: map["action"], value: map["value"], timestamp: DateTime.fromMillisecondsSinceEpoch( map["timestamp"]).toLocal());
+        UpdateEvent updateEvent =
+            UpdateEvent(action: map["action"], value: map["value"], timestamp: DateTime.fromMillisecondsSinceEpoch(map["timestamp"]).toLocal());
         list.add(updateEvent);
       }
       onResponse(list);
@@ -120,11 +116,15 @@ class AppWebChannel extends AppWebChannelCore {
     }
   }
 
-  void uploadJson({required String url, required String jsonBody ,void Function()? onSuccess, void Function(int?)? onFailed, required UpdateEvent updateEvent}) async {
+  void uploadJson(
+      {required String url,
+      required String jsonBody,
+      void Function()? onSuccess,
+      void Function(int?)? onFailed,
+      required UpdateEvent updateEvent}) async {
     try {
       final response = await post(Uri.parse(url),
-          headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8', "Authorization": token},
-          body: jsonBody);
+          headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8', "Authorization": token}, body: jsonBody);
       if (response.statusCode == 200) {
         if (onSuccess != null) {
           onSuccess();
@@ -142,11 +142,15 @@ class AppWebChannel extends AppWebChannelCore {
     }
   }
 
-  void uploadFile({required String url, required String filePath, void Function()? onSuccess, void Function(int?)? onFailed, required UpdateEvent updateEvent}) async {
+  void uploadFile(
+      {required String url,
+      required String filePath,
+      void Function()? onSuccess,
+      void Function(int?)? onFailed,
+      required UpdateEvent updateEvent}) async {
     try {
       MultipartRequest request = MultipartRequest('POST', Uri.parse(url));
-      MultipartFile multipartFile =
-      await MultipartFile.fromPath("file", filePath);
+      MultipartFile multipartFile = await MultipartFile.fromPath("file", filePath);
 
       request.headers.addAll({"Authorization": token});
       request.files.add(multipartFile);
@@ -189,10 +193,10 @@ class AppWebChannel extends AppWebChannelCore {
     }
   }
 
-  void getSongInfo({required String songId, required void Function(Map<String, dynamic>) onSuccess, void Function()? onFailed}) async {
+  void _getJson({required String url, required void Function(Map<String, dynamic>) onSuccess, void Function()? onFailed}) async {
     try {
       final response = await get(
-        Uri.parse("$serverAddress/music/songs/${songId}"),
+        Uri.parse(url),
         headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8', "Authorization": token},
       );
       if (response.statusCode == 200) {
@@ -205,17 +209,30 @@ class AppWebChannel extends AppWebChannelCore {
     }
   }
 
+  void getSongInfo({required String id, required void Function(Map<String, dynamic>) onSuccess, void Function()? onFailed}) async {
+    _getJson(url: "$serverAddress/music/songs/${id}", onSuccess: onSuccess, onFailed: onFailed);
+  }
+  void getAlbumInfo({required String id, required void Function(Map<String, dynamic>) onSuccess, void Function()? onFailed}) async {
+    _getJson(url: "$serverAddress/music/albums/${id}", onSuccess: onSuccess, onFailed: onFailed);
+  }
+  void getArtistInfo({required String id, required void Function(Map<String, dynamic>) onSuccess, void Function()? onFailed}) async {
+    _getJson(url: "$serverAddress/music/artists/${id}", onSuccess: onSuccess, onFailed: onFailed);
+  }
+  void getPlaylist({required String id, required void Function(Map<String, dynamic>) onSuccess, void Function()? onFailed}) async {
+    _getJson(url: "$serverAddress/music/playlists/${id}", onSuccess: onSuccess, onFailed: onFailed);
+  }
+
   void uploadAlbumInfo({required Album album, void Function()? onSuccess, void Function(int?)? onFailed}) async {
     UpdateEvent updateEvent = UpdateEvent(action: UpdateEvent.uploadAlbumInfo, value: album.id, timestamp: DateTime.now().toUtc());
     uploadJson(url: "$serverAddress/music/albums/${album.id}", jsonBody: jsonEncode(album.data), updateEvent: updateEvent);
   }
 
   void uploadAlbumCover({required String albumId, required String filePath, void Function(int?)? onFailed, void Function()? onSuccess}) async {
-
     var filename = PathUtils.basename(filePath);
     var infoEvent = UpdateEvent(action: UpdateEvent.uploadSongFile, value: filename, timestamp: DateTime.now().toUtc());
 
-    uploadFile(url: "$serverAddress/music/albums/$albumId/$filename", filePath: filePath, onSuccess: onSuccess, onFailed: onFailed, updateEvent: infoEvent);
+    uploadFile(
+        url: "$serverAddress/music/albums/$albumId/$filename", filePath: filePath, onSuccess: onSuccess, onFailed: onFailed, updateEvent: infoEvent);
   }
 
   void uploadArtistInfo({required Artist artist, void Function()? onSuccess, void Function(int?)? onFailed}) async {
@@ -229,17 +246,122 @@ class AppWebChannel extends AppWebChannelCore {
   }
 
   void uploadSongFile({required String songId, required String filePath, void Function(int?)? onFailed, void Function()? onSuccess}) async {
-
     var filename = PathUtils.basename(filePath);
     var infoEvent = UpdateEvent(action: UpdateEvent.uploadSongFile, value: filename, timestamp: DateTime.now().toUtc());
 
-    uploadFile(url: "$serverAddress/music/songs/$songId/$filename", filePath: filePath, onSuccess: onSuccess, onFailed: onFailed, updateEvent: infoEvent);
+    uploadFile(
+        url: "$serverAddress/music/songs/$songId/$filename", filePath: filePath, onSuccess: onSuccess, onFailed: onFailed, updateEvent: infoEvent);
   }
 
   void uploadPlaylist({required Playlist playlist, void Function(int?)? onFailed, void Function()? onSuccess}) async {
-
     UpdateEvent updateEvent = UpdateEvent(action: UpdateEvent.uploadPlaylist, value: playlist.id, timestamp: DateTime.now().toUtc());
     var fileContent = await File(playlist.path).readAsString();
     uploadJson(url: "$serverAddress/music/playlists/${playlist.id}", jsonBody: fileContent, updateEvent: updateEvent);
+  }
+
+  void getItems({required String url, required void Function(List<String>) onSuccess, void Function(int?)? onFailed}) async {
+    try {
+      final response = await get(
+        Uri.parse(url),
+        headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8', "Authorization": appWebChannel.token},
+      );
+      if (response.statusCode == 200) {
+        List<dynamic> list = jsonDecode(response.body);
+        onSuccess(list.map((item) => item as String).toList());
+      } else {
+        if (onFailed != null) {
+          onFailed(response.statusCode);
+        }
+      }
+    } catch (e) {
+      if (onFailed != null) {
+        onFailed(null);
+      }
+    }
+  }
+
+  void _getMapItems({required String url, required void Function(List<Map<String, dynamic>>) onSuccess, void Function(int?)? onFailed}) async {
+    try {
+      final response = await get(
+        Uri.parse(url),
+        headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8', "Authorization": appWebChannel.token},
+      );
+      if (response.statusCode == 200) {
+        List<dynamic> list = jsonDecode(response.body);
+        onSuccess(list.map((item) => item as Map<String, dynamic>).toList());
+      } else {
+        if (onFailed != null) {
+          onFailed(response.statusCode);
+        }
+      }
+    } catch (e) {
+      if (onFailed != null) {
+        onFailed(null);
+      }
+    }
+  }
+
+  void getSongs({required void Function(List<String>) onSuccess, void Function(int?)? onFailed}) async {
+    getItems(url: "$serverAddress/music/songs", onSuccess: onSuccess, onFailed: onFailed);
+  }
+  void getArtists({required void Function(List<String>) onSuccess, void Function(int?)? onFailed}) async {
+    getItems(url: "$serverAddress/music/artists", onSuccess: onSuccess, onFailed: onFailed);
+  }
+
+  void getAlbums({required void Function(List<String>) onSuccess, void Function(int?)? onFailed}) async {
+    getItems(url: "$serverAddress/music/albums", onSuccess: onSuccess, onFailed: onFailed);
+  }
+  
+  void getAlbumCovers({required String id, required void Function(List<Map<String, dynamic>>) onSuccess, void Function(int?)? onFailed}) async {
+    _getMapItems(url: "$serverAddress/music/albums/$id/covers", onSuccess: onSuccess, onFailed: onFailed);
+  }
+
+  void getPlaylists({required void Function(List<Map<String, dynamic>>) onSuccess, void Function(int?)? onFailed}) async {
+    _getMapItems(url: "$serverAddress/music/playlists", onSuccess: onSuccess, onFailed: onFailed);
+  }
+
+  void uploadTheme(
+      {required String themeFileContent, required String themeFilename, void Function()? onSuccess, void Function(int?)? onFailed}) async {
+    UpdateEvent updateEvent = UpdateEvent(action: UpdateEvent.uploadTheme, value: themeFilename, timestamp: DateTime.now().toUtc());
+    uploadJson(
+        url: "$serverAddress/music/themes/${themeFilename}",
+        jsonBody: themeFileContent,
+        updateEvent: updateEvent,
+        onSuccess: onSuccess,
+        onFailed: onFailed);
+  }
+
+  void _downloadFile({required String url, required String filePath ,void Function()? onSuccess, void Function(int?)? onFailed}) async {
+    try {
+      final response = await get(
+        Uri.parse(url),
+        headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8', "Authorization": token},
+      );
+      if (response.statusCode == 200) {
+        var file = File(filePath);
+        await file.writeAsBytes(response.bodyBytes);
+        if (onSuccess != null) {
+          onSuccess();
+        }
+      } else if (onFailed != null) {
+        print(response.statusCode);
+        onFailed(response.statusCode);
+      }
+    } catch (e) {
+      print(e);
+      if (onFailed != null) {
+        onFailed(null);
+      }
+    }
+  }
+
+  void downloadSongFile({required Song song, required String filename, void Function()? onSuccess, void Function(int?)? onFailed}) async {
+    var url = "$serverAddress/music/songs/${song.id}/$filename";
+    var filePath = PathUtils.join(song.path, filename);
+    _downloadFile(url: url, filePath: filePath , onSuccess: onSuccess, onFailed: onFailed);
+  }
+
+  void downloadAlbumCover({required Album album, required String filename, void Function()? onSuccess, void Function(int?)? onFailed}) async {
+    _downloadFile(url: "$serverAddress/music/albums/${album.id}/${filename}", filePath: PathUtils.join(album.path, "covers"));
   }
 }

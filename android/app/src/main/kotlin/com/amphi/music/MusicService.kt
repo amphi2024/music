@@ -12,6 +12,7 @@ import android.media.session.PlaybackState
 import android.os.Binder
 import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -157,6 +158,7 @@ class MusicService : Service() {
     }
 
     override fun onDestroy() {
+        Log.d("heyyyyy", "destroy.......")
         super.onDestroy()
         player.release()
         mediaSession.release()

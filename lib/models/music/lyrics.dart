@@ -42,6 +42,7 @@ class Lyrics {
 
   static Future<Lyrics> fromSelectedFile(String localeCode) async {
     Lyrics lyrics = Lyrics();
+
     var result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ["lrc"], allowMultiple: false);
     var selectedFiles = result?.files;
     if(selectedFiles != null) {

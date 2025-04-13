@@ -151,44 +151,48 @@ class Song {
   }
 
   Future<void> save({bool upload = true}) async {
+    var directory = Directory(path);
+    if(!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
     var infoFile = File(PathUtils.join(path, "info.json"));
     await infoFile.writeAsString(jsonEncode(data));
 
     if(upload) {
       appWebChannel.uploadSongInfo(song: this);
-      // appWebChannel.getSongFiles(songId: id, onSuccess: (list) {
-      //     files.forEach((key, songFile) {
-      //       bool infoExists = false;
-      //       bool mediaExists = false;
-      //       for(var map in list) {
-      //         var filename = map["filename"];
-      //         if(filename == PathUtils.basename(songFile.mediaFilepath)) {
-      //           // my-music.mp3 == my-music.mp3
-      //           mediaExists = true;
-      //           break;
-      //         }
-      //         if(filename == PathUtils.basename(songFile.infoFilepath)) {
-      //           // my-music.json == my-music.json
-      //           infoExists = true;
-      //           break;
-      //         }
-      //       }
-      //       if(!infoExists) {
-      //         appWebChannel.uploadSongFile(songId: id, filePath: songFile.infoFilepath);
-      //       }
-      //       if(!mediaExists) {
-      //         appWebChannel.uploadSongFile(songId: id, filePath: songFile.mediaFilepath, onSuccess: () {
-      //           // If metadata is empty
-      //           if(title["default"] == null) {
-      //             appWebChannel.getSongInfo(songId: id, onSuccess: (map) async {
-      //               title["default"] = map["title"]["default"];
-      //               await infoFile.writeAsString(jsonEncode(data));
-      //             });
-      //           }
-      //         });
-      //       }
-      //     });
-      // });
+      appWebChannel.getSongFiles(songId: id, onSuccess: (list) {
+          files.forEach((key, songFile) {
+            bool infoExists = false;
+            bool mediaExists = false;
+            for(var map in list) {
+              var filename = map["filename"];
+              if(filename == PathUtils.basename(songFile.mediaFilepath)) {
+                // my-music.mp3 == my-music.mp3
+                mediaExists = true;
+                break;
+              }
+              if(filename == PathUtils.basename(songFile.infoFilepath)) {
+                // my-music.json == my-music.json
+                infoExists = true;
+                break;
+              }
+            }
+            if(!infoExists) {
+              appWebChannel.uploadSongFile(songId: id, filePath: songFile.infoFilepath);
+            }
+            if(!mediaExists) {
+              appWebChannel.uploadSongFile(songId: id, filePath: songFile.mediaFilepath, onSuccess: () {
+                // If metadata is empty
+                // if(title["default"] == null) {
+                //   appWebChannel.getSongInfo(id: id, onSuccess: (map) async {
+                //     title["default"] = map["title"]["default"];
+                //     await infoFile.writeAsString(jsonEncode(data));
+                //   });
+                // }
+              });
+            }
+          });
+      });
 
     }
   }

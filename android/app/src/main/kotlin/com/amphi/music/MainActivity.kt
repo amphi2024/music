@@ -58,7 +58,6 @@ class MainActivity: FlutterActivity() {
     override fun onDestroy() {
         super.onDestroy()
         stopProgressTracking()
-        stopService(serviceIntent)
     }
 
     override fun onStop() {
@@ -212,10 +211,13 @@ class MainActivity: FlutterActivity() {
             while (isTracking) {
                 musicService?.let { service ->
                     val currentPosition = service.player.currentPosition
-
-                    methodChannel.invokeMethod("on_playback_changed", mapOf(
-                        "position" to currentPosition
-                    ))
+                    if(currentPosition > 0) {
+                        methodChannel.invokeMethod(
+                            "on_playback_changed", mapOf(
+                                "position" to currentPosition
+                            )
+                        )
+                    }
                 }
                 delay(1000L)
             }

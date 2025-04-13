@@ -1,13 +1,18 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:amphi/models/app_storage_core.dart';
+import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:music/channels/app_method_channel.dart';
+import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/music/playlist.dart';
+import 'package:music/models/music/song_file.dart';
 
 import 'app_state.dart';
+import 'app_theme.dart';
 import 'music/album.dart';
 import 'music/artist.dart';
 
@@ -121,7 +126,6 @@ class AppStorage extends AppStorageCore {
   }
 
   void initMusic() {
-    print(songsPath);
     playlists[""] = Playlist();
     var directory = Directory(songsPath);
     for (var subDirectory in directory.listSync()) {
@@ -139,5 +143,183 @@ class AppStorage extends AppStorageCore {
     initAlbums();
     initArtists();
     initPlaylists();
+  }
+
+  List<AppTheme> getAllThemes() {
+    List<AppTheme> list = [];
+    AppTheme appTheme = AppTheme(created: DateTime.now(), modified: DateTime.now());
+
+    list.add(appTheme);
+
+    Directory directory = Directory(appStorage.themesPath);
+    List<FileSystemEntity> fileList = directory.listSync();
+
+    for (FileSystemEntity file in fileList) {
+      if (file is File) {
+        AppTheme appTheme = AppTheme.fromFile(file);
+        list.add(appTheme);
+      }
+    }
+    return list;
+  }
+
+  void syncMissingData() async {
+    appWebChannel.getThemes(onSuccess: (list) {
+      List<AppTheme> appThemeList = getAllThemes();
+
+      for (int i = 0; i < appThemeList.length; i++) {
+        // remove items that existing on server
+        for (int j = 0; j < list.length; j++) {
+          Map<String, dynamic> map = list[j];
+          if (map["filename"] == appThemeList[i].filename) {
+            appThemeList.removeAt(i);
+            i--;
+            break;
+          }
+        }
+      }
+
+      for (AppTheme appTheme in appThemeList) {
+        // upload themes that not exist
+        if(appTheme.filename != "!DEFAULT") {
+          appWebChannel.uploadTheme(themeFileContent: jsonEncode(appTheme.toMap()), themeFilename: appTheme.filename);
+        }
+      }
+
+      for (int i = 0; i < list.length; i++) {
+        Map<String, dynamic> map = list[i];
+        String filename = map["filename"];
+        DateTime modified = DateTime.fromMillisecondsSinceEpoch(map["modified"]).toLocal();
+        File file = File(PathUtils.join(appStorage.themesPath, filename));
+        if (!file.existsSync()) {
+          appWebChannel.downloadTheme(filename: filename);
+        } else if (modified.isAfter(file.lastModifiedSync())) {
+          appWebChannel.downloadTheme(filename: filename);
+        }
+      }
+    });
+
+    appWebChannel.getSongs(onSuccess: (list) {
+      List<Song> songList = [];
+      songs.forEach((key, value) {
+        songList.add(value);
+      });
+
+      for (int i = 0; i < songList.length; i++) {
+        // remove items that existing on server
+        for (int j = 0; j < list.length; j++) {
+          if (list[j] == songList[i].id) {
+            songList.removeAt(i);
+            i--;
+            break;
+          }
+        }
+      }
+
+      for(var song in songList) {
+        appWebChannel.uploadSongInfo(song: song);
+        song.files.forEach((key, value) {
+          appWebChannel.uploadSongFile(songId: song.id, filePath: value.infoFilepath);
+          appWebChannel.uploadSongFile(songId: song.id, filePath: value.mediaFilepath);
+        });
+      }
+
+      for(var songId in list) {
+        appWebChannel.getSongInfo(id: songId, onSuccess: (data) {
+          var song = Song();
+          song.id = songId;
+          song.data = data;
+          song.path = PathUtils.join(songsPath, songId.substring(0, 1), songId);
+          song.save(upload: false);
+          songs[songId] = song;
+
+          appWebChannel.getSongFiles(songId: songId, onSuccess: (files) {
+            for(var file in files) {
+              String filename = file["filename"];
+              appWebChannel.downloadSongFile(song: song, filename: filename);
+              var nameOnly = FilenameUtils.nameOnly(filename);
+              var songFile = song.files.putIfAbsent(nameOnly, () => SongFile());
+              songFile.id = nameOnly;
+              if(filename.endsWith(".json")) {
+                songFile.infoFilepath = PathUtils.join(song.path, filename);
+              }
+              else {
+                songFile.mediaFilepath = PathUtils.join(song.path, filename);
+              }
+            }
+          });
+        });
+      }
+    });
+
+    appWebChannel.getAlbums(onSuccess: (list) {
+      List<Album> albumList = [];
+      albums.forEach((key, value) {
+        albumList.add(value);
+      });
+
+      for (int i = 0; i < albumList.length; i++) {
+        // remove items that existing on server
+        for (int j = 0; j < list.length; j++) {
+          if (list[j] == albumList[i].id) {
+            albumList.removeAt(i);
+            i--;
+            break;
+          }
+        }
+      }
+
+      for(var album in albumList) {
+        appWebChannel.uploadAlbumInfo(album: album);
+        for(var coverFilePath in album.covers) {
+          appWebChannel.uploadAlbumCover(albumId: album.id, filePath: coverFilePath);
+        }
+      }
+
+      for(var id in list) {
+        appWebChannel.getAlbumInfo(id: id, onSuccess: (data) {
+          var album = Album();
+          album.id = id;
+          album.data = data;
+          album.path = PathUtils.join(albumsPath, id.substring(0, 1), id);
+          album.save(upload: false);
+          albums[id] = album;
+
+          appWebChannel.getAlbumCovers(id: id, onSuccess: (covers) {
+            for(var coverInfo in covers) {
+              var filename = coverInfo["filename"];
+              appWebChannel.downloadAlbumCover(album: album, filename: filename);
+            }
+          });
+        });
+      }
+    });
+    appWebChannel.getArtists(onSuccess: (list) {
+      for(var id in list) {
+        appWebChannel.getArtistInfo(id: id, onSuccess: (data) {
+          var artist = Artist();
+          artist.id = id;
+          artist.data = data;
+          artist.path = PathUtils.join(artistsPath, id.substring(0, 1), id);
+          artist.save(upload: false);
+          artists[id] = artist;
+
+
+        });
+      }
+    });
+    appWebChannel.getPlaylists(onSuccess: (list) {
+      for(var fileInfo in list) {
+        String filename = fileInfo["filename"];
+        String id = fileInfo["id"];
+        appWebChannel.getPlaylist(id: id, onSuccess: (data) {
+          var playlist = Playlist();
+          playlist.id = id;
+          playlist.path = PathUtils.join(playlistsPath, filename);
+          playlist.save(upload: false);
+        });
+      }
+    });
+
   }
 }
