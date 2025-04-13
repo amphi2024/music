@@ -26,20 +26,33 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+
+      if (appSettings.useOwnServer) {
+        if(!appWebChannel.connected) {
+          appWebChannel.connectWebSocket();
+        }
+        appStorage.syncDataFromEvents();
+      }
+    }
+    super.didChangeAppLifecycleState(state);
+  }
 
   Locale? locale;
-  //late OverlayEntry overlayEntry;
 
   @override
   void dispose() {
-    //overlayEntry.remove();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   void initState() {
-
+    WidgetsBinding.instance.addObserver(this);
     appState.setState = (fun) {
       setState(fun);
     };
@@ -49,6 +62,24 @@ class _MyAppState extends State<MyApp> {
       setState(() {
         locale = appSettings.locale;
       });
+
+      if (appSettings.useOwnServer) {
+        appWebChannel.connectWebSocket();
+
+        appStorage.syncDataFromEvents();
+        // appWebChannel.noteUpdateListeners.add((note) {
+        //   setState(() {
+        //     AppStorage.notifyNote(note);
+        //   });
+        // });
+        //
+        // appWebChannel.folderUpdateListeners.add((folder) {
+        //   setState(() {
+        //     AppStorage.notifyFolder(folder);
+        //   });
+        // });
+      }
+
       if(App.isDesktop()) {
         doWhenWindowReady(() {
           final win = appWindow;
@@ -59,7 +90,6 @@ class _MyAppState extends State<MyApp> {
           win.title = "";
           win.show();
         });
-
       }
     });
 

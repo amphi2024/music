@@ -34,7 +34,7 @@ class AppWebChannel extends AppWebChannelCore {
   get serverAddress => appSettings.serverAddress;
 
   @override
-  Future<void> connectWebSocket() async => connectWebSocketSuper("/notes/sync");
+  Future<void> connectWebSocket() async => connectWebSocketSuper("/music/sync");
 
   @override
   void setupWebsocketChannel(String serverAddress) async {
@@ -91,7 +91,7 @@ class AppWebChannel extends AppWebChannelCore {
     String postData = json.encode(data);
 
     await delete(
-      Uri.parse("$serverAddress/notes/events"),
+      Uri.parse("$serverAddress/music/events"),
       headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8', "Authorization": appWebChannel.token},
       body: postData,
     );
@@ -100,7 +100,7 @@ class AppWebChannel extends AppWebChannelCore {
   void getEvents({required void Function(List<UpdateEvent>) onResponse}) async {
     List<UpdateEvent> list = [];
     final response = await get(
-      Uri.parse("$serverAddress/notes/events"),
+      Uri.parse("$serverAddress/music/events"),
       headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8', "Authorization": appWebChannel.token},
     );
     if (response.statusCode == HttpStatus.ok) {
@@ -337,6 +337,9 @@ class AppWebChannel extends AppWebChannelCore {
         Uri.parse(url),
         headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8', "Authorization": token},
       );
+      print(url);
+      print(response.statusCode);
+      print(response.body);
       if (response.statusCode == 200) {
         var file = File(filePath);
         await file.writeAsBytes(response.bodyBytes);
@@ -362,6 +365,7 @@ class AppWebChannel extends AppWebChannelCore {
   }
 
   void downloadAlbumCover({required Album album, required String filename, void Function()? onSuccess, void Function(int?)? onFailed}) async {
-    _downloadFile(url: "$serverAddress/music/albums/${album.id}/${filename}", filePath: PathUtils.join(album.path, "covers"));
+    print(PathUtils.join(album.path, filename));
+    _downloadFile(url: "$serverAddress/music/albums/${album.id}/${filename}", filePath: PathUtils.join(album.path, filename));
   }
 }

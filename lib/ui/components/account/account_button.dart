@@ -1,8 +1,11 @@
 import 'package:amphi/models/account_info_bottom_sheet.dart';
 import 'package:amphi/models/app.dart';
+import 'package:amphi/models/user.dart';
 import 'package:amphi/widgets/account/account_info.dart';
 import 'package:flutter/material.dart';
 import 'package:amphi/widgets/account/profile_image.dart';
+import 'package:music/models/app_cache.dart';
+import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/ui/components/bottom_sheet_drag_handle.dart';
 
@@ -46,12 +49,14 @@ class AccountButton extends StatelessWidget {
                               child: AccountInfo(
                             appStorage: appStorage,
                             appWebChannel: appWebChannel,
+                            appCacheData: appCacheData,
                             onUserRemoved: onUserRemoved,
                             onUserAdded: onUserAdded,
                             onLoggedIn: ({required id, required token, required username}) {
                               onLoggedIn(id: id, token: token, username: username, context: context);
                             },
                             onUsernameChanged: onUsernameChanged,
+                                onSelectedUserChanged: onSelectedUserChanged,
                           ))
                         ],
                       ),
@@ -66,12 +71,14 @@ class AccountButton extends StatelessWidget {
                 return AccountInfoBottomSheet(
                     appWebChannel: appWebChannel,
                     appStorage: appStorage,
+                    appCacheData: appCacheData,
                     onUserRemoved: onUserRemoved,
                     onUserAdded: onUserAdded,
                     onUsernameChanged: onUsernameChanged,
                     onLoggedIn: ({required id, required token, required username}) {
                       onLoggedIn(id: id, token: token, username: username, context: context);
                     },
+                    onSelectedUserChanged: onSelectedUserChanged,
                     dragHandle: const BottomSheetDragHandle());
               },
             );
@@ -90,6 +97,20 @@ void onUserAdded() {
 
 void onUsernameChanged() {
 
+}
+
+void onSelectedUserChanged(User user) {
+  appSettings.getData();
+  appWebChannel.disconnectWebSocket();
+  appWebChannel.connectWebSocket();
+  appStorage.albums.clear();
+  appStorage.songs.clear();
+  appStorage.playlists.clear();
+  appStorage.artists.clear();
+  appState.setState(() {
+    appStorage.initMusic();
+    appStorage.syncDataFromEvents();
+  });
 }
 
 void onLoggedIn({required String id, required String token, required String username, required BuildContext context}) async {

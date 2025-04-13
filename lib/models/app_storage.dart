@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:amphi/models/app_storage_core.dart';
+import 'package:amphi/models/update_event.dart';
 import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
 import 'package:file_picker/file_picker.dart';
@@ -287,6 +288,7 @@ class AppStorage extends AppStorageCore {
 
           appWebChannel.getAlbumCovers(id: id, onSuccess: (covers) {
             for(var coverInfo in covers) {
+              print(coverInfo);
               var filename = coverInfo["filename"];
               appWebChannel.downloadAlbumCover(album: album, filename: filename);
             }
@@ -321,5 +323,29 @@ class AppStorage extends AppStorageCore {
       }
     });
 
+  }
+
+  Future<void> syncDataFromEvents() async {
+    if (appWebChannel.token.isNotEmpty) {
+      appWebChannel.getEvents(onResponse: (updateEvents) async {
+        for (UpdateEvent updateEvent in updateEvents) {
+          switch (updateEvent.action) {
+            case UpdateEvent.renameUser:
+              appStorage.selectedUser.name = updateEvent.value;
+              appStorage.saveSelectedUserInformation(updateEvent: updateEvent);
+              break;
+            case UpdateEvent.uploadTheme:
+              File file = File(PathUtils.join(appStorage.themesPath, updateEvent.value));
+              if (!file.existsSync()) {
+                appWebChannel.downloadTheme(filename: updateEvent.value);
+              } else if (updateEvent.timestamp.isAfter(file.lastModifiedSync())) {
+                appWebChannel.downloadTheme(filename: updateEvent.value);
+              }
+              break;
+          }
+          appWebChannel.acknowledgeEvent(updateEvent);
+        }
+      });
+    }
   }
 }
