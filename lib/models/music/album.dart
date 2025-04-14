@@ -22,9 +22,10 @@ class Album {
   Map<String, dynamic> get name => data["name"];
   Map<String, dynamic> get genre => data["genre"];
   Artist get artist => appStorage.artists[data["artist"]] ?? Artist();
+  String get artistId => data["artist"];
   set artist(value) => data["artist"] = value;
   List<String> covers = [];
-  List<String> music = [];
+  List<String> songs = [];
   DateTime get added => DateTime.fromMillisecondsSinceEpoch(data["added"], isUtc: true).toLocal();
   DateTime get modified => DateTime.fromMillisecondsSinceEpoch(data["modified"], isUtc: true).toLocal();
   late String id;
@@ -69,9 +70,9 @@ class Album {
     if(infoFile.existsSync()) {
       album.data = jsonDecode(infoFile.readAsStringSync());
     }
-    appStorage.songs.forEach((key, music) {
-      if(music.albumId == album.id) {
-        album.music.add(music.id);
+    appStorage.songs.forEach((key, song) {
+      if(song.albumId == album.id) {
+        album.songs.add(song.id);
       }
     });
 
@@ -106,6 +107,14 @@ class Album {
 
       });
 
+    }
+  }
+
+  Future<void> delete({bool upload = true}) async {
+    var directory = Directory(path);
+    await directory.delete(recursive: true);
+    if(upload) {
+      appWebChannel.deleteAlbum(id: id);
     }
   }
 }

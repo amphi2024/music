@@ -92,7 +92,14 @@ void onUserRemoved() {
 }
 
 void onUserAdded() {
-
+  appStorage.albums.clear();
+  appStorage.songs.clear();
+  appStorage.playlists.clear();
+  appStorage.artists.clear();
+  appSettings.getData();
+  appState.setState(() {
+    appStorage.initMusic();
+  });
 }
 
 void onUsernameChanged() {

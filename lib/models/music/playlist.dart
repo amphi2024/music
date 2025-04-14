@@ -64,6 +64,16 @@ class Playlist {
     }
   }
 
+  Future<void> delete({bool upload = true}) async {
+    var file = File(path);
+    var directory = Directory(PathUtils.join(appStorage.playlistsPath, id));
+    await directory.delete(recursive: true);
+    await file.delete();
+    if(upload) {
+      appWebChannel.deletePlaylist(id: id);
+    }
+  }
+
   void shuffle() {
     Random random = Random();
     queue.shuffle(random);

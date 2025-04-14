@@ -14,8 +14,8 @@ import 'package:music/ui/views/edit_lyrics_view.dart';
 
 class EditSongInfoDialog extends StatefulWidget {
 
-  final String songId;
-  const EditSongInfoDialog({super.key, required this.songId});
+  final Song song;
+  const EditSongInfoDialog({super.key, required this.song});
 
   @override
   State<EditSongInfoDialog> createState() => _EditSongInfoDialogState();
@@ -24,7 +24,7 @@ class EditSongInfoDialog extends StatefulWidget {
 class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
 
   final controller = TextEditingController();
-  late Song song = appStorage.songs[widget.songId]!;
+  late Song song = widget.song;
 
   @override
   void dispose() {
@@ -38,12 +38,16 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
     var songFile = song.files.entries.firstOrNull?.value ?? SongFile();
     print(songFile.mediaFilepath);
     var lyricsEditingController = LyricsEditingController(lyrics: songFile.lyrics, readOnly: true, songFilePath: songFile.mediaFilepath);
-    return Dialog(
+    var maxHeight = MediaQuery.of(context).size.height - 20;
+    if(maxHeight > 500) {
+      maxHeight = 500;
+    }
+      return Dialog(
       child: ConstrainedBox(
         constraints: BoxConstraints(
             maxWidth: 500,
             minHeight: 250,
-            maxHeight: MediaQuery.of(context).size.height - 300
+            maxHeight: maxHeight
         ),
         child: Column(
           children: [
@@ -64,6 +68,7 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                             return SelectArtistDialog(excepting: song.artistId, onSelected: (artistId) {
                               setState(() {
                                 song.data["artist"] = artistId;
+                                song.album.data["artist"] = artistId;
                               });
                             });
                           });
@@ -125,7 +130,10 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                 IconButton(
                   icon: Icon(Icons.check),
                   onPressed: () {
-
+                    song.save();
+                    song.album.save();
+                    song.artist.refreshAlbums();
+                    Navigator.pop(context);
                   },
                 ),
               ],

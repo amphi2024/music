@@ -54,9 +54,6 @@ class AppTheme extends AppThemeCore {
     appTheme.lightTheme.textColor = Color(jsonData["lightTextColor"]);
     appTheme.lightTheme.accentColor = Color(jsonData["lightAccentColor"]);
     appTheme.lightTheme.inactiveColor = Color(jsonData["lightInactiveColor"]);
-    appTheme.lightTheme.noteBackgroundColor =
-        Color(jsonData["lightNoteBackgroundColor"]);
-    appTheme.lightTheme.noteTextColor = Color(jsonData["lightNoteTextColor"]);
     appTheme.lightTheme.floatingButtonBackground =
         Color(jsonData["lightFloatingButtonBackground"]);
     appTheme.lightTheme.floatingButtonIconColor =
@@ -70,9 +67,6 @@ class AppTheme extends AppThemeCore {
     appTheme.darkTheme.textColor = Color(jsonData["darkTextColor"]);
     appTheme.darkTheme.accentColor = Color(jsonData["darkAccentColor"]);
     appTheme.darkTheme.inactiveColor = Color(jsonData["darkInactiveColor"]);
-    appTheme.darkTheme.noteBackgroundColor =
-        Color(jsonData["darkNoteBackgroundColor"]);
-    appTheme.darkTheme.noteTextColor = Color(jsonData["darkNoteTextColor"]);
     appTheme.darkTheme.floatingButtonBackground =
         Color(jsonData["darkFloatingButtonBackground"]);
     appTheme.darkTheme.floatingButtonIconColor =
@@ -106,8 +100,6 @@ class AppTheme extends AppThemeCore {
       "lightTextColor":  lightTheme.textColor.value,
       "lightAccentColor":  lightTheme.accentColor.value,
       "lightInactiveColor":  lightTheme.inactiveColor.value,
-      "lightNoteBackgroundColor":  lightTheme.noteBackgroundColor.value,
-      "lightNoteTextColor":  lightTheme.noteTextColor.value,
       "lightFloatingButtonBackground":  lightTheme.floatingButtonBackground.value,
       "lightFloatingButtonIconColor":  lightTheme.floatingButtonIconColor.value,
       "lightCheckBoxColor":  lightTheme.checkBoxColor.value,
@@ -117,8 +109,6 @@ class AppTheme extends AppThemeCore {
       "darkTextColor":  darkTheme.textColor.value,
       "darkAccentColor":  darkTheme.accentColor.value,
       "darkInactiveColor":  darkTheme.inactiveColor.value,
-      "darkNoteBackgroundColor":  darkTheme.noteBackgroundColor.value,
-      "darkNoteTextColor":  darkTheme.noteTextColor.value,
       "darkFloatingButtonBackground":  darkTheme.floatingButtonBackground.value,
       "darkFloatingButtonIconColor":  darkTheme.floatingButtonIconColor.value,
       "darkCheckBoxColor":  darkTheme.checkBoxColor.value,

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:music/models/app_settings.dart';

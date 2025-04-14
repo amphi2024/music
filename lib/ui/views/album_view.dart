@@ -5,16 +5,18 @@ import 'package:music/models/music/song.dart';
 import 'package:music/ui/components/album_cover.dart';
 
 class AlbumView extends StatelessWidget {
-
   final Album album;
+
   const AlbumView({super.key, required this.album});
 
   @override
   Widget build(BuildContext context) {
-
     List<Song> musicList = [];
-    for(var musicId in album.music) {
-      musicList.add(appStorage.songs[musicId]!);
+    for (var musicId in album.songs) {
+      var song = appStorage.songs[musicId];
+      if (song != null) {
+        musicList.add(song);
+      }
     }
 
     return Scaffold(
@@ -25,10 +27,8 @@ class AlbumView extends StatelessWidget {
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
-                  album.name.byContext(context),
-                style: TextStyle(
-                  fontSize: 15
-                ),
+                album.name.byContext(context),
+                style: TextStyle(fontSize: 15),
               ),
               centerTitle: true,
               background: Center(
@@ -36,17 +36,20 @@ class AlbumView extends StatelessWidget {
                   width: 250,
                   child: ClipRRect(
                       borderRadius: BorderRadius.circular(15),
-                      child: AlbumCover(album: album, fit: BoxFit.cover,)),
+                      child: AlbumCover(
+                        album: album,
+                        fit: BoxFit.cover,
+                      )),
                 ),
               ),
             ),
           ),
           SliverList(
             delegate: SliverChildBuilderDelegate(
-                  (context, index) => ListTile(
+              (context, index) => ListTile(
                 title: Text(musicList[index].title.byContext(context)),
               ),
-              childCount: musicList.length,  // Number of songs
+              childCount: musicList.length, // Number of songs
             ),
           ),
         ],

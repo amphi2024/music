@@ -196,6 +196,14 @@ class Song {
 
     }
   }
+
+  Future<void> delete({bool upload = true}) async {
+    var directory = Directory(path);
+    await directory.delete(recursive: true);
+    if(upload) {
+      appWebChannel.deleteSong(id: id);
+    }
+  }
 }
 
 extension MusicTitleExtension on Map<String, dynamic> {

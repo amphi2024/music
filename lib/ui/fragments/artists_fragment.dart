@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/song.dart';
+import 'package:music/ui/components/artist_linear_item.dart';
 import 'package:music/ui/components/artist_profile_image.dart';
 import 'package:music/ui/views/artist_view.dart';
 
@@ -16,7 +17,6 @@ class ArtistsFragment extends StatefulWidget {
 }
 
 class _ArtistsFragmentState extends State<ArtistsFragment> {
-
   var scrollController = ScrollController();
 
   @override
@@ -49,43 +49,15 @@ class _ArtistsFragmentState extends State<ArtistsFragment> {
     children.add(Container(
       height: 60,
     ));
-    for(var artist in list) {
-      var artistWidget = GestureDetector(
-        onTap: () {
-          Navigator.push(context, CupertinoPageRoute(builder: (context) => ArtistView()));
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(5),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 10, right: 10),
-                child: SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: ArtistProfileImage(
-                        artist: artist,
-                      ),
-                    )
-                ),
-              ),
-              Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                          artist.name.byContext(context)
-                      )
-                    ],
-                  )
-              ),
-            ],
-          ),
-        ),
-      );
+    for (var artist in list) {
+      var artistWidget = ArtistLinearItem(
+          artist: artist,
+          onPressed: () {
+            Navigator.push(context, CupertinoPageRoute(builder: (context) => ArtistView(artist: artist)));
+          },
+          onLongPressed: () {
+            artist.delete();
+          });
       children.add(artistWidget);
     }
 

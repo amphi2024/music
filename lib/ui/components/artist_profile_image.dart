@@ -7,12 +7,28 @@ class ArtistProfileImage extends StatelessWidget {
 
   final Artist artist;
   final BoxFit? fit;
-  const ArtistProfileImage({super.key, required this.artist, this.fit});
+  const ArtistProfileImage({super.key, required this.artist, this.fit = BoxFit.cover});
 
   @override
   Widget build(BuildContext context) {
     var filePath = artist.profileImages.firstOrNull;
     if(filePath != null) {
+      return AbsoluteArtistProfileImage(filePath: filePath);
+    }
+    else {
+      return Image.asset("assets/images/music.png", fit: fit);
+    }
+  }
+}
+
+class AbsoluteArtistProfileImage extends StatelessWidget {
+
+  final String filePath;
+  final BoxFit? fit;
+  const AbsoluteArtistProfileImage({super.key, required this.filePath, this.fit = BoxFit.cover});
+
+  @override
+  Widget build(BuildContext context) {
       var file = File(filePath);
       if(!file.existsSync()) {
         return Image.asset("assets/images/music.png", fit: fit);
@@ -22,8 +38,4 @@ class ArtistProfileImage extends StatelessWidget {
         fit: fit,
       );
     }
-    else {
-      return Image.asset("assets/images/music.png", fit: fit);
-    }
-  }
 }

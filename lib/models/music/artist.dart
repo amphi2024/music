@@ -26,6 +26,15 @@ class Artist {
 
   late String path;
 
+  void refreshAlbums() {
+    albums.clear();
+    appStorage.albums.forEach((key, album) {
+      if(id == album.artistId) {
+        albums.add(album.id);
+      }
+    });
+  }
+
   static Artist fromDirectory(Directory directory) {
     var artist = Artist();
 
@@ -34,6 +43,20 @@ class Artist {
     var infoFile = File(PathUtils.join(artist.path, "info.json"));
     if(infoFile.existsSync()) {
       artist.data = jsonDecode(infoFile.readAsStringSync());
+    }
+
+    artist.albums.clear();
+
+    appStorage.albums.forEach((key, album) {
+      if(artist.id == album.artistId) {
+        artist.albums.add(album.id);
+      }
+    });
+
+    for(var file in directory.listSync()) {
+      if(!file.path.endsWith("info.json")) {
+        artist.profileImages.add(file.path);
+      }
     }
     return artist;
   }
@@ -51,7 +74,7 @@ class Artist {
     return artist;
   }
 
-  void save({bool upload = true}) async {
+  Future<void> save({bool upload = true}) async {
     var directory = Directory(path);
     if(!await directory.exists()) {
       await directory.create(recursive: true);
@@ -63,6 +86,15 @@ class Artist {
       appWebChannel.uploadArtistInfo(artist: this);
     }
   }
+
+  Future<void> delete({bool upload = true}) async {
+    var directory = Directory(path);
+    await directory.delete(recursive: true);
+    if(upload) {
+      appWebChannel.deleteArtist(id: id);
+    }
+  }
+
 }
 
 

@@ -343,7 +343,7 @@ class AppStorage extends AppStorageCore {
               }
               break;
           }
-          appWebChannel.acknowledgeEvent(updateEvent);
+         // appWebChannel.acknowledgeEvent(updateEvent);
         }
       });
     }

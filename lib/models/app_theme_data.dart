@@ -7,26 +7,24 @@ class AppThemeData {
   Color textColor;
   Color accentColor;
   Color inactiveColor;
-  Color noteBackgroundColor;
-  Color noteTextColor;
   Color floatingButtonBackground;
   Color floatingButtonIconColor;
   Color checkBoxColor;
   Color checkBoxCheckColor;
   Color errorColor;
+  Color navigationBarBackgroundColor;
 
   AppThemeData({
     this.backgroundColor = AppTheme.midnight,
     this.textColor = AppTheme.white,
     this.accentColor = AppTheme.cherry,
     this.inactiveColor = AppTheme.inactiveGray,
-    this.noteBackgroundColor = AppTheme.charCoal,
-    this.noteTextColor = AppTheme.white,
     this.floatingButtonBackground = AppTheme.white,
     this.floatingButtonIconColor = AppTheme.lightBlue,
     this.checkBoxColor = AppTheme.lightBlue,
     this.checkBoxCheckColor = AppTheme.white,
-    this.errorColor = AppTheme.red
+    this.errorColor = AppTheme.red,
+    this.navigationBarBackgroundColor = AppTheme.charCoal
   });
 
   ThemeData themeData({required Brightness brightness, required BuildContext context}) {
@@ -117,7 +115,10 @@ class AppThemeData {
       disabledColor: inactiveColor,
       highlightColor: accentColor,
       scaffoldBackgroundColor: backgroundColor,
-      cardColor: noteBackgroundColor,
+      cardColor: backgroundColor,
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: navigationBarBackgroundColor
+      ),
       snackBarTheme: SnackBarThemeData(
           backgroundColor: floatingButtonBackground,
           behavior: SnackBarBehavior.floating,
@@ -134,8 +135,8 @@ class AppThemeData {
         onSecondary: textColor,
         onError: accentColor,
         error: AppTheme.red,
-        surface: noteBackgroundColor,
-        onSurface: noteTextColor,
+        surface: backgroundColor,
+        onSurface: textColor,
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
           backgroundColor: floatingButtonBackground,

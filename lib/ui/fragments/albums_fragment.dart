@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:music/models/music/album.dart';
 import 'package:music/models/music/song.dart';
+import 'package:music/ui/components/album_grid_item.dart';
 import 'package:music/ui/views/album_view.dart';
 
 import '../../models/app_state.dart';
@@ -57,36 +58,7 @@ class _AlbumsFragmentState extends State<AlbumsFragment> {
       ));
     }
     for(var album in albumList) {
-      var albumWidget = GestureDetector(
-        onTap: () {
-          Navigator.push(context, CupertinoPageRoute(builder: (context) => AlbumView(album: album)));
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 15),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: AlbumCover(album: album),
-                ),
-              ),
-              Text(
-                album.name.byContext(context),
-                maxLines: 3,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold
-                ),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                  album.artist.name.byContext(context)
-              ),
-            ],
-          ),
-        ),
-      );
+      var albumWidget = AlbumGridItem(album: album);
       children.add(albumWidget);
     }
     return MasonryGridView(

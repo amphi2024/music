@@ -104,7 +104,7 @@ class SongListItem extends StatelessWidget {
                           PopupMenuItem(child: Text("Add to Playlist")),
                           PopupMenuItem(child: Text("Edit Info"), onTap: () {
                             showDialog(context: context, builder: (context) {
-                              return EditSongInfoDialog(songId: song.id);
+                              return EditSongInfoDialog(song: song);
                             });
                           }),
                           PopupMenuItem(child: Text("Delete")),

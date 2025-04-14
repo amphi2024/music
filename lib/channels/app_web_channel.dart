@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:amphi/models/app_web_channel_core.dart';
 import 'package:amphi/models/update_event.dart';
+import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:music/models/music/playlist.dart';
 import 'package:web_socket_channel/io.dart';
@@ -15,6 +15,7 @@ import '../models/app_theme.dart';
 import '../models/music/album.dart';
 import '../models/music/artist.dart';
 import '../models/music/song.dart';
+import '../models/music/song_file.dart';
 
 final appWebChannel = AppWebChannel.getInstance();
 
@@ -45,7 +46,7 @@ class AppWebChannel extends AppWebChannelCore {
       UpdateEvent updateEvent = UpdateEvent.fromJson(jsonData);
 
       switch (updateEvent.action) {}
-      appWebChannel.acknowledgeEvent(updateEvent);
+      //appWebChannel.acknowledgeEvent(updateEvent);
     }, onDone: () {
       connected = false;
     }, onError: (d) {
@@ -240,6 +241,14 @@ class AppWebChannel extends AppWebChannelCore {
     uploadJson(url: "$serverAddress/music/artists/${artist.id}", jsonBody: jsonEncode(artist.data), updateEvent: updateEvent);
   }
 
+  void uploadArtistFile({required String id, required String filePath, void Function(int?)? onFailed, void Function()? onSuccess}) async {
+    var filename = PathUtils.basename(filePath);
+    var infoEvent = UpdateEvent(action: UpdateEvent.uploadArtistFile, value: filename, timestamp: DateTime.now().toUtc());
+
+    uploadFile(
+        url: "$serverAddress/music/artists/$id/$filename", filePath: filePath, onSuccess: onSuccess, onFailed: onFailed, updateEvent: infoEvent);
+  }
+
   void uploadSongInfo({required Song song, void Function()? onSuccess, void Function(int?)? onFailed}) async {
     UpdateEvent updateEvent = UpdateEvent(action: UpdateEvent.uploadSongInfo, value: song.id, timestamp: DateTime.now().toUtc());
     uploadJson(url: "$serverAddress/music/songs/${song.id}", jsonBody: jsonEncode(song.data), updateEvent: updateEvent);
@@ -287,6 +296,7 @@ class AppWebChannel extends AppWebChannelCore {
         headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8', "Authorization": appWebChannel.token},
       );
       if (response.statusCode == 200) {
+        print(response.body);
         List<dynamic> list = jsonDecode(response.body);
         onSuccess(list.map((item) => item as Map<String, dynamic>).toList());
       } else {
@@ -314,6 +324,10 @@ class AppWebChannel extends AppWebChannelCore {
   
   void getAlbumCovers({required String id, required void Function(List<Map<String, dynamic>>) onSuccess, void Function(int?)? onFailed}) async {
     _getMapItems(url: "$serverAddress/music/albums/$id/covers", onSuccess: onSuccess, onFailed: onFailed);
+  }
+
+  void getArtistFiles({required String id, required void Function(List<Map<String, dynamic>>) onSuccess, void Function(int?)? onFailed}) async {
+    _getMapItems(url: "$serverAddress/music/artist/$id/files", onSuccess: onSuccess, onFailed: onFailed);
   }
 
   void getPlaylists({required void Function(List<Map<String, dynamic>>) onSuccess, void Function(int?)? onFailed}) async {
@@ -361,11 +375,72 @@ class AppWebChannel extends AppWebChannelCore {
   void downloadSongFile({required Song song, required String filename, void Function()? onSuccess, void Function(int?)? onFailed}) async {
     var url = "$serverAddress/music/songs/${song.id}/$filename";
     var filePath = PathUtils.join(song.path, filename);
+    var directory = Directory(song.path);
+    if(!await directory.exists()) {
+      directory.create(recursive: true);
+    }
     _downloadFile(url: url, filePath: filePath , onSuccess: onSuccess, onFailed: onFailed);
   }
 
   void downloadAlbumCover({required Album album, required String filename, void Function()? onSuccess, void Function(int?)? onFailed}) async {
-    print(PathUtils.join(album.path, filename));
+    var directory = Directory(album.path);
+    if(!await directory.exists()) {
+      directory.create(recursive: true);
+    }
     _downloadFile(url: "$serverAddress/music/albums/${album.id}/${filename}", filePath: PathUtils.join(album.path, filename));
   }
+
+  void downloadArtistFile({required Artist artist, required String filename, void Function()? onSuccess, void Function(int?)? onFailed}) async {
+    var directory = Directory(artist.path);
+    if(!await directory.exists()) {
+      directory.create(recursive: true);
+    }
+    _downloadFile(url: "$serverAddress/music/artist/${artist.id}/${filename}", filePath: PathUtils.join(artist.path, filename));
+  }
+
+  void _deleteSomething({required String url, void Function()? onSuccess, void Function(int?)? onFailed}) async {
+      final response = await delete(
+        Uri.parse(url),
+        headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8', "Authorization": token},
+      );
+      if (response.statusCode == 200) {
+        if (onSuccess != null) {
+          onSuccess();
+        }
+      } else if (onFailed != null) {
+        onFailed(response.statusCode);
+      }
+  }
+
+  void deleteSongFile({required String id, required SongFile songFile, void Function()? onSuccess, void Function(int?)? onFailed}) async {
+    _deleteSomething(url: "$serverAddress/music/songs/${id}/${PathUtils.basename(songFile.infoFilepath)}");
+    _deleteSomething(url: "$serverAddress/music/songs/${id}/${PathUtils.basename(songFile.mediaFilepath)}");
+  }
+
+  void deleteArtistFile({required String id, required String filePath, void Function()? onSuccess, void Function(int?)? onFailed}) async {
+    _deleteSomething(url: "$serverAddress/music/artists/${id}/${PathUtils.basename(filePath)}");
+  }
+
+  void deleteAlbumCover({required String id, required String filePath, void Function()? onSuccess, void Function(int?)? onFailed}) async {
+    _deleteSomething(url: "$serverAddress/music/albums/${id}/${PathUtils.basename(filePath)}");
+  }
+
+  void deletePlaylistThumbnail({required String id, required String filePath, void Function()? onSuccess, void Function(int?)? onFailed}) async {
+    _deleteSomething(url: "$serverAddress/music/playlists/${id}/${PathUtils.basename(filePath)}");
+  }
+
+  void deleteSong({required String id, void Function()? onSuccess, void Function(int?)? onFailed}) async {
+    _deleteSomething(url: "$serverAddress/music/songs/$id");
+  }
+
+  void deleteArtist({required String id, void Function()? onSuccess, void Function(int?)? onFailed}) async {
+    _deleteSomething(url: "$serverAddress/music/artists/$id");
+  }
+  void deleteAlbum({required String id, void Function()? onSuccess, void Function(int?)? onFailed}) async {
+    _deleteSomething(url: "$serverAddress/music/albums/$id");
+  }
+  void deletePlaylist({required String id, void Function()? onSuccess, void Function(int?)? onFailed}) async {
+    _deleteSomething(url: "$serverAddress/music/playlists/$id");
+  }
+
 }

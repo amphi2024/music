@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:music/models/music/artist.dart';
 import 'package:music/models/music/song.dart';
+import 'package:music/ui/components/artist_linear_item.dart';
 import 'package:music/ui/components/artist_profile_image.dart';
 
 import '../../models/app_storage.dart';
@@ -47,25 +48,10 @@ class _SelectArtistDialogState extends State<SelectArtistDialog> {
               itemCount: artists.length,
                 itemBuilder: (context, index) {
                 var artist = artists[index];
-              return GestureDetector(
-                onTap: () {
-                  widget.onSelected(artist.id);
-                  Navigator.pop(context);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: SizedBox(
-                        height: 60,
-                        child: ArtistProfileImage(artist: artist),
-                      ),
-                    ),
-                    Text(artist.name.byContext(context))
-                  ]),
-                ),
-              );
+              return ArtistLinearItem(artist: artist, onLongPressed: () {}, onPressed: () {
+                widget.onSelected(artist.id);
+                Navigator.pop(context);
+              });
             }))
           ],
         ),

@@ -11,13 +11,12 @@ class LightTheme extends AppThemeData {
         super.textColor = AppTheme.midnight,
         super.accentColor = AppTheme.cherry,
         super.inactiveColor = AppTheme.inactiveGray,
-        super.noteBackgroundColor = AppTheme.white,
-        super.noteTextColor = AppTheme.midnight,
         super.floatingButtonBackground = AppTheme.white,
         super.floatingButtonIconColor = AppTheme.cherry,
         super.checkBoxColor = AppTheme.cherry,
         super.checkBoxCheckColor = AppTheme.white,
-        super.errorColor = AppTheme.red
+        super.errorColor = AppTheme.red,
+        super.navigationBarBackgroundColor = AppTheme.lightGray
       });
   ThemeData toThemeData(BuildContext context) {
     return themeData(

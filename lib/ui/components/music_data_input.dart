@@ -69,6 +69,9 @@ class _MusicDataInputState extends State<MusicDataInput> {
             ),
             Expanded(
                 child: TextField(
+                  onChanged: (text) {
+                    widget.data[key] = text;
+                  },
                   controller: controllers.putIfAbsent(key, () => TextEditingController(text: widget.data[key])),
                 )),
             SizedBox(
@@ -117,6 +120,9 @@ class _MusicDataInputState extends State<MusicDataInput> {
               ),
             ),
             Expanded(child: TextField(
+              onChanged: (text) {
+                widget.data["default"] = text;
+              },
               controller: controllers.putIfAbsent("default", () => TextEditingController(text: widget.data["default"])),
             )),
             SizedBox(
