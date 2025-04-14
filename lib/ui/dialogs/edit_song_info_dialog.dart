@@ -132,8 +132,10 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                   onPressed: () {
                     song.save();
                     song.album.save();
-                    song.artist.refreshAlbums();
                     Navigator.pop(context);
+                    appState.setState(() {
+                      song.artist.refreshAlbums();
+                    });
                   },
                 ),
               ],

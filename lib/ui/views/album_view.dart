@@ -11,19 +11,23 @@ class AlbumView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Song> musicList = [];
-    for (var musicId in album.songs) {
-      var song = appStorage.songs[musicId];
+    List<Song> songList = [];
+    for (var id in album.songs) {
+      var song = appStorage.songs[id];
       if (song != null) {
-        musicList.add(song);
+        songList.add(song);
       }
     }
+
+    var themeData = Theme.of(context);
+
+    var imageSize = MediaQuery.of(context).size.width - 100;
 
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: MediaQuery.of(context).size.width + 150,
+            expandedHeight: MediaQuery.of(context).size.width + 50,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
               title: Text(
@@ -33,7 +37,8 @@ class AlbumView extends StatelessWidget {
               centerTitle: true,
               background: Center(
                 child: SizedBox(
-                  width: 250,
+                  width: imageSize,
+                  height: imageSize,
                   child: ClipRRect(
                       borderRadius: BorderRadius.circular(15),
                       child: AlbumCover(
@@ -46,10 +51,20 @@ class AlbumView extends StatelessWidget {
           ),
           SliverList(
             delegate: SliverChildBuilderDelegate(
-              (context, index) => ListTile(
-                title: Text(musicList[index].title.byContext(context)),
-              ),
-              childCount: musicList.length, // Number of songs
+              (context, index) {
+                var song = songList[index];
+                return ListTile(
+                title: Text(song.title.byContext(context)),
+                leading: Text(
+                    song.trackNumber.toString(),
+                  style: TextStyle(
+                    fontSize: themeData.textTheme.bodyMedium?.fontSize,
+                    color: themeData.dividerColor
+                  ),
+                ),
+              );
+              },
+              childCount: songList.length,
             ),
           ),
         ],

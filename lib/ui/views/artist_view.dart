@@ -23,11 +23,13 @@ class ArtistView extends StatelessWidget {
       }
     }
 
+    var imageSize = MediaQuery.of(context).size.width - 100;
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: MediaQuery.of(context).size.width + 150,
+            expandedHeight: MediaQuery.of(context).size.width,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
               title: GestureDetector(
@@ -44,8 +46,8 @@ class ArtistView extends StatelessWidget {
               centerTitle: true,
               background: Center(
                 child: SizedBox(
-                  width: 250,
-                  height: 250,
+                  width: imageSize,
+                  height: imageSize,
                   child: ClipRRect(
                       borderRadius: BorderRadius.circular(15),
                       child: ArtistProfileImage(artist: artist)),
@@ -57,7 +59,7 @@ class ArtistView extends StatelessWidget {
               itemCount: albumList.length,
               itemBuilder: (context, index) => AlbumGridItem(album: albumList[index]),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-                childAspectRatio: 0.65))
+                childAspectRatio: 0.6))
         ]
       ),
     );

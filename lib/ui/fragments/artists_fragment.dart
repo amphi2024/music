@@ -1,3 +1,4 @@
+import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_storage.dart';
@@ -56,7 +57,12 @@ class _ArtistsFragmentState extends State<ArtistsFragment> {
             Navigator.push(context, CupertinoPageRoute(builder: (context) => ArtistView(artist: artist)));
           },
           onLongPressed: () {
-            artist.delete();
+            showConfirmationDialog("@", () {
+              artist.delete();
+              setState(() {
+                appStorage.artists.remove(artist.id);
+              });
+            });
           });
       children.add(artistWidget);
     }
