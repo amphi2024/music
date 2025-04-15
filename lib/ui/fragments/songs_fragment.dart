@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
-import 'package:music/ui/components/song_list_item.dart';
+import 'package:music/ui/components/item/song_list_item.dart';
 
 import '../../models/music/song.dart';
 
@@ -43,6 +43,7 @@ class _SongsFragmentState extends State<SongsFragment> {
     appStorage.songs.forEach((key, song) {
       songList.add(song);
     });
+    songList.sort((a, b) => a.title.byContext(context).compareTo(b.title.byContext(context)));
     children.add(Container(
       height: 50,
     ));

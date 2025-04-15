@@ -17,7 +17,7 @@ class Song {
 
   Map<String, dynamic> data = {
     "title": <String, dynamic>{},
-    "genre": <String, dynamic>{},
+    "genre": [],
     "artist": "",
     "albumArtist": "",
     "album": "",
@@ -28,7 +28,7 @@ class Song {
   };
 
   Map<String, dynamic> get title => data["title"];
-  Map<String, dynamic> get genre => data["genre"];
+  List<dynamic> get genre => data["genre"];
   set artist(value) => data["artist"] = value;
   Artist get artist => appStorage.artists[data["artist"]] ?? Artist();
   String get artistId => data["artist"];
@@ -86,14 +86,19 @@ class Song {
     var filename = FilenameUtils.generatedDirectoryNameWithChar(appStorage.songsPath, alphabet);
 
     var directory = Directory(PathUtils.join(appStorage.songsPath , alphabet ,filename));
-    directory.createSync(recursive: true);
 
     song.title["default"] = metadata["title"];
     song.id = filename;
     song.path = directory.path;
     song.artist = artistId;
     song.album = albumId;
-    song.genre["default"] = metadata["genre"];
+
+    var genreName = metadata["genre"];
+    if(genreName is String && genreName.isNotEmpty) {
+      song.genre.add({
+        "default": genreName
+      });
+    }
 
     var discNumber = metadata["discNumber"];
     if(discNumber is String && discNumber.isNotEmpty) {
@@ -203,6 +208,29 @@ class Song {
     if(upload) {
       appWebChannel.deleteSong(id: id);
     }
+  }
+
+  Future<void> downloadMissingFiles() async {
+    appWebChannel.getSongFiles(songId: id, onSuccess: (files) async {
+      for(var fileInfo in files) {
+        String filename = fileInfo["filename"];
+        var nameOnly = FilenameUtils.nameOnly(filename);
+        var songFile = this.files.putIfAbsent(nameOnly, () => SongFile());
+        var file = File(PathUtils.join(path, filename));
+
+        if(!await file.exists()) {
+          appWebChannel.downloadSongFile(song: this, filename: filename);
+
+          songFile.id = nameOnly;
+          if(filename.endsWith(".json")) {
+            songFile.infoFilepath = PathUtils.join(path, filename);
+          }
+          else {
+            songFile.mediaFilepath = PathUtils.join(path, filename);
+          }
+        }
+      }
+    });
   }
 }
 

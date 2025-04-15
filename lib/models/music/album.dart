@@ -37,7 +37,6 @@ class Album {
     var filename = FilenameUtils.generatedDirectoryNameWithChar(appStorage.albumsPath, alphabet);
 
     var directory = Directory(PathUtils.join(appStorage.albumsPath , alphabet , filename));
-    directory.createSync(recursive: true);
 
     album.path = directory.path;
     album.id = filename;
@@ -116,5 +115,18 @@ class Album {
     if(upload) {
       appWebChannel.deleteAlbum(id: id);
     }
+  }
+
+  Future<void> downloadMissingCovers() async {
+    appWebChannel.getAlbumCovers(id: id, onSuccess: (covers) async {
+      for(var coverInfo in covers) {
+        var filename = coverInfo["filename"];
+        var file = File(PathUtils.join(path, filename));
+
+        if(!await file.exists()) {
+          appWebChannel.downloadAlbumCover(album: this, filename: filename);
+        }
+      }
+    });
   }
 }

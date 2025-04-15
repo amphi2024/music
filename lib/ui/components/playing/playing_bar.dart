@@ -64,6 +64,7 @@ class _PlayingBarState extends State<PlayingBar> {
             }
           },
           child: Material(
+            color: Colors.transparent,
             child: AnimatedContainer(
               height: appState.playingBarExpanded ? mediaQuery.size.height : 60,
               curve: Curves.easeOutQuint,

@@ -1,5 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:music/models/app_storage.dart';
+import 'package:music/ui/components/item/genre_list_item.dart';
+import 'package:music/ui/views/genre_view.dart';
 
 import '../../models/app_state.dart';
 
@@ -36,10 +38,22 @@ class _GenresFragmentState extends State<GenresFragment> {
   @override
   Widget build(BuildContext context) {
     List<Widget> children = [];
-    List<Map<String, String>> genreList = [];
+    List<Map<String, dynamic>> genreList = [];
     appStorage.genres.forEach((key, value) {
       genreList.add(value);
     });
+
+    children.add(Container(
+      height: 60
+    ));
+
+    for(var genre in genreList) {
+      var child = GenreListItem(genre: genre, onPressed: () {
+        Navigator.push(context, CupertinoPageRoute(builder: (context) => GenreView(genre: genre)));
+      });
+      children.add(child);
+    }
+
     return ListView(
       controller: scrollController,
       children: children,

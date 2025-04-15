@@ -3,8 +3,8 @@ import 'package:music/models/app_state.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/ui/dialogs/edit_song_info_dialog.dart';
 
-import '../../models/player_service.dart';
-import 'album_cover.dart';
+import '../../../models/player_service.dart';
+import '../album_cover.dart';
 
 class SongListItem extends StatelessWidget {
 

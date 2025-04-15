@@ -2,13 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:music/models/music/album.dart';
-import 'package:music/models/music/song.dart';
-import 'package:music/ui/components/album_grid_item.dart';
-import 'package:music/ui/views/album_view.dart';
+import 'package:music/ui/components/item/album_grid_item.dart';
 
 import '../../models/app_state.dart';
 import '../../models/app_storage.dart';
-import '../components/album_cover.dart';
 
 class AlbumsFragment extends StatefulWidget {
   const AlbumsFragment({super.key});

@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:amphi/models/app_web_channel_core.dart';
 import 'package:amphi/models/update_event.dart';
-import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
 import 'package:http/http.dart';
 import 'package:music/models/music/playlist.dart';
@@ -174,7 +173,7 @@ class AppWebChannel extends AppWebChannelCore {
     }
   }
 
-  void downloadTheme({required String filename, void Function(AppTheme)? onSuccess, void Function()? onFailed}) async {
+  Future<void> downloadTheme({required String filename, void Function(AppTheme)? onSuccess, void Function()? onFailed}) async {
     try {
       final response = await get(
         Uri.parse("$serverAddress/music/themes/${filename}"),
@@ -300,6 +299,7 @@ class AppWebChannel extends AppWebChannelCore {
         List<dynamic> list = jsonDecode(response.body);
         onSuccess(list.map((item) => item as Map<String, dynamic>).toList());
       } else {
+        print(response.body);
         if (onFailed != null) {
           onFailed(response.statusCode);
         }
@@ -327,7 +327,7 @@ class AppWebChannel extends AppWebChannelCore {
   }
 
   void getArtistFiles({required String id, required void Function(List<Map<String, dynamic>>) onSuccess, void Function(int?)? onFailed}) async {
-    _getMapItems(url: "$serverAddress/music/artist/$id/files", onSuccess: onSuccess, onFailed: onFailed);
+    _getMapItems(url: "$serverAddress/music/artists/$id/files", onSuccess: onSuccess, onFailed: onFailed);
   }
 
   void getPlaylists({required void Function(List<Map<String, dynamic>>) onSuccess, void Function(int?)? onFailed}) async {
@@ -345,7 +345,7 @@ class AppWebChannel extends AppWebChannelCore {
         onFailed: onFailed);
   }
 
-  void _downloadFile({required String url, required String filePath ,void Function()? onSuccess, void Function(int?)? onFailed}) async {
+  Future<void> _downloadFile({required String url, required String filePath ,void Function()? onSuccess, void Function(int?)? onFailed}) async {
     try {
       final response = await get(
         Uri.parse(url),
@@ -372,30 +372,30 @@ class AppWebChannel extends AppWebChannelCore {
     }
   }
 
-  void downloadSongFile({required Song song, required String filename, void Function()? onSuccess, void Function(int?)? onFailed}) async {
+  Future<void> downloadSongFile({required Song song, required String filename, void Function()? onSuccess, void Function(int?)? onFailed}) async {
     var url = "$serverAddress/music/songs/${song.id}/$filename";
     var filePath = PathUtils.join(song.path, filename);
     var directory = Directory(song.path);
     if(!await directory.exists()) {
       directory.create(recursive: true);
     }
-    _downloadFile(url: url, filePath: filePath , onSuccess: onSuccess, onFailed: onFailed);
+    await _downloadFile(url: url, filePath: filePath , onSuccess: onSuccess, onFailed: onFailed);
   }
 
-  void downloadAlbumCover({required Album album, required String filename, void Function()? onSuccess, void Function(int?)? onFailed}) async {
+  Future<void> downloadAlbumCover({required Album album, required String filename, void Function()? onSuccess, void Function(int?)? onFailed}) async {
     var directory = Directory(album.path);
     if(!await directory.exists()) {
       directory.create(recursive: true);
     }
-    _downloadFile(url: "$serverAddress/music/albums/${album.id}/${filename}", filePath: PathUtils.join(album.path, filename));
+    await _downloadFile(url: "$serverAddress/music/albums/${album.id}/${filename}", filePath: PathUtils.join(album.path, filename));
   }
 
-  void downloadArtistFile({required Artist artist, required String filename, void Function()? onSuccess, void Function(int?)? onFailed}) async {
+  Future<void> downloadArtistFile({required Artist artist, required String filename, void Function()? onSuccess, void Function(int?)? onFailed}) async {
     var directory = Directory(artist.path);
     if(!await directory.exists()) {
       directory.create(recursive: true);
     }
-    _downloadFile(url: "$serverAddress/music/artist/${artist.id}/${filename}", filePath: PathUtils.join(artist.path, filename));
+    await _downloadFile(url: "$serverAddress/music/artists/${artist.id}/${filename}", filePath: PathUtils.join(artist.path, filename));
   }
 
   void _deleteSomething({required String url, void Function()? onSuccess, void Function(int?)? onFailed}) async {

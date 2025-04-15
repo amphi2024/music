@@ -3,9 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
+import 'package:music/models/music/artist.dart';
 import 'package:music/models/music/playlist.dart';
 import 'package:music/ui/components/account/account_button.dart';
 import 'package:music/ui/components/menu/floating_menu_button.dart';
+import 'package:music/ui/dialogs/edit_artist_dialog.dart';
 import 'package:music/ui/dialogs/edit_playlist_dialog.dart';
 import 'package:music/ui/views/settings_view.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -24,6 +26,7 @@ class FloatingMenu extends StatefulWidget {
 class _FloatingMenuState extends State<FloatingMenu> {
 
   var pageController = PageController();
+  bool dialogShowing = false;
 
   @override
   void dispose() {
@@ -88,11 +91,40 @@ class _FloatingMenuState extends State<FloatingMenu> {
                 children: [
                   AccountButton(),
                   PopupMenuButton(
+                    onOpened: () {
+                      appState.setMainViewState(() {
+                        appState.playingBarShowing = false;
+                      });
+                    },
+                    onCanceled: () {
+                      if(!dialogShowing) {
+                        appState.setMainViewState(() {
+                          appState.playingBarShowing = true;
+                        });
+                      }
+                    },
                     icon: Icon(Icons.add_circle_outline),
                     itemBuilder: (context) {
                       return [
-                        PopupMenuItem(child: Text("Song"), onTap: () async {
+                        PopupMenuItem(
+                            child: Text("Song"), onTap: () async {
                          appStorage.selectMusicFilesAndSave();
+                        }),
+                        PopupMenuItem(
+                            child: Text("Artist"), onTap: () {
+                          dialogShowing = true;
+                          showDialog(context: context, builder: (context) {
+                            return EditArtistDialog(artist: Artist.created({}), onSave: (artist) {
+                              setState(() {
+                                appStorage.artists[artist.id] = artist;
+                              });
+                            });
+                          }).then((value) {
+                           dialogShowing = false;
+                           appState.setMainViewState(() {
+                             appState.playingBarShowing = true;
+                           });
+                          });
                         }),
                         PopupMenuItem(child: Text("Playlist"), onTap: () {
                           showDialog(context: context, builder: (context) {

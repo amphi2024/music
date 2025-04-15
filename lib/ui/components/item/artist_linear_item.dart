@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:music/models/music/artist.dart';
 import 'package:music/models/music/song.dart';
 
-import 'artist_profile_image.dart';
+import '../artist_profile_image.dart';
 
 class ArtistLinearItem extends StatelessWidget {
 

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:music/models/app_state.dart';
 import 'package:music/models/music/album.dart';
 import 'package:music/models/music/artist.dart';
 import 'package:music/models/music/song.dart';
-import 'package:music/ui/components/album_grid_item.dart';
+import 'package:music/ui/components/item/album_grid_item.dart';
 import 'package:music/ui/components/artist_profile_image.dart';
 import 'package:music/ui/dialogs/edit_artist_dialog.dart';
 
@@ -29,17 +30,24 @@ class ArtistView extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: MediaQuery.of(context).size.width,
+            expandedHeight: MediaQuery.of(context).size.width + 80,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
               title: GestureDetector(
                 onLongPress: () {
-                  showDialog(context: context, builder: (context) => EditArtistDialog(artist: artist));
+                  showDialog(context: context, builder: (context) => EditArtistDialog(artist: artist, onSave: (result) {
+                    appState.setMainViewState(() {
+
+                    });
+                  }));
                 },
-                child: Text(
-                  artist.name.byContext(context),
-                  style: TextStyle(
-                      fontSize: 15
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text(
+                    artist.name.byContext(context),
+                    style: TextStyle(
+                        fontSize: 15
+                    ),
                   ),
                 ),
               ),

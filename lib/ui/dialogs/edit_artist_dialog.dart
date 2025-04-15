@@ -6,18 +6,16 @@ import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:music/channels/app_web_channel.dart';
-import 'package:music/models/app_state.dart';
 import 'package:music/models/music/artist.dart';
 import 'package:music/ui/components/artist_profile_image.dart';
-import 'package:music/utils/toast.dart';
 
-import '../../models/app_storage.dart';
 import '../components/music_data_input.dart';
 
 class EditArtistDialog extends StatefulWidget {
 
   final Artist artist;
-  const EditArtistDialog({super.key, required this.artist});
+  final void Function(Artist) onSave;
+  const EditArtistDialog({super.key, required this.artist, required this.onSave});
 
   @override
   State<EditArtistDialog> createState() => _EditArtistDialogState();
@@ -85,7 +83,9 @@ class _EditArtistDialogState extends State<EditArtistDialog> {
             var file = File(PathUtils.join(artist.path, filename));
             var bytes = await selectedFile.xFile.readAsBytes();
             await file.writeAsBytes(bytes);
-            artist.profileImages.add(file.path);
+            setState(() {
+              artist.profileImages.add(file.path);
+            });
             appWebChannel.uploadArtistFile(id: artist.id, filePath: file.path);
           }
         }
@@ -204,6 +204,7 @@ class _EditArtistDialogState extends State<EditArtistDialog> {
                   icon: Icon(Icons.check),
                   onPressed: () {
                     artist.save();
+                    widget.onSave(artist);
                     Navigator.pop(context);
                   },
                 ),

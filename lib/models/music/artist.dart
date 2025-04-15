@@ -66,7 +66,6 @@ class Artist {
     var alphabet = randomAlphabet();
     var filename = FilenameUtils.generatedDirectoryNameWithChar(appStorage.artistsPath, alphabet);
     var directory = Directory(PathUtils.join(appStorage.artistsPath , alphabet ,filename));
-    directory.createSync(recursive: true);
     artist.path = directory.path;
     artist.id = filename;
     artist.name["default"] = metadata["artist"];
@@ -93,6 +92,18 @@ class Artist {
     if(upload) {
       appWebChannel.deleteArtist(id: id);
     }
+  }
+
+  Future<void> downloadMissingFiles() async {
+    appWebChannel.getArtistFiles(id: id, onSuccess: (files) async {
+      for(var fileInfo in files) {
+        var filename = fileInfo["filename"];
+        var file = File(PathUtils.join(path, filename));
+        if(!await file.exists()) {
+          appWebChannel.downloadArtistFile(artist: this, filename: filename);
+        }
+      }
+    });
   }
 
 }

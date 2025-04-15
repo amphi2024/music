@@ -3,16 +3,22 @@ import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/album.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/ui/components/album_cover.dart';
+import 'package:music/ui/dialogs/edit_album_dialog.dart';
 
-class AlbumView extends StatelessWidget {
+class AlbumView extends StatefulWidget {
   final Album album;
 
   const AlbumView({super.key, required this.album});
 
   @override
+  State<AlbumView> createState() => _AlbumViewState();
+}
+
+class _AlbumViewState extends State<AlbumView> {
+  @override
   Widget build(BuildContext context) {
     List<Song> songList = [];
-    for (var id in album.songs) {
+    for (var id in widget.album.songs) {
       var song = appStorage.songs[id];
       if (song != null) {
         songList.add(song);
@@ -27,12 +33,24 @@ class AlbumView extends StatelessWidget {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
-            expandedHeight: MediaQuery.of(context).size.width + 50,
+            expandedHeight: MediaQuery.of(context).size.width + 80,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              title: Text(
-                album.name.byContext(context),
-                style: TextStyle(fontSize: 15),
+              title: GestureDetector(
+                onLongPress: () {
+                  showDialog(context: context, builder: (context) => EditAlbumDialog(album: widget.album, onSave: (a) {
+                    setState(() {
+
+                    });
+                  }));
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text(
+                    widget.album.name.byContext(context),
+                    style: TextStyle(fontSize: 15),
+                  ),
+                ),
               ),
               centerTitle: true,
               background: Center(
@@ -42,7 +60,7 @@ class AlbumView extends StatelessWidget {
                   child: ClipRRect(
                       borderRadius: BorderRadius.circular(15),
                       child: AlbumCover(
-                        album: album,
+                        album: widget.album,
                         fit: BoxFit.cover,
                       )),
                 ),

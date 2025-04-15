@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:music/models/music/artist.dart';
-import 'package:music/models/music/song.dart';
-import 'package:music/ui/components/artist_linear_item.dart';
-import 'package:music/ui/components/artist_profile_image.dart';
+import 'package:music/ui/components/item/artist_linear_item.dart';
 
 import '../../models/app_storage.dart';
 

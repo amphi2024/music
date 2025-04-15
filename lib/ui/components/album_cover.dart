@@ -13,17 +13,29 @@ class AlbumCover extends StatelessWidget {
   Widget build(BuildContext context) {
     var coverFilePath = album.covers.firstOrNull;
     if(coverFilePath != null) {
-      var file = File(coverFilePath);
-      if(!file.existsSync()) {
-        return Image.asset("assets/images/music.png", fit: fit);
-      }
-      return Image.file(
-          file,
-        fit: fit,
-      );
+      return AbsoluteAlbumCover(filePath: coverFilePath, fit: fit);
     }
     else {
       return Image.asset("assets/images/music.png", fit: fit);
     }
+  }
+}
+
+class AbsoluteAlbumCover extends StatelessWidget {
+
+  final String filePath;
+  final BoxFit? fit;
+  const AbsoluteAlbumCover({super.key, required this.filePath, this.fit});
+
+  @override
+  Widget build(BuildContext context) {
+    var file = File(filePath);
+    if(!file.existsSync()) {
+      return Image.asset("assets/images/music.png", fit: fit);
+    }
+    return Image.file(
+      file,
+      fit: fit,
+    );
   }
 }
