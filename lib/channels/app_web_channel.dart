@@ -43,9 +43,7 @@ class AppWebChannel extends AppWebChannelCore {
     webSocketChannel?.stream.listen((message) async {
       Map<String, dynamic> jsonData = jsonDecode(message);
       UpdateEvent updateEvent = UpdateEvent.fromJson(jsonData);
-
-      switch (updateEvent.action) {}
-      //appWebChannel.acknowledgeEvent(updateEvent);
+      appStorage.syncData(updateEvent);
     }, onDone: () {
       connected = false;
     }, onError: (d) {
@@ -53,7 +51,7 @@ class AppWebChannel extends AppWebChannelCore {
     }, cancelOnError: true);
   }
 
-  void getFiles({required String url, void Function(int?)? onFailed, void Function(List<Map<String, dynamic>>)? onSuccess}) async {
+  Future<void> getFiles({required String url, void Function(int?)? onFailed, void Function(List<Map<String, dynamic>>)? onSuccess}) async {
     try {
       final response = await get(
         Uri.parse(url),
@@ -74,7 +72,7 @@ class AppWebChannel extends AppWebChannelCore {
     }
   }
 
-  void getSongFiles({required String songId, void Function(int?)? onFailed, void Function(List<Map<String, dynamic>>)? onSuccess}) async {
+  Future<void> getSongFiles({required String songId, void Function(int?)? onFailed, void Function(List<Map<String, dynamic>>)? onSuccess}) async {
     getFiles(url: "$serverAddress/music/songs/$songId/files", onFailed: onFailed, onSuccess: onSuccess);
   }
 
@@ -105,7 +103,9 @@ class AppWebChannel extends AppWebChannelCore {
     );
     if (response.statusCode == HttpStatus.ok) {
       List<dynamic> decoded = jsonDecode(utf8.decode(response.bodyBytes));
+      print(decoded.length);
       for (Map<String, dynamic> map in decoded) {
+        print(map);
         UpdateEvent updateEvent =
             UpdateEvent(action: map["action"], value: map["value"], timestamp: DateTime.fromMillisecondsSinceEpoch(map["timestamp"]).toLocal());
         list.add(updateEvent);
@@ -236,7 +236,7 @@ class AppWebChannel extends AppWebChannelCore {
   }
 
   void uploadArtistInfo({required Artist artist, void Function()? onSuccess, void Function(int?)? onFailed}) async {
-    UpdateEvent updateEvent = UpdateEvent(action: UpdateEvent.uploadSongInfo, value: artist.id, timestamp: DateTime.now().toUtc());
+    UpdateEvent updateEvent = UpdateEvent(action: UpdateEvent.uploadArtistInfo, value: artist.id, timestamp: DateTime.now().toUtc());
     uploadJson(url: "$serverAddress/music/artists/${artist.id}", jsonBody: jsonEncode(artist.data), updateEvent: updateEvent);
   }
 
@@ -377,7 +377,7 @@ class AppWebChannel extends AppWebChannelCore {
     var filePath = PathUtils.join(song.path, filename);
     var directory = Directory(song.path);
     if(!await directory.exists()) {
-      directory.create(recursive: true);
+      await directory.create(recursive: true);
     }
     await _downloadFile(url: url, filePath: filePath , onSuccess: onSuccess, onFailed: onFailed);
   }
@@ -396,6 +396,14 @@ class AppWebChannel extends AppWebChannelCore {
       directory.create(recursive: true);
     }
     await _downloadFile(url: "$serverAddress/music/artists/${artist.id}/${filename}", filePath: PathUtils.join(artist.path, filename));
+  }
+
+  Future<void> downloadPlaylistThumbnail({required Playlist playlist, required String filename, void Function()? onSuccess, void Function(int?)? onFailed}) async {
+    var directory = Directory(playlist.path);
+    if(!await directory.exists()) {
+      directory.create(recursive: true);
+    }
+    await _downloadFile(url: "$serverAddress/music/playlists/${playlist.id}/${filename}", filePath: PathUtils.join(playlist.path, filename));
   }
 
   void _deleteSomething({required String url, void Function()? onSuccess, void Function(int?)? onFailed}) async {

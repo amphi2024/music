@@ -30,7 +30,7 @@ class AlbumGridItem extends StatelessWidget {
             SizedBox(
               height: 70,
               child: Text(
-                album.name.byContext(context),
+                album.title.byContext(context),
                 maxLines: 3,
                 style: TextStyle(
                     fontWeight: FontWeight.bold

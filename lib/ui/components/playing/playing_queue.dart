@@ -14,7 +14,7 @@ class PlayingQueue extends StatefulWidget {
 class _PlayingQueueState extends State<PlayingQueue> {
   @override
   Widget build(BuildContext context) {
-    var playingQueue = playerService.playlist.queue;
+    var playingQueue = playerService.playlist.songs;
 
     return Column(
       children: [

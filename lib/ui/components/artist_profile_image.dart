@@ -16,6 +16,7 @@ class ArtistProfileImage extends StatelessWidget {
       return AbsoluteArtistProfileImage(filePath: filePath);
     }
     else {
+      artist.downloadMissingFiles();
       return Image.asset("assets/images/music.png", fit: fit);
     }
   }

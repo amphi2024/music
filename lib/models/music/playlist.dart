@@ -8,10 +8,17 @@ import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/app_storage.dart';
 
 class Playlist {
-  List<String> queue = [];
-  String title = "";
   String path = "";
   String id = "";
+  Map<String, dynamic> data = {
+    "title": "",
+    "songs": []
+  };
+
+  set title(value) => data["title"] = value;
+  String get title => data["title"];
+
+  List<dynamic> get songs => data["songs"];
 
   static Playlist created(String title) {
     var playlist = Playlist();
@@ -22,21 +29,12 @@ class Playlist {
     return playlist;
   }
 
-  static Playlist fromMap(Map<String, dynamic> map) {
-    var playlist = Playlist();
-    playlist.title = map["title"] ?? "";
-    for(var songId in map["songs"]) {
-      playlist.queue.add(songId);
-    }
-
-    return playlist;
-  }
-
   static Playlist fromFile(File file) {
     try {
-      var playlist = fromMap(jsonDecode(file.readAsStringSync()));
+      var playlist = Playlist();
       playlist.id = FilenameUtils.nameOnly(PathUtils.basename(file.path));
       playlist.path = file.path;
+      playlist.data = jsonDecode(file.readAsStringSync());
       return playlist;
     }
     catch(e) {
@@ -44,20 +42,9 @@ class Playlist {
     }
   }
 
-  Map<String, dynamic> toMap() {
-    Map<String, dynamic> map = {};
-    map["title"] = title;
-    List<String> songs = [];
-    for(var songId in queue) {
-      songs.add(songId);
-    }
-    map["songs"] = songs;
-    return map;
-  }
-
   void save({bool upload = true}) async {
     var file = File(path);
-    await file.writeAsString(jsonEncode(toMap()));
+    await file.writeAsString(jsonEncode(data));
 
     if(upload) {
       appWebChannel.uploadPlaylist(playlist: this);
@@ -76,6 +63,6 @@ class Playlist {
 
   void shuffle() {
     Random random = Random();
-    queue.shuffle(random);
+    songs.shuffle(random);
   }
 }

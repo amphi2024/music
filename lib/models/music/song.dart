@@ -64,6 +64,17 @@ class Song {
   int get discNumber => data["discNumber"] ?? 0;
   set discNumber(int value) => data["discNumber"] = value;
 
+  bool availableOnOffline() {
+    var available = false;
+    files.forEach((id, songFile) {
+      if(songFile.mediaFileExists) {
+        available = true;
+      }
+    });
+
+    return available;
+  }
+
   Map<String, SongFile> files = {};
   String? songFilePath() {
     var path = files.entries.firstOrNull?.value.mediaFilepath;
@@ -79,7 +90,7 @@ class Song {
     return files.entries.firstOrNull?.value ?? SongFile();
   }
 
-  static Song created({required Map metadata, required String artistId, required String albumId, required File file}) {
+  static Song created({required Map metadata, required String artistId, required String albumId, required File? file}) {
     var song = Song();
 
     String alphabet = randomAlphabet();
@@ -110,15 +121,17 @@ class Song {
       song.trackNumber = int.tryParse(trackNumber) ?? 0;
     }
 
-
-
-    var songFile = SongFile.created(path: directory.path, originalFile: file);
-    var lyrics = Lyrics();
-    lyrics.data.get("default").add(LyricLine(text: metadata["lyrics"] ?? ""));
-    songFile.lyrics = lyrics;
-    songFile.save();
-    song.files[songFile.id] = songFile;
-    song.data["files"] = [songFile.id];
+    if(file != null) {
+      if (!directory.existsSync()) {
+        directory.createSync(recursive: true);
+      }
+      var songFile = SongFile.created(path: directory.path, originalFile: file);
+      var lyrics = Lyrics();
+      lyrics.data.get("default").add(LyricLine(text: metadata["lyrics"] ?? ""));
+      songFile.lyrics = lyrics;
+      songFile.save();
+      song.files[songFile.id] = songFile;
+    }
 
     var releasedYear = metadata["year"];
 
@@ -214,21 +227,14 @@ class Song {
     appWebChannel.getSongFiles(songId: id, onSuccess: (files) async {
       for(var fileInfo in files) {
         String filename = fileInfo["filename"];
-        var nameOnly = FilenameUtils.nameOnly(filename);
-        var songFile = this.files.putIfAbsent(nameOnly, () => SongFile());
-        var file = File(PathUtils.join(path, filename));
-
-        if(!await file.exists()) {
+        var id = FilenameUtils.nameOnly(filename);
+        var songFile = this.files.putIfAbsent(id, () => SongFile());
+        if(filename.endsWith(".json")) {
           appWebChannel.downloadSongFile(song: this, filename: filename);
-
-          songFile.id = nameOnly;
-          if(filename.endsWith(".json")) {
-            songFile.infoFilepath = PathUtils.join(path, filename);
-          }
-          else {
-            songFile.mediaFilepath = PathUtils.join(path, filename);
-          }
+          songFile.id = id;
         }
+
+        songFile.mediaFilepath = PathUtils.join(path, filename);
       }
     });
   }

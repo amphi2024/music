@@ -92,12 +92,9 @@ void onUserRemoved() {
 }
 
 void onUserAdded() {
-  appStorage.albums.clear();
-  appStorage.songs.clear();
-  appStorage.playlists.clear();
-  appStorage.artists.clear();
   appSettings.getData();
   appState.setState(() {
+    appStorage.clearMusic();
     appStorage.initMusic();
   });
 }
@@ -110,10 +107,7 @@ void onSelectedUserChanged(User user) {
   appSettings.getData();
   appWebChannel.disconnectWebSocket();
   appWebChannel.connectWebSocket();
-  appStorage.albums.clear();
-  appStorage.songs.clear();
-  appStorage.playlists.clear();
-  appStorage.artists.clear();
+  appStorage.clearMusic();
   appState.setState(() {
     appStorage.initMusic();
     appStorage.syncDataFromEvents();

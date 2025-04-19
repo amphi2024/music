@@ -1,4 +1,7 @@
+import 'package:amphi/utils/file_name_utils.dart';
+import 'package:amphi/utils/path_utils.dart';
 import 'package:flutter/material.dart';
+import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/ui/dialogs/edit_song_info_dialog.dart';
@@ -92,10 +95,27 @@ class SongListItem extends StatelessWidget {
                           ],
                         )
                     ),
-                    // Icon(
-                    //   Icons.arrow_downward_outlined,
-                    //   size: 13,
-                    // ),
+                    Visibility(
+                      visible: !song.availableOnOffline(),
+                        child: IconButton(onPressed: () async {
+                          appWebChannel.getSongFiles(songId: song.id, onSuccess: (list) async {
+                            for(var fileInfo in list) {
+                              String filename = fileInfo["filename"];
+                              String id = FilenameUtils.nameOnly(filename);
+                              if(!filename.endsWith(".json")) {
+                                appWebChannel.downloadSongFile(song: song, filename: filename, onSuccess: () {
+                                  var mediaFilePath = PathUtils.join(song.path, filename);
+                                  appState.setState(() {
+                                    song.files[id]?.mediaFilepath = mediaFilePath;
+                                  });
+                                });
+                              }
+                            }
+                          });
+                        }, icon: Icon(
+                          Icons.arrow_downward_outlined,
+                          size: 13,
+                        ))),
                     PopupMenuButton(
                       icon: Icon(Icons.more_vert),
                       itemBuilder: (context) {

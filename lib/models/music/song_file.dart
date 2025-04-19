@@ -10,6 +10,7 @@ class SongFile {
   String mediaFilepath = "";
   Lyrics lyrics = Lyrics();
   Map<String, dynamic> data = {};
+  bool get mediaFileExists => mediaFilepath.isNotEmpty;
 
   late String id;
 
@@ -43,6 +44,7 @@ class SongFile {
     id = FilenameUtils.nameOnly(infoFilename);
     var infoFile = File(infoFilepath);
     var jsonData = await infoFile.readAsString();
+
     data = jsonDecode(jsonData);
     var lyricsData = data["lyrics"];
     if(lyricsData is Map<String, dynamic>) {
@@ -80,7 +82,7 @@ class SongFile {
 
   }
 
-  void save() async {
+  Future<void> save() async {
     var infoFile = File(infoFilepath);
     data["lyrics"] = lyrics.toMap();
     await infoFile.writeAsString(jsonEncode(data));

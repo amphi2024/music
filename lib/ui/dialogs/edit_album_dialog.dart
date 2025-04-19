@@ -130,7 +130,7 @@ class _EditAlbumDialogState extends State<EditAlbumDialog> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: MusicDataInput(data: album.name),
+                    child: MusicDataInput(data: album.title),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),

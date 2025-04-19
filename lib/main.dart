@@ -67,17 +67,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         appWebChannel.connectWebSocket();
 
         appStorage.syncDataFromEvents();
-        // appWebChannel.noteUpdateListeners.add((note) {
-        //   setState(() {
-        //     AppStorage.notifyNote(note);
-        //   });
-        // });
-        //
-        // appWebChannel.folderUpdateListeners.add((folder) {
-        //   setState(() {
-        //     AppStorage.notifyFolder(folder);
-        //   });
-        // });
       }
 
       if(App.isDesktop()) {

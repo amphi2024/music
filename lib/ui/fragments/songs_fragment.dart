@@ -38,18 +38,14 @@ class _SongsFragmentState extends State<SongsFragment> {
 
   @override
   Widget build(BuildContext context) {
-    List<Song> songList = [];
     List<Widget> children = [];
-    appStorage.songs.forEach((key, song) {
-      songList.add(song);
-    });
-    songList.sort((a, b) => a.title.byContext(context).compareTo(b.title.byContext(context)));
     children.add(Container(
       height: 50,
     ));
-    for (int i = 0; i < songList.length; i++) {
-      var music = songList[i];
-      children.add(SongListItem(song: music, index: i));
+    for (int i = 0; i < appStorage.songIdList.length; i++) {
+      final id = appStorage.songIdList[i];
+      var song = appStorage.songs.get(id);
+      children.add(SongListItem(song: song, index: i));
     }
     return ListView(
       controller: scrollController,

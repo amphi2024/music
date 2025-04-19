@@ -47,7 +47,7 @@ class _AlbumViewState extends State<AlbumView> {
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Text(
-                    widget.album.name.byContext(context),
+                    widget.album.title.byContext(context),
                     style: TextStyle(fontSize: 15),
                   ),
                 ),

@@ -101,6 +101,7 @@ class Artist {
         var file = File(PathUtils.join(path, filename));
         if(!await file.exists()) {
           appWebChannel.downloadArtistFile(artist: this, filename: filename);
+          profileImages.add(file.path);
         }
       }
     });

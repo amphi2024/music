@@ -39,11 +39,7 @@ class _AlbumsFragmentState extends State<AlbumsFragment> {
 
   @override
   Widget build(BuildContext context) {
-    List<Album> albumList = [];
     List<Widget> children = [];
-    appStorage.albums.forEach((key, album) {
-      albumList.add(album);
-    });
 
     int axisCount = (MediaQuery.of(context).size.width / 250).toInt();
     if(axisCount < 2) {
@@ -54,8 +50,8 @@ class _AlbumsFragmentState extends State<AlbumsFragment> {
         height: 60,
       ));
     }
-    for(var album in albumList) {
-      var albumWidget = AlbumGridItem(album: album);
+    for(var id in appStorage.albumIdList) {
+      var albumWidget = AlbumGridItem(album: appStorage.albums.get(id));
       children.add(albumWidget);
     }
     return MasonryGridView(

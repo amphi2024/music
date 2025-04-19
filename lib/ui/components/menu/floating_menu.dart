@@ -26,7 +26,6 @@ class FloatingMenu extends StatefulWidget {
 class _FloatingMenuState extends State<FloatingMenu> {
 
   var pageController = PageController();
-  bool dialogShowing = false;
 
   @override
   void dispose() {
@@ -36,7 +35,9 @@ class _FloatingMenuState extends State<FloatingMenu> {
 
   @override
   Widget build(BuildContext context) {
-    double verticalPadding = MediaQuery.of(context).size.height > 300 ? 150 : 20;
+    final double height = 300;
+    final screenHeight = MediaQuery.of(context).size.height;
+    double verticalPadding = (screenHeight - height) / 2;
 
     return AnimatedPositioned(
       left: widget.showing ? 15 : -300,
@@ -51,7 +52,7 @@ class _FloatingMenuState extends State<FloatingMenu> {
         },
         child: Container(
           width: 250,
-          height: 300,
+          height: height,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(15),
               color: Theme.of(context).cardColor,
@@ -91,18 +92,6 @@ class _FloatingMenuState extends State<FloatingMenu> {
                 children: [
                   AccountButton(),
                   PopupMenuButton(
-                    onOpened: () {
-                      appState.setMainViewState(() {
-                        appState.playingBarShowing = false;
-                      });
-                    },
-                    onCanceled: () {
-                      if(!dialogShowing) {
-                        appState.setMainViewState(() {
-                          appState.playingBarShowing = true;
-                        });
-                      }
-                    },
                     icon: Icon(Icons.add_circle_outline),
                     itemBuilder: (context) {
                       return [
@@ -112,18 +101,12 @@ class _FloatingMenuState extends State<FloatingMenu> {
                         }),
                         PopupMenuItem(
                             child: Text("Artist"), onTap: () {
-                          dialogShowing = true;
                           showDialog(context: context, builder: (context) {
                             return EditArtistDialog(artist: Artist.created({}), onSave: (artist) {
                               setState(() {
                                 appStorage.artists[artist.id] = artist;
                               });
                             });
-                          }).then((value) {
-                           dialogShowing = false;
-                           appState.setMainViewState(() {
-                             appState.playingBarShowing = true;
-                           });
                           });
                         }),
                         PopupMenuItem(child: Text("Playlist"), onTap: () {

@@ -79,7 +79,7 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
-                        Expanded(child: Text(song.album.name.byContext(context))),
+                        Expanded(child: Text(song.album.title.byContext(context))),
                         IconButton(onPressed: () {
                           showDialog(context: context, builder: (context) {
                             return SelectAlbumDialog(excepting: song.albumId, onSelected: (albumId) {});
@@ -130,7 +130,6 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                   icon: Icon(Icons.check),
                   onPressed: () {
                     song.save();
-                    song.album.save();
                     Navigator.pop(context);
                     appState.setState(() {
                       song.artist.refreshAlbums();

@@ -40,15 +40,12 @@ class _ArtistsFragmentState extends State<ArtistsFragment> {
   @override
   Widget build(BuildContext context) {
     List<Widget> children = [];
-    List<Artist> list = [];
 
-    appStorage.artists.forEach((id, artist) {
-      list.add(artist);
-    });
     children.add(Container(
       height: 60,
     ));
-    for (var artist in list) {
+    for (var id in appStorage.artistIdList) {
+      var artist = appStorage.artists.get(id);
       var artistWidget = ArtistLinearItem(
           artist: artist,
           onPressed: () {

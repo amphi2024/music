@@ -12,14 +12,14 @@ import '../app_storage.dart';
 class Album {
 
   Map<String, dynamic> data = {
-    "name": <String, dynamic>{},
+    "title": <String, dynamic>{},
     "genre": <String, dynamic>{},
     "artist": "",
     "added": DateTime.now().toUtc().millisecondsSinceEpoch,
     "modified": DateTime.now().toUtc().millisecondsSinceEpoch
   };
 
-  Map<String, dynamic> get name => data["name"];
+  Map<String, dynamic> get title => data["title"];
   Map<String, dynamic> get genre => data["genre"];
   Artist get artist => appStorage.artists[data["artist"]] ?? Artist();
   String get artistId => data["artist"];
@@ -28,8 +28,8 @@ class Album {
   List<String> songs = [];
   DateTime get added => DateTime.fromMillisecondsSinceEpoch(data["added"], isUtc: true).toLocal();
   DateTime get modified => DateTime.fromMillisecondsSinceEpoch(data["modified"], isUtc: true).toLocal();
-  late String id;
-  late String path;
+  String id = "";
+  String path = "";
 
   static Album created({required Map metadata, required String artistId, required List<int> albumCover}) {
     var album = Album();
@@ -41,13 +41,14 @@ class Album {
     album.path = directory.path;
     album.id = filename;
 
-    album.name["default"] = metadata["album"];
+    album.title["default"] = metadata["album"];
     album.genre["default"] = metadata["genre"];
     album.artist = artistId;
 
     if(albumCover.isNotEmpty) {
       var coverFilename = FilenameUtils.generatedFileName(".jpg", album.path);
       var coverFile = File(PathUtils.join(album.path, coverFilename));
+      directory.createSync(recursive: true);
       coverFile.writeAsBytes(albumCover);
       album.covers.add(coverFile.path);
     }
@@ -118,15 +119,18 @@ class Album {
   }
 
   Future<void> downloadMissingCovers() async {
-    appWebChannel.getAlbumCovers(id: id, onSuccess: (covers) async {
-      for(var coverInfo in covers) {
-        var filename = coverInfo["filename"];
-        var file = File(PathUtils.join(path, filename));
+    if(id.isNotEmpty) {
+      appWebChannel.getAlbumCovers(id: id, onSuccess: (list) async {
+        for (var coverInfo in list) {
+          var filename = coverInfo["filename"];
+          var file = File(PathUtils.join(path, filename));
 
-        if(!await file.exists()) {
-          appWebChannel.downloadAlbumCover(album: this, filename: filename);
+          if (!await file.exists()) {
+            appWebChannel.downloadAlbumCover(album: this, filename: filename);
+            covers.add(file.path);
+          }
         }
-      }
-    });
+      });
+    }
   }
 }

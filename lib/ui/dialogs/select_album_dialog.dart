@@ -70,7 +70,7 @@ class _SelectAlbumDialogState extends State<SelectAlbumDialog> {
                         ),
                       ),
                       Text(
-                          album.name.byContext(context)
+                          album.title.byContext(context)
                       ),
                       Text(
                           album.artist.name.byContext(context)

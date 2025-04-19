@@ -21,15 +21,15 @@ class PlayerService {
 
   void shuffle() {
     playlist.shuffle();
-    for(int i = 0 ; i < playlist.queue.length; i++) {
-      if(playlist.queue[i] == playingSongId) {
+    for(int i = 0 ; i < playlist.songs.length; i++) {
+      if(playlist.songs[i] == playingSongId) {
         index = i;
       }
     }
   }
 
   Song nowPlaying() {
-    if(playlist.queue.isEmpty || playlist.queue.length <= index) {
+    if(playlist.songs.isEmpty || playlist.songs.length <= index) {
       return Song();
     }
     else {
@@ -42,7 +42,7 @@ class PlayerService {
     if(songFilePath != null) {
       playlistKey = "";
       index = i;
-      playingSongId = playlist.queue[index];
+      playingSongId = playlist.songs[index];
       if(localeCode != null) {
         appMethodChannel.localeCode = localeCode;
       }
@@ -54,9 +54,9 @@ class PlayerService {
   Future<void> playPrevious(String? localeCode) async {
     playerService.index--;
     if(index < 0) {
-      index = playlist.queue.length - 1;
+      index = playlist.songs.length - 1;
     }
-    playingSongId = playlist.queue[index];
+    playingSongId = playlist.songs[index];
     var songFilePath = playerService.nowPlaying().songFilePath();
     if(songFilePath != null) {
       if(localeCode != null) {
@@ -77,10 +77,10 @@ class PlayerService {
     await pauseMusicIfPlaying();
 
     index++;
-    if(index >= playlist.queue.length) {
+    if(index >= playlist.songs.length) {
       index = 0;
     }
-    playingSongId = playlist.queue[index];
+    playingSongId = playlist.songs[index];
     var songFilePath = playerService.nowPlaying().songFilePath();
     if(songFilePath != null) {
       if(localeCode != null) {
@@ -108,7 +108,7 @@ class PlayerService {
       await appMethodChannel.pauseMusic();
     }
     index = i;
-    playingSongId = playlist.queue[i];
+    playingSongId = playlist.songs[i];
     var songFilePath = playerService.nowPlaying().songFilePath();
     if(songFilePath != null) {
       await appMethodChannel.setMediaSource(song: nowPlaying());

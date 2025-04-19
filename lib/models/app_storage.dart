@@ -1,12 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:amphi/models/app_storage_core.dart';
 import 'package:amphi/models/update_event.dart';
+import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:music/channels/app_method_channel.dart';
 import 'package:music/channels/app_web_channel.dart';
+import 'package:music/models/app_settings.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/music/playlist.dart';
 
@@ -33,6 +36,10 @@ class AppStorage extends AppStorageCore {
   Map<String, Map<String, dynamic>> genres = {};
   Map<String, Album> albums = {};
   Map<String, Playlist> playlists = {};
+  List<String> songIdList = [];
+  List<String> artistIdList = [];
+  List<String> albumIdList = [];
+  List<String> playlistIdList = [];
 
   @override
   void initPaths() {
@@ -58,13 +65,13 @@ class AppStorage extends AppStorageCore {
       for (var file in result.files) {
         var filePath = file.path;
         if (filePath != null && File(filePath).existsSync()) {
-          createMusicAndAll(filePath);
+          createMusic(filePath);
         }
       }
     }
   }
 
-  void createMusicAndAll(String filePath) async {
+  void createMusic(String filePath) async {
     var metadata = await appMethodChannel.getMusicMetadata(filePath);
     var albumCover = await appMethodChannel.getAlbumCover(filePath);
     print(metadata);
@@ -72,17 +79,23 @@ class AppStorage extends AppStorageCore {
 
     var artist = Artist.created(metadata);
     artists[artist.id] = artist;
+    artistIdList.add(artist.id);
     artist.save();
 
     var album = Album.created(metadata: metadata, artistId: artist.id, albumCover: albumCover);
-    artists[album.id]?.albums.add(album.id);
+    artist.albums.add(album.id);
     albums[album.id] = album;
+    albumIdList.add(album.id);
     album.save();
 
-    var createdMusic = Song.created(metadata: metadata, artistId: artist.id, albumId: album.id, file: File(filePath));
-    createdMusic.save();
+    var song = Song.created(metadata: metadata, artistId: artist.id, albumId: album.id, file: File(filePath));
+    song.save();
+    songs[song.id] = song;
+    songIdList.add(song.id);
     appState.setMainViewState(() {
-      songs[createdMusic.id] = createdMusic;
+      songIdList.sortSongList();
+      artistIdList.sortArtistList();
+      albumIdList.sortAlbumList();
     });
   }
 
@@ -94,6 +107,7 @@ class AppStorage extends AppStorageCore {
           if (file is Directory) {
             var artist = Artist.fromDirectory(file);
             artists[artist.id] = artist;
+            artistIdList.add(artist.id);
           }
         }
       }
@@ -108,6 +122,7 @@ class AppStorage extends AppStorageCore {
           if (file is Directory) {
             var album = Album.fromDirectory(file);
             albums[album.id] = album;
+            albumIdList.add(album.id);
           }
         }
       }
@@ -120,6 +135,7 @@ class AppStorage extends AppStorageCore {
       if (file is File) {
         var playlist = Playlist.fromFile(file);
         playlists[playlist.id] = playlist;
+        playlistIdList.add(playlist.id);
       }
     }
   }
@@ -149,7 +165,8 @@ class AppStorage extends AppStorageCore {
           if (file is Directory) {
             var song = Song.fromDirectory(file);
             songs[song.id] = song;
-            playlists[""]!.queue.add(song.id);
+            songIdList.add(song.id);
+            playlists[""]!.songs.add(song.id);
             for(var genre in song.genre) {
               if(genre is Map<String, dynamic>) {
                 updateGenres(genre);
@@ -212,25 +229,19 @@ class AppStorage extends AppStorageCore {
     });
 
     appWebChannel.getSongs(onSuccess: (list) {
-      List<Song> songList = [];
-      songs.forEach((key, value) {
-        songList.add(value);
-      });
-
-      songList.filterByMapList(list, (i, j) {
-        return list[j] == songList[i].id;
-      });
-
-      for(var song in songList) {
-        appWebChannel.uploadSongInfo(song: song);
-        song.files.forEach((key, value) {
-          appWebChannel.uploadSongFile(songId: song.id, filePath: value.infoFilepath);
-          appWebChannel.uploadSongFile(songId: song.id, filePath: value.mediaFilepath);
-        });
+      for(var id in songIdList) {
+        if(!list.contains(id)) {
+          var song = songs.get(id);
+          appWebChannel.uploadSongInfo(song: song);
+          song.files.forEach((key, value) {
+            appWebChannel.uploadSongFile(songId: song.id, filePath: value.infoFilepath);
+            appWebChannel.uploadSongFile(songId: song.id, filePath: value.mediaFilepath);
+          });
+        }
       }
 
       for(var songId in list) {
-        if(songs.containsKey(songId)) {
+        if(!songs.containsKey(songId)) {
           appWebChannel.getSongInfo(id: songId, onSuccess: (data) {
             var song = Song();
             song.id = songId;
@@ -238,6 +249,7 @@ class AppStorage extends AppStorageCore {
             song.path = PathUtils.join(songsPath, songId.substring(0, 1), songId);
             song.save(upload: false);
             songs[songId] = song;
+            songIdList.add(songId);
 
             song.downloadMissingFiles();
           });
@@ -246,19 +258,13 @@ class AppStorage extends AppStorageCore {
     });
 
     appWebChannel.getAlbums(onSuccess: (list) {
-      List<Album> albumList = [];
-      albums.forEach((key, value) {
-        albumList.add(value);
-      });
-
-      albumList.filterByMapList(list, (i, j) {
-        return list[j] == albumList[i].id;
-      });
-
-      for(var album in albumList) {
-        appWebChannel.uploadAlbumInfo(album: album);
-        for(var coverFilePath in album.covers) {
-          appWebChannel.uploadAlbumCover(albumId: album.id, filePath: coverFilePath);
+      for(var id in albumIdList) {
+        if(!list.contains(id)) {
+          var album = albums.get(id);
+          appWebChannel.uploadAlbumInfo(album: album);
+          for(var coverFilePath in album.covers) {
+            appWebChannel.uploadAlbumCover(albumId: album.id, filePath: coverFilePath);
+          }
         }
       }
 
@@ -271,13 +277,28 @@ class AppStorage extends AppStorageCore {
           album.path = PathUtils.join(albumsPath, id.substring(0, 1), id);
           album.save(upload: false);
           albums[id] = album;
-
+          albumIdList.add(id);
           album.downloadMissingCovers();
         });
         }
+        else {
+          albums.get(id).downloadMissingCovers();
+        }
+
       }
     });
     appWebChannel.getArtists(onSuccess: (list) {
+
+      for(var id in artistIdList) {
+        if(!list.contains(id)) {
+          var artist = artists.get(id);
+          appWebChannel.uploadArtistInfo(artist: artist);
+          for(var filePath in artist.profileImages) {
+            appWebChannel.uploadArtistFile(id: id, filePath: filePath);
+          }
+        }
+      }
+
       for(var id in list) {
         if(!artists.containsKey(id)) {
           appWebChannel.getArtistInfo(id: id, onSuccess: (data) {
@@ -287,13 +308,30 @@ class AppStorage extends AppStorageCore {
             artist.path = PathUtils.join(artistsPath, id.substring(0, 1), id);
             artist.save(upload: false);
             artists[id] = artist;
-
+            artistIdList.add(id);
             artist.downloadMissingFiles();
           });
+        }
+        else {
+          artists.get(id).downloadMissingFiles();
         }
       }
     });
     appWebChannel.getPlaylists(onSuccess: (list) {
+
+      List<String> idList = [];
+      for(var fileInfo in list) {
+        String id = fileInfo["id"];
+        idList.add(id);
+      }
+
+      for(var id in playlistIdList) {
+        if(!idList.contains(id)) {
+          var playlist = playlists.get(id);
+          appWebChannel.uploadPlaylist(playlist: playlist);
+        }
+      }
+
       for(var fileInfo in list) {
         String filename = fileInfo["filename"];
         String id = fileInfo["id"];
@@ -303,6 +341,7 @@ class AppStorage extends AppStorageCore {
             playlist.id = id;
             playlist.path = PathUtils.join(playlistsPath, filename);
             playlist.save(upload: false);
+            playlistIdList.add(id);
           });
         }
       }
@@ -314,56 +353,189 @@ class AppStorage extends AppStorageCore {
     if (appWebChannel.token.isNotEmpty) {
       appWebChannel.getEvents(onResponse: (updateEvents) async {
         for (UpdateEvent updateEvent in updateEvents) {
-          switch (updateEvent.action) {
-            case UpdateEvent.renameUser:
-              appStorage.selectedUser.name = updateEvent.value;
-              appStorage.saveSelectedUserInformation(updateEvent: updateEvent);
-              break;
-            case UpdateEvent.uploadTheme:
-              File file = File(PathUtils.join(appStorage.themesPath, updateEvent.value));
-              if (!file.existsSync()) {
-                appWebChannel.downloadTheme(filename: updateEvent.value);
-              } else if (updateEvent.timestamp.isAfter(file.lastModifiedSync())) {
-                appWebChannel.downloadTheme(filename: updateEvent.value);
-              }
-              break;
-            case UpdateEvent.uploadSongInfo:
-              break;
-            case UpdateEvent.uploadSongFile:
-              break;
-            case UpdateEvent.uploadAlbumCover:
-              break;
-            case UpdateEvent.uploadAlbumInfo:
-              break;
-            case UpdateEvent.uploadArtistInfo:
-              break;
-            case UpdateEvent.uploadArtistFile:
-              break;
-            case UpdateEvent.uploadPlaylist:
-              break;
-            case UpdateEvent.uploadPlaylistThumbnail:
-              break;
-            case UpdateEvent.deleteSong:
-              break;
-            case UpdateEvent.deleteSongFile:
-              break;
-            case UpdateEvent.deleteAlbum:
-              break;
-            case UpdateEvent.deleteAlbumCover:
-              break;
-            case UpdateEvent.deleteArtist:
-              break;
-            case UpdateEvent.deleteArtistFile:
-              break;
-            case UpdateEvent.deletePlaylist:
-              break;
-            case UpdateEvent.deletePlaylistThumbnail:
-              break;
-          }
-         // appWebChannel.acknowledgeEvent(updateEvent);
+          syncData(updateEvent);
         }
       });
     }
+  }
+
+  Future<void> syncData(UpdateEvent updateEvent) async {
+    final value = updateEvent.value;
+    switch (updateEvent.action) {
+      case UpdateEvent.renameUser:
+        appStorage.selectedUser.name = updateEvent.value;
+        appStorage.saveSelectedUserInformation(updateEvent: updateEvent);
+        break;
+      case UpdateEvent.uploadTheme:
+        File file = File(PathUtils.join(appStorage.themesPath, updateEvent.value));
+        if (!file.existsSync()) {
+          appWebChannel.downloadTheme(filename: updateEvent.value);
+        } else if (updateEvent.timestamp.isAfter(file.lastModifiedSync())) {
+          appWebChannel.downloadTheme(filename: updateEvent.value);
+        }
+        break;
+      case UpdateEvent.uploadSongInfo:
+        appWebChannel.getSongInfo(id: value, onSuccess: (info) {
+          var song = songs[value];
+          if(song != null) {
+            appState.setState(() {
+              song.data = info;
+            });
+            song.save(upload: false);
+          }
+          else {
+            var song = Song();
+            song.id = value;
+            song.path = PathUtils.join(songsPath, value.substring(0, 1), value);
+            song.data = info;
+            song.save(upload: false);
+            songIdList.add(song.id);
+            appState.setState(() {
+              songIdList.sortSongList();
+            });
+          }
+        });
+        break;
+      case UpdateEvent.uploadSongFile:
+        var split = value.split(";");
+        if(split.length > 1) {
+          var id = split[0];
+          var filename = split[1];
+          if(filename.endsWith(".json")) {
+            var song = songs.get(id);
+            appWebChannel.downloadSongFile(song: song, filename: filename);
+          }
+        }
+        break;
+      case UpdateEvent.uploadAlbumInfo:
+        appWebChannel.getAlbumInfo(id: value, onSuccess: (info) {
+          var album = albums.get(value);
+          appState.setState(() {
+            album.data = info;
+          });
+          album.save(upload: false);
+        });
+        break;
+      case UpdateEvent.uploadAlbumCover:
+        var split = value.split(";");
+        if(split.length > 1) {
+          var id = split[0];
+          var filename = split[1];
+          var album = albums.get(id);
+          appWebChannel.downloadAlbumCover(album: album, filename: filename);
+        }
+        break;
+      case UpdateEvent.uploadArtistInfo:
+        appWebChannel.getArtistInfo(id: value, onSuccess: (info) {
+          var artist = artists.get(value);
+          appState.setState(() {
+            artist.data = info;
+          });
+          artist.save(upload: false);
+        });
+        break;
+      case UpdateEvent.uploadArtistFile:
+        var split = value.split(";");
+        if(split.length > 1) {
+          var id = split[0];
+          var filename = split[1];
+          var artist = artists.get(id);
+          appWebChannel.downloadArtistFile(artist: artist, filename: filename);
+        }
+        break;
+      case UpdateEvent.uploadPlaylist:
+        appWebChannel.getPlaylist(id: value, onSuccess: (info) {
+          var playlist = playlists.get(value);
+          appState.setState(() {
+            playlist.data = info;
+          });
+          playlist.save(upload: false);
+        });
+        break;
+      case UpdateEvent.uploadPlaylistThumbnail:
+        var split = value.split(";");
+        if(split.length > 1) {
+          var id = split[0];
+          var filename = split[1];
+          var playlist = playlists.get(id);
+          appWebChannel.downloadPlaylistThumbnail(playlist: playlist, filename: filename);
+        }
+        break;
+      case UpdateEvent.deleteSong:
+        var song = songs.get(value);
+        song.delete(upload: false);
+        break;
+      case UpdateEvent.deleteSongFile:
+        var split = value.split(";");
+        if(split.length > 1) {
+          var id = split[0];
+          var filename = split[1];
+          var song = songs.get(id);
+        }
+        break;
+      case UpdateEvent.deleteAlbum:
+        var album = albums.get(value);
+        album.delete(upload: false);
+        break;
+      case UpdateEvent.deleteAlbumCover:
+        var split = value.split(";");
+        if(split.length > 1) {
+          var id = split[0];
+          var filename = split[1];
+          var album = albums.get(id);
+          for(int i = 0; i < album.covers.length; i++) {
+            var filePath = album.covers[i];
+            if(PathUtils.basename(filePath) == filename) {
+              var file = File(filePath);
+              file.delete();
+              album.covers.removeAt(i);
+              i--;
+              break;
+            }
+          }
+        }
+        break;
+      case UpdateEvent.deleteArtist:
+        var artist = artists.get(value);
+        artist.delete(upload: false);
+        break;
+      case UpdateEvent.deleteArtistFile:
+        var split = value.split(";");
+        if(split.length > 1) {
+          var id = split[0];
+          var filename = split[1];
+          var artist = artists.get(id);
+          for(int i = 0; i < artist.profileImages.length; i++) {
+            var filePath = artist.profileImages[i];
+            if(PathUtils.basename(filePath) == filename) {
+              var file = File(filePath);
+              file.delete();
+              artist.profileImages.removeAt(i);
+              i--;
+              break;
+            }
+          }
+        }
+        break;
+      case UpdateEvent.deletePlaylist:
+        var playlist = playlists.get(value);
+        playlist.delete(upload: false);
+        break;
+      case UpdateEvent.deletePlaylistThumbnail:
+        break;
+    }
+     appWebChannel.acknowledgeEvent(updateEvent);
+  }
+
+  void clearMusic() {
+   albums.clear();
+   songs.clear();
+   playlists.clear();
+   artists.clear();
+   songIdList.clear();
+   albumIdList.clear();
+   artistIdList.clear();
+   playlistIdList.clear();
   }
 }
 
@@ -381,3 +553,96 @@ extension FilterExtension on List {
     }
   }
 }
+
+extension SongsExtension on Map<String, Song> {
+  Song get(String id) {
+    final value = this[id];
+    if(value is Song) {
+      return value;
+    }
+    else {
+      var song = Song();
+      song.path = PathUtils.join(appStorage.songsPath, id.substring(0, 1), id);
+      song.id = id;
+      return song;
+    }
+  }
+}
+
+extension AlbumsEx on Map<String, Album> {
+  Album get(String id) {
+    final value = this[id];
+    if(value is Album) {
+      return value;
+    }
+    else {
+      var album = Album();
+      album.path = PathUtils.join(appStorage.albumsPath, id.substring(0, 1), id);
+      album.id = id;
+      return album;
+    }
+  }
+}
+
+extension ArtistsEx on Map<String, Artist> {
+  Artist get(String id) {
+    final value = this[id];
+    if(value is Artist) {
+      return value;
+    }
+    else {
+      var artist = Artist();
+      artist.path = PathUtils.join(appStorage.artistsPath, id.substring(0, 1), id);
+      artist.id = id;
+      return artist;
+    }
+  }
+}
+
+extension PlaylistsEx on Map<String, Playlist> {
+  Playlist get(String id) {
+    final value = this[id];
+    if(value is Playlist) {
+      return value;
+    }
+    else {
+      var playlist = Playlist();
+      playlist.path = PathUtils.join(appStorage.playlistsPath, id);
+      playlist.id = id;
+      return playlist;
+    }
+  }
+}
+
+extension SortEx on List<String> {
+  void sortSongList() {
+    sort((a, b) {
+      var aTitle = appStorage.songs[a]!.title.byLocaleCode(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
+      var bTitle = appStorage.songs[b]!.title.byLocaleCode(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
+      return aTitle.compareTo(bTitle);
+    });
+  }
+  void sortAlbumList() {
+    sort((a, b) {
+      var aTitle = appStorage.albums[a]!.title.byLocaleCode(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
+      var bTitle = appStorage.albums[b]!.title.byLocaleCode(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
+      return aTitle.compareTo(bTitle);
+    });
+  }
+  void sortArtistList() {
+    sort((a, b) {
+      var aTitle = appStorage.artists[a]!.name.byLocaleCode(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
+      var bTitle = appStorage.artists[b]!.name.byLocaleCode(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
+      return aTitle.compareTo(bTitle);
+    });
+  }
+  void sortPlaylistList() {
+    sort((a, b) {
+      var aTitle = appStorage.playlists[a]!.title;
+      var bTitle = appStorage.playlists[b]!.title;
+      return aTitle.compareTo(bTitle);
+    });
+  }
+}
+
+const sortByTitle = 0;

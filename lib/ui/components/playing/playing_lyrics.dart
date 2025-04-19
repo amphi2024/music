@@ -49,7 +49,7 @@ class _PlayingLyricsState extends State<PlayingLyrics> {
           }
         return Text(
             lines[index].text,
-          maxLines: 5,
+          maxLines: 200,
           style: TextStyle(
             fontSize: 20,
             color: focused ? Theme.of(context).highlightColor : null,
