@@ -44,7 +44,8 @@ class _ArtistsFragmentState extends State<ArtistsFragment> {
     children.add(Container(
       height: 60,
     ));
-    for (var id in appStorage.artistIdList) {
+    for (int i = 0; i < appStorage.artistIdList.length; i++) {
+      var id = appStorage.artistIdList[i];
       var artist = appStorage.artists.get(id);
       var artistWidget = ArtistLinearItem(
           artist: artist,
@@ -56,6 +57,7 @@ class _ArtistsFragmentState extends State<ArtistsFragment> {
               artist.delete();
               setState(() {
                 appStorage.artists.remove(artist.id);
+                appStorage.artistIdList.removeAt(i);
               });
             });
           });

@@ -93,6 +93,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor);
     if(locale == null) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,

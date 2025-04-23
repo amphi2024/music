@@ -43,6 +43,28 @@ class AppDelegate: FlutterAppDelegate {
                 } else {
                     result(FlutterError(code: "INVALID_ARGUMENT", message: "Missing path argument", details: nil))
                 }
+            case "resume_music":
+                result(FlutterError(code: "INVALID_ARGUMENT", message: "Missing path argument", details: nil))
+            case "pause_music":
+                result(FlutterError(code: "INVALID_ARGUMENT", message: "Missing path argument", details: nil))
+            case "is_music_playing":
+                result(FlutterError(code: "INVALID_ARGUMENT", message: "Missing path argument", details: nil))
+            case "set_media_source":
+                if let arguments = call.arguments as? [String: Any],
+                   let path = arguments["path"] as? String {
+                    let fileURL = URL(fileURLWithPath: path)
+                    do {
+                        var player: AVAudioPlayer?
+                        player = try AVAudioPlayer(contentsOf: fileURL)
+                        player?.prepareToPlay()
+                        player?.play()
+                    } catch {
+                    }
+                }
+            case "apply_playback_position":
+                result(FlutterError(code: "INVALID_ARGUMENT", message: "Missing path argument", details: nil))
+            case "get_music_duration":
+                result(FlutterError(code: "INVALID_ARGUMENT", message: "Missing path argument", details: nil))
             default:
                 result(FlutterMethodNotImplemented)
             }

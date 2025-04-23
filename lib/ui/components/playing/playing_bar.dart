@@ -26,7 +26,20 @@ class _PlayingBarState extends State<PlayingBar> {
   @override
   void dispose() {
     pageController.dispose();
+    appMethodChannel.playbackListeners.remove(listener);
     super.dispose();
+  }
+
+  void listener(int position) {
+    setState(() {
+
+    });
+  }
+
+  @override
+  void initState() {
+    appMethodChannel.playbackListeners.add(listener);
+    super.initState();
   }
 
   @override

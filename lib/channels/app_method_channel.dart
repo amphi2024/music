@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:music/models/app_settings.dart';
+import 'package:music/models/app_state.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
 
@@ -28,6 +29,17 @@ class AppMethodChannel extends MethodChannel {
         case "play_next":
           playerService.playNext(localeCode);
           break;
+        case "on_pause":
+          for (var fun in playbackListeners) {
+            playerService.isPlaying = false;
+            fun(playerService.playbackPosition);
+          }
+          break;
+        case "on_resume":
+          for (var fun in playbackListeners) {
+            playerService.isPlaying = true;
+            fun(playerService.playbackPosition);
+          }
         default:
           break;
       }

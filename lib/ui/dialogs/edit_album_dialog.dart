@@ -6,7 +6,9 @@ import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/music/album.dart';
+import 'package:music/models/music/song.dart';
 import 'package:music/ui/components/album_cover.dart';
+import 'package:music/ui/dialogs/select_artist_dialog.dart';
 
 import '../../channels/app_web_channel.dart';
 import '../components/music_data_input.dart';
@@ -126,6 +128,23 @@ class _EditAlbumDialogState extends State<EditAlbumDialog> {
                       child: PageView(
                         children: pageViewChildren,
                       ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Expanded(child: Text(album.artist.name.byContext(context))),
+                        IconButton(onPressed: () {
+                          showDialog(context: context, builder: (context) {
+                            return SelectArtistDialog(excepting: album.artistId, onSelected: (albumId) {
+                              setState(() {
+                                album.data["artist"] = albumId;
+                              });
+                            });
+                          });
+                        }, icon: Icon(Icons.edit))
+                      ],
                     ),
                   ),
                   Padding(

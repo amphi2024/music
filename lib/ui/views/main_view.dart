@@ -33,6 +33,7 @@ class _MainViewState extends State<MainView> {
 
   @override
   void initState() {
+    appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor);
     appState.setMainViewState = (function) {
       setState(function);
     };
@@ -44,6 +45,7 @@ class _MainViewState extends State<MainView> {
         builder: (context) => PlayingBar(),
       );
       overlay.insert(overlayEntry);
+      appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor);
     });
   }
 

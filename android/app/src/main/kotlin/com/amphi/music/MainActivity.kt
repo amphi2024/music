@@ -1,6 +1,5 @@
 package com.amphi.music
 
-import android.app.Service
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -11,16 +10,9 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
-import android.util.Log
 import android.view.WindowManager
-import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
-import androidx.media3.datasource.DefaultDataSourceFactory
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.source.MediaSource
-import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.*
@@ -51,7 +43,8 @@ class MainActivity: FlutterActivity() {
         super.onStart()
         serviceIntent = Intent(this, MusicService::class.java)
 
-        startService(serviceIntent)
+        androidx.core.content.ContextCompat.startForegroundService(this, serviceIntent)
+        //startForegroundService(serviceIntent)
         bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE)
     }
 
@@ -98,12 +91,7 @@ class MainActivity: FlutterActivity() {
         methodChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
         methodChannel!!.setMethodCallHandler { call, result ->
             val window = this@MainActivity.window
-
-            musicService?.let {
-                if(it.methodChannel == null) {
-                    it.methodChannel = methodChannel
-                }
-            }
+            musicService?.methodChannel = methodChannel
             when (call.method) {
                 "set_navigation_bar_color" -> {
                     val color = call.argument<Long>("color")
@@ -126,11 +114,13 @@ class MainActivity: FlutterActivity() {
                 "resume_music" -> {
                     musicService?.player?.play()
                     musicService?.isPlaying = true
+                    musicService?.notifyNotification()
                 }
 
                 "pause_music" -> {
                     musicService?.player?.pause()
                     musicService?.isPlaying = false
+                    musicService?.notifyNotification()
                 }
 
                 "is_music_playing" -> {
@@ -155,11 +145,9 @@ class MainActivity: FlutterActivity() {
                             val playNow = call.argument<Any>("play_now")
                             if(playNow == true) {
                                 service.player.play()
+                                musicService?.isPlaying = true
                             }
-
-                            if(isBound) {
-                                musicService?.showMediaNotification()
-                            }
+                            musicService?.notifyNotification()
                         }
 
 

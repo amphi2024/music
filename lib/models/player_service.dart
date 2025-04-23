@@ -75,7 +75,6 @@ class PlayerService {
 
   Future<void> playNext(String? localeCode) async {
     await pauseMusicIfPlaying();
-
     index++;
     if(index >= playlist.songs.length) {
       index = 0;

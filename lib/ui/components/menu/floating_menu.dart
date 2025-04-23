@@ -3,10 +3,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
+import 'package:music/models/music/album.dart';
 import 'package:music/models/music/artist.dart';
 import 'package:music/models/music/playlist.dart';
 import 'package:music/ui/components/account/account_button.dart';
 import 'package:music/ui/components/menu/floating_menu_button.dart';
+import 'package:music/ui/dialogs/edit_album_dialog.dart';
 import 'package:music/ui/dialogs/edit_artist_dialog.dart';
 import 'package:music/ui/dialogs/edit_playlist_dialog.dart';
 import 'package:music/ui/views/settings_view.dart';
@@ -100,11 +102,25 @@ class _FloatingMenuState extends State<FloatingMenu> {
                          appStorage.selectMusicFilesAndSave();
                         }),
                         PopupMenuItem(
+                            child: Text("Album"), onTap: () {
+                          showDialog(context: context, builder: (context) {
+                            return EditAlbumDialog(album: Album.created(metadata: {}, artistId: "", albumCover: []), onSave: (album) {
+                              setState(() {
+                                appStorage.albums[album.id] = album;
+                                appStorage.albumIdList.add(album.id);
+                                appStorage.albumIdList.sortAlbumList();
+                              });
+                            });
+                          });
+                        }),
+                        PopupMenuItem(
                             child: Text("Artist"), onTap: () {
                           showDialog(context: context, builder: (context) {
                             return EditArtistDialog(artist: Artist.created({}), onSave: (artist) {
                               setState(() {
                                 appStorage.artists[artist.id] = artist;
+                                appStorage.artistIdList.add(artist.id);
+                                appStorage.artistIdList.sortArtistList();
                               });
                             });
                           });
