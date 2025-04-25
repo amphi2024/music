@@ -1,16 +1,17 @@
-# music
+# Amphi Music
 
-A new Flutter project.
+Music App is coming!
 
-## Getting Started
+## What makes it different from other music apps?
 
-This project is a starting point for a Flutter application.
+- Sync your music via a self-hosted server
+- Offline-accessible live lyrics
+- Multiple versions of each track (live, MV, or any version you prefer)
+- Play video as canvas (to be implemented starting in version 1.1.0)
+- Works across all platforms
+- Smart playlist features (to be implemented starting in version 1.1.0)
+- Localized song info: titles, artists, albums, genres
 
-A few resources to get you started if this is your first Flutter project:
+If you want to see this app released faster, please consider donating!
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+https://amphi.site
