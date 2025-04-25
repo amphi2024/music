@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:music/models/app_settings.dart';
 import 'package:music/models/app_state.dart';
+import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
 
@@ -13,8 +14,12 @@ class AppMethodChannel extends MethodChannel {
     setMethodCallHandler((call) async {
       switch (call.method) {
         case "on_playback_changed":
-          playerService.playbackPosition = call.arguments["position"];
-          if(playerService.playbackPosition < playerService.musicDuration) {
+          final position = call.arguments["position"];
+          playerService.playbackPosition = position;
+          if(playerService.playbackPosition <= playerService.musicDuration) {
+            if(position < 1500) {
+              playerService.musicDuration = await getMusicDuration();
+            }
             for (var fun in playbackListeners) {
               fun(playerService.playbackPosition);
             }
@@ -119,13 +124,19 @@ class AppMethodChannel extends MethodChannel {
     return await invokeMethod("is_music_playing");
   }
 
+  Future<void> setVolume(double volume) async {
+    await invokeMethod("set_volume", {"volume": volume});
+  }
+
   Future<void> setMediaSource({required Song song, String? localeCode, bool playNow = true}) async {
     await invokeMethod("set_media_source", {
       "path": song.songFilePath(),
       "play_now": playNow,
       "title": song.title.byLocaleCode(this.localeCode ?? "default"),
       "artist": song.artist.name.byLocaleCode(this.localeCode ?? "default"),
-      "album_cover": song.album.covers.firstOrNull
+      "album_cover": song.album.covers.firstOrNull,
+      "url": song.playingFile().url,
+      "token": appStorage.selectedUser.token
     });
   }
 

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
+import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/music/lyrics.dart';
 
 class SongFile {
@@ -13,6 +14,12 @@ class SongFile {
   bool get mediaFileExists => mediaFilepath.isNotEmpty;
 
   late String id;
+  late String songId;
+
+  String get url {
+    final filename = PathUtils.basename(mediaFilepath);
+    return "${appWebChannel.serverAddress}/songs//${filename}";
+  }
 
   SongFile({
     this.infoFilepath = "",

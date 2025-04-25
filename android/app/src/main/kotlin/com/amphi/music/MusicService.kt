@@ -13,6 +13,7 @@ import androidx.annotation.OptIn
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
@@ -47,6 +48,14 @@ class MusicService : Service() {
         player = ExoPlayer.Builder(this).build()
         mediaSession = MediaSession.Builder(this, player)
             .build()
+
+        player.addListener(object : Player.Listener{
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                if (playbackState == Player.STATE_ENDED) {
+                    methodChannel?.invokeMethod("play_next", null)
+                }
+            }
+        })
 
         val previousIntent = PendingIntent.getBroadcast(
             this, 0, Intent(this, com.amphi.music.MediaButtonReceiver::class.java).apply {
@@ -118,11 +127,22 @@ class MusicService : Service() {
                 else -> {}
             }
         }
-        notifyNotification()
+        updateNotification()
         return START_STICKY
     }
 
-    fun notifyNotification() {
+    fun updateNotification() {
+
+        notificationBuilder.setContentTitle(title)
+            .setContentText(artist)
+
+        albumCoverFilePath?.let {
+            val file = File(it)
+            if(file.exists() && it.isNotEmpty()) {
+                val bitmap = BitmapFactory.decodeFile(albumCoverFilePath)
+                notificationBuilder.setLargeIcon(bitmap)
+            }
+        }
 
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -145,7 +165,6 @@ class MusicService : Service() {
     }
 
     override fun onDestroy() {
-        Log.d("heyyyyy", "destroy.......")
         super.onDestroy()
         player.release()
         mediaSession.release()

@@ -45,7 +45,7 @@ class _SongsFragmentState extends State<SongsFragment> {
     for (int i = 0; i < appStorage.songIdList.length; i++) {
       final id = appStorage.songIdList[i];
       var song = appStorage.songs.get(id);
-      children.add(SongListItem(song: song, index: i));
+      children.add(SongListItem(song: song));
     }
     return ListView(
       controller: scrollController,

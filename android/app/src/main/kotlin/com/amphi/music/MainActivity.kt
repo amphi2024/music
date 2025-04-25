@@ -114,13 +114,13 @@ class MainActivity: FlutterActivity() {
                 "resume_music" -> {
                     musicService?.player?.play()
                     musicService?.isPlaying = true
-                    musicService?.notifyNotification()
+                    musicService?.updateNotification()
                 }
 
                 "pause_music" -> {
                     musicService?.player?.pause()
                     musicService?.isPlaying = false
-                    musicService?.notifyNotification()
+                    musicService?.updateNotification()
                 }
 
                 "is_music_playing" -> {
@@ -145,9 +145,9 @@ class MainActivity: FlutterActivity() {
                             val playNow = call.argument<Any>("play_now")
                             if(playNow == true) {
                                 service.player.play()
-                                musicService?.isPlaying = true
+                                service.isPlaying = true
                             }
-                            musicService?.notifyNotification()
+                            service.updateNotification()
                         }
 
 

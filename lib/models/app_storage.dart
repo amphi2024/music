@@ -108,6 +108,7 @@ class AppStorage extends AppStorageCore {
             var artist = Artist.fromDirectory(file);
             artists[artist.id] = artist;
             artistIdList.add(artist.id);
+            artistIdList.sortArtistList();
           }
         }
       }
@@ -123,6 +124,7 @@ class AppStorage extends AppStorageCore {
             var album = Album.fromDirectory(file);
             albums[album.id] = album;
             albumIdList.add(album.id);
+            albumIdList.sortAlbumList();
           }
         }
       }
@@ -136,6 +138,7 @@ class AppStorage extends AppStorageCore {
         var playlist = Playlist.fromFile(file);
         playlists[playlist.id] = playlist;
         playlistIdList.add(playlist.id);
+        playlistIdList.sortPlaylistList();
       }
     }
   }
@@ -167,6 +170,8 @@ class AppStorage extends AppStorageCore {
             songs[song.id] = song;
             songIdList.add(song.id);
             playlists[""]!.songs.add(song.id);
+            songIdList.sortSongList();
+            playlists[""]!.songs.sortSongList();
             for(var genre in song.genre) {
               if(genre is Map<String, dynamic>) {
                 updateGenres(genre);
@@ -640,6 +645,16 @@ extension SortEx on List<String> {
     sort((a, b) {
       var aTitle = appStorage.playlists[a]!.title;
       var bTitle = appStorage.playlists[b]!.title;
+      return aTitle.compareTo(bTitle);
+    });
+  }
+}
+
+extension SortExDynamic on List {
+  void sortSongList() {
+    sort((a, b) {
+      var aTitle = appStorage.songs[a]!.title.byLocaleCode(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
+      var bTitle = appStorage.songs[b]!.title.byLocaleCode(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
       return aTitle.compareTo(bTitle);
     });
   }

@@ -19,6 +19,7 @@ class Playlist {
   String get title => data["title"];
 
   List<dynamic> get songs => data["songs"];
+  set songs(value) => data["songs"] = value;
 
   static Playlist created(String title) {
     var playlist = Playlist();

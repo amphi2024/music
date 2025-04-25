@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:music/ui/components/repeat_icon.dart';
 
 import '../../../channels/app_method_channel.dart';
 import '../../../models/player_service.dart';
 import '../../../utils/duration_converter.dart';
+import '../shuffle_icon.dart';
 
 class DesktopPlayControls extends StatefulWidget {
 
@@ -47,9 +49,11 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             IconButton(
-                icon: Icon(Icons.shuffle, size: 20),
+                icon: ShuffleIcon(),
                 onPressed: () {
-                  playerService.playPrevious(Localizations.localeOf(context).languageCode);
+                  setState(() {
+                    playerService.toggleShuffle();
+                  });
                 }),
             IconButton(
                 icon: Icon(Icons.fast_rewind, size: 20),
@@ -89,9 +93,11 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
                   playerService.playNext(Localizations.localeOf(context).languageCode);
                 }),
             IconButton(
-                icon: Icon(Icons.loop, size: 20),
+                icon: RepeatIcon(),
                 onPressed: () {
-                  playerService.playPrevious(Localizations.localeOf(context).languageCode);
+                  setState(() {
+                    playerService.togglePlayMode();
+                  });
                 }),
           ],
         ),

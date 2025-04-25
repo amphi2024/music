@@ -11,6 +11,8 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../../channels/app_method_channel.dart';
 import '../../../models/app_state.dart';
+import '../repeat_icon.dart';
+import '../shuffle_icon.dart';
 
 class PlayingBar extends StatefulWidget {
   const PlayingBar({super.key});
@@ -225,7 +227,32 @@ class _PlayingBarState extends State<PlayingBar> {
                                     Padding(
                                       padding: const EdgeInsets.only(
                                           left: 30, right: 30),
-                                      child: PlayingQueue(),
+                                      child: Column(
+                                        children: [
+                                          Expanded(
+                                              child: PlayingQueue()
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                ElevatedButton(onPressed: () {
+                                                  setState(() {
+                                                    playerService.toggleShuffle();
+                                                  });
+                                                }, child: ShuffleIcon()),
+                                                ElevatedButton(onPressed: () {
+                                                  setState(() {
+                                                    playerService.togglePlayMode();
+                                                  });
+                                                }, child: RepeatIcon())
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),

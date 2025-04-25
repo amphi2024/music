@@ -14,6 +14,7 @@ import 'package:music/ui/views/wide_main_view.dart';
 
 import 'channels/app_method_channel.dart';
 import 'channels/app_web_channel.dart';
+import 'models/app_theme.dart';
 
 void main() {
   runApp(const MyApp());
@@ -42,7 +43,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.didChangeAppLifecycleState(state);
   }
 
-  Locale? locale;
+  bool initialized = false;
 
   @override
   void dispose() {
@@ -53,15 +54,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
-    appState.setState = (fun) {
-      setState(fun);
-    };
     appStorage.initialize(() {
       appSettings.getData();
       appStorage.initMusic();
       setState(() {
-        locale = appSettings.locale;
+        initialized = true;
       });
+
+      appState.setState = setState;
 
       if (appSettings.useOwnServer) {
         appWebChannel.connectWebSocket();
@@ -93,14 +93,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor);
-    if(locale == null) {
-      return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(),
-      );
-    }
-    else {
+    if(initialized) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
         locale: appSettings.locale,
@@ -116,5 +109,25 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         home: App.isDesktop() || App.isWideScreen(context) ? WideMainView() : MainView(),
       );
     }
+    else {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(scaffoldBackgroundColor: AppTheme.lightGray),
+        darkTheme: ThemeData(scaffoldBackgroundColor: AppTheme.charCoal),
+        home: Scaffold(
+          appBar: AppBar(), // This is needed to change the status bar text (icon) color on Android
+        ),
+      );
+    }
   }
+}
+
+double bottomPaddingIfAndroid3Button(BuildContext context) {
+  if(appMethodChannel.needsBottomPadding) {
+    return MediaQuery.of(context).padding.bottom;
+  }
+  else {
+    return 0;
+  }
+
 }

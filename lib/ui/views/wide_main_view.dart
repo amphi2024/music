@@ -2,6 +2,7 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
+import 'package:music/models/player_service.dart';
 import 'package:music/ui/components/account/account_button.dart';
 import 'package:music/ui/components/fragment_title.dart';
 import 'package:music/ui/components/navigation_menu.dart';
@@ -110,7 +111,7 @@ class _WideMainViewState extends State<WideMainView> {
               ),
             ),
           ),
-          DesktopPlayingBar(),
+          DesktopPlayingBar(song: playerService.nowPlaying(),),
           NavigationMenu(),
         ],
       ),

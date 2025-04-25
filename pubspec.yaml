@@ -44,6 +44,7 @@ dependencies:
   smooth_page_indicator: ^1.2.1
   web_socket_channel: ^3.0.2
   percent_indicator: ^4.2.4
+  provider: ^6.1.4
   amphi:
 #    git: https://github.com/amphi2024/flutter-shared.git
     path: ../amphi

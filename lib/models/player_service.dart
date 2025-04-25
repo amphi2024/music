@@ -5,6 +5,10 @@ import 'package:music/models/music/playlist.dart';
 import 'app_state.dart';
 import 'music/song.dart';
 
+const repeatAll = 0;
+const repeatOne = 1;
+const playOnce = 2;
+
 final playerService = PlayerService.getInstance();
 
 class PlayerService {
@@ -18,12 +22,29 @@ class PlayerService {
   int musicDuration = 0;
   int playbackPosition = 0;
   bool isPlaying = false;
+  double volume = 0.5;
+  bool shuffled = false;
+  int playMode = repeatAll;
 
-  void shuffle() {
-    playlist.shuffle();
+  void togglePlayMode() {
+    playMode++;
+    if(playMode > playOnce) {
+      playMode = 0;
+    }
+  }
+
+  void toggleShuffle() {
+    if(shuffled) {
+      shuffled = false;
+      playlist.songs.sortSongList();
+    }
+    else {
+      shuffled = true;
+      playlist.shuffle();
+    }
     for(int i = 0 ; i < playlist.songs.length; i++) {
       if(playlist.songs[i] == playingSongId) {
-        index = i;
+        index = i; // Sync index of playing song
       }
     }
   }
@@ -37,11 +58,18 @@ class PlayerService {
     }
   }
 
-  Future<void> startPlay({required Song song, String? localeCode, required int i}) async {
+  Future<void> startPlay({required Song song, String? localeCode}) async {
     var songFilePath = song.songFilePath();
     if(songFilePath != null) {
       playlistKey = "";
-      index = i;
+      index = 0;
+      for(int i = 0; i < playlist.songs.length; i++) {
+        var id = playlist.songs[i];
+        if(id == song.id) {
+          index = i;
+          break;
+        }
+      }
       playingSongId = playlist.songs[index];
       if(localeCode != null) {
         appMethodChannel.localeCode = localeCode;
@@ -57,44 +85,32 @@ class PlayerService {
       index = playlist.songs.length - 1;
     }
     playingSongId = playlist.songs[index];
-    var songFilePath = playerService.nowPlaying().songFilePath();
-    if(songFilePath != null) {
+
       if(localeCode != null) {
         appMethodChannel.localeCode = localeCode;
       }
-      await appMethodChannel.setMediaSource(song: nowPlaying(), playNow: true);
-      musicDuration = await appMethodChannel.getMusicDuration();
-     appState.setState(() {
-       isPlaying = true;
-     });
-    }
-    else {
-      playPrevious(localeCode);
-    }
+      appState.setState(() {
+
+      });
+      await appMethodChannel.setMediaSource(song: nowPlaying(), playNow: isPlaying);
   }
 
-  Future<void> playNext(String? localeCode) async {
-    await pauseMusicIfPlaying();
+  void playNext(String? localeCode) async {
     index++;
     if(index >= playlist.songs.length) {
       index = 0;
     }
     playingSongId = playlist.songs[index];
-    var songFilePath = playerService.nowPlaying().songFilePath();
-    if(songFilePath != null) {
+
       if(localeCode != null) {
         appMethodChannel.localeCode = localeCode;
       }
-      await appMethodChannel.setMediaSource(song: nowPlaying());
-      await appMethodChannel.resumeMusic();
-      musicDuration = await appMethodChannel.getMusicDuration();
-      appState.setState(() {
-        isPlaying = true;
-      });
-    }
-    else {
-      playNext(localeCode);
-    }
+
+    appState.setState(() {
+
+    });
+      await appMethodChannel.setMediaSource(song: nowPlaying(), playNow: isPlaying);
+
   }
 
   Future<void> pauseMusicIfPlaying() async {

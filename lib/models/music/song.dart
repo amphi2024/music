@@ -126,6 +126,7 @@ class Song {
         directory.createSync(recursive: true);
       }
       var songFile = SongFile.created(path: directory.path, originalFile: file);
+      songFile.songId = song.id;
       var lyrics = Lyrics();
       lyrics.data.get("default").add(LyricLine(text: metadata["lyrics"] ?? ""));
       songFile.lyrics = lyrics;
@@ -156,6 +157,7 @@ class Song {
         if(FilenameUtils.extensionName(file.path) == "json") {
           var songFile = song.files.putIfAbsent(nameOnly, () => SongFile());
           songFile.infoFilepath = file.path;
+          songFile.songId = song.id;
           songFile.getData();
         }
         else {

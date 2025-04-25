@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:music/channels/app_method_channel.dart';
+import 'package:music/models/app_settings.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/song.dart';
@@ -33,7 +34,6 @@ class _MainViewState extends State<MainView> {
 
   @override
   void initState() {
-    appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor);
     appState.setMainViewState = (function) {
       setState(function);
     };
@@ -45,13 +45,14 @@ class _MainViewState extends State<MainView> {
         builder: (context) => PlayingBar(),
       );
       overlay.insert(overlayEntry);
-      appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor);
     });
   }
 
+
+
   @override
   Widget build(BuildContext context) {
-     appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor);
+    appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor);
 
     var fragments = [
       SongsFragment(),

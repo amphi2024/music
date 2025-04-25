@@ -12,8 +12,7 @@ import '../album_cover.dart';
 class SongListItem extends StatelessWidget {
 
   final Song song;
-  final int index;
-  const SongListItem({super.key, required this.song, required this.index});
+  const SongListItem({super.key, required this.song});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +25,7 @@ class SongListItem extends StatelessWidget {
       onTap: () {
         appState.setState(() {
           playerService.isPlaying = true;
-          playerService.startPlay(song: song, i: index, localeCode: Localizations.localeOf(context).languageCode);
+          playerService.startPlay(song: song, localeCode: Localizations.localeOf(context).languageCode);
         });
       },
       child: Padding(

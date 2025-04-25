@@ -14,7 +14,7 @@ class AppSettings {
 
   Map<String, dynamic> data = {
     "locale": null,
-    "serverAddress":"http://10.0.2.2:8000"
+    "serverAddress": ""
   };
   set localeCode(value) => data["locale"] = value;
   String? get localeCode => data["locale"];
