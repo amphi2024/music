@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:music/models/app_settings.dart';
@@ -10,23 +11,21 @@ final appMethodChannel = AppMethodChannel.getInstance();
 
 class AppMethodChannel extends MethodChannel {
   static final AppMethodChannel _instance = AppMethodChannel._internal("music_method_channel");
+
   AppMethodChannel._internal(super.name) {
+    if(Platform.isWindows) {
+      timer = Timer.periodic(Duration(milliseconds: 500), (timer) async {
+        final position = await getPlaybackPosition();
+        if(playerService.isPlaying) {
+          await onPlaybackChanged(position);
+        }
+      });
+    }
     setMethodCallHandler((call) async {
       switch (call.method) {
         case "on_playback_changed":
           final position = call.arguments["position"];
-          playerService.playbackPosition = position;
-          if(playerService.playbackPosition <= playerService.musicDuration) {
-            if(position < 1500) {
-              playerService.musicDuration = await getMusicDuration();
-            }
-            for (var fun in playbackListeners) {
-              fun(playerService.playbackPosition);
-            }
-          }
-          else {
-            playerService.musicDuration = await appMethodChannel.getMusicDuration();
-          }
+          await onPlaybackChanged(position);
           break;
         case "play_previous":
           playerService.playPrevious(localeCode);
@@ -51,10 +50,26 @@ class AppMethodChannel extends MethodChannel {
     });
   }
 
+  Future<void> onPlaybackChanged(int position) async {
+    if(position <= playerService.musicDuration) {
+      playerService.playbackPosition = position;
+      if(position < 1500) {
+        playerService.musicDuration = await getMusicDuration();
+      }
+      for (var fun in playbackListeners) {
+        fun(playerService.playbackPosition);
+      }
+    }
+    else {
+      playerService.musicDuration = await appMethodChannel.getMusicDuration();
+    }
+  }
+
   static AppMethodChannel getInstance() => _instance;
 
   List<void Function(int)> playbackListeners = [];
 
+  Timer? timer;
   int systemVersion = 0;
   bool needsBottomPadding = false;
   String? localeCode;
@@ -148,5 +163,9 @@ class AppMethodChannel extends MethodChannel {
 
   Future<int> getMusicDuration() async {
     return await invokeMethod("get_music_duration");
+  }
+
+  Future<int> getPlaybackPosition() async {
+    return await invokeMethod("get_playback_position");
   }
 }

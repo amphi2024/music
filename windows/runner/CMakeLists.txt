@@ -24,6 +24,7 @@ add_executable(${BINARY_NAME} WIN32
   "Runner.rc"
   "runner.exe.manifest"
   "metadata_retriever.cpp"
+  "audio_player.cpp"
 )
 
 # Apply the standard set of build settings. This can be removed for applications
