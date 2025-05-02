@@ -1,5 +1,4 @@
 #include "audio_player.h"
-#include "miniaudio.h"
 #include <string>
 #include <mutex>
 #include <iostream>
@@ -8,8 +7,9 @@ AudioPlayer::AudioPlayer() {}
 AudioPlayer::~AudioPlayer() {
     Stop();
     if (initialized_) {
-        ma_engine_uninit(&engine_);
+        BASS_Free();
     }
+
 }
 
 AudioPlayer& AudioPlayer::GetInstance() {
@@ -20,7 +20,7 @@ AudioPlayer& AudioPlayer::GetInstance() {
 bool AudioPlayer::Init() {
     std::lock_guard<std::mutex> lock(mutex_);
     if (!initialized_) {
-        if (ma_engine_init(NULL, &engine_) != MA_SUCCESS) {
+        if (!BASS_Init(-1, 44100, 0, 0, NULL)) {
             return false;
         }
         initialized_ = true;
@@ -29,62 +29,75 @@ bool AudioPlayer::Init() {
 }
 
 void AudioPlayer::Play(const string& path, const string& url, const string& token) {
+
+    Stop();
+
     if (!initialized_) Init();
 
-    if (sound_loaded_) {
-        ma_sound_uninit(&sound_);
+    if(&path != NULL) {
+        stream = BASS_StreamCreateFile(FALSE, path.c_str(), 0, 0, 0);
+        BASS_ChannelPlay(stream, FALSE);
+        BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, volume_);
+        sound_loaded_ = true;
     }
-
-    if (ma_sound_init_from_file(&engine_, path.c_str(), 0, NULL, NULL, &sound_) != MA_SUCCESS) {
-
-    }
-
-    sound_loaded_ = true;
-
-    ma_sound_start(&sound_);
 }
 
 void AudioPlayer::Pause() {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (sound_loaded_) ma_sound_stop(&sound_);
+    if (sound_loaded_) BASS_ChannelPause(stream);
 }
 
 void AudioPlayer::Resume() {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (sound_loaded_) ma_sound_start(&sound_);
+    if (sound_loaded_) BASS_ChannelPlay(stream, FALSE);
 }
 
 void AudioPlayer::Stop() {
     std::lock_guard<std::mutex> lock(mutex_);
     if (sound_loaded_) {
-        ma_sound_uninit(&sound_);
+        BASS_StreamFree(stream);
         sound_loaded_ = false;
+    }
+}
+
+void AudioPlayer::SeekTo(long position) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (sound_loaded_) {
+        double timeMs = position / 1000;
+        QWORD pos = BASS_ChannelSeconds2Bytes(stream, timeMs);
+        BASS_ChannelSetPosition(stream, pos, BASS_POS_BYTE);
+    }
+}
+
+void AudioPlayer::SetVolume(double volume) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (sound_loaded_) {
+        this->volume_ = (float) volume;
+        BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, this->volume_);
     }
 }
 
 bool AudioPlayer::IsPlaying() const {
     std::lock_guard<std::mutex> lock(mutex_);
-    return sound_loaded_ && ma_sound_is_playing(&sound_);
+    return sound_loaded_ && BASS_ChannelIsActive(stream);
 }
 
 long AudioPlayer::GetPlaybackPosition() {
     std::lock_guard<std::mutex> lock(mutex_);
-    float cursor = 0.0f;
     if (sound_loaded_) {
-        ma_sound_get_cursor_in_seconds(&sound_, &cursor);
-        cursor = cursor * 1000;
-        return static_cast<long>(cursor);
+        QWORD pos = BASS_ChannelGetPosition(stream, BASS_POS_BYTE);
+        double timeMs = BASS_ChannelBytes2Seconds(stream, pos) * 1000;
+        return (long) timeMs;
     }
     return 0;
 }
 
 long AudioPlayer::GetMusicDuration() {
     std::lock_guard<std::mutex> lock(mutex_);
-    float duration = 0.0f;
     if (sound_loaded_) {
-        ma_sound_get_length_in_seconds(&sound_, &duration);
-        duration = duration * 1000;
-        return static_cast<long>(duration);
+        QWORD pos = BASS_ChannelGetLength(stream, BASS_POS_BYTE);
+        double timeMs = BASS_ChannelBytes2Seconds(stream, pos) * 1000;
+        return (long) timeMs;
     }
     return 0;
 }

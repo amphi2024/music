@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:amphi/models/app.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
@@ -102,7 +104,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
       }),
     ];
 
-    if(App.isDesktop() && !appWindow.isMaximized) {
+    if(Platform.isMacOS && !appWindow.isMaximized) {
       children.insert(0, SizedBox(
         height: 50,
         child: Row(

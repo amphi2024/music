@@ -44,29 +44,31 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: ClipRRect(borderRadius: BorderRadius.circular(5), child: AlbumCover(album: playerService.nowPlaying().album))),
-                  ),
-                  SizedBox(
-                    width: 250,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(song.title.byContext(context)),
-                        Text(song.artist.name.byContext(context))
-                      ],
-                    ),
-                  )
-                ],
-              ),
               SizedBox(
-                width: 500,
+                width: 250,
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: ClipRRect(borderRadius: BorderRadius.circular(5), child: AlbumCover(album: playerService.nowPlaying().album))),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(song.title.byContext(context)),
+                          Text(song.artist.name.byContext(context))
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Expanded(
                 child: DesktopPlayControls(
                   setState: setState,
                 ),

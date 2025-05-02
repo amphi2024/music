@@ -13,6 +13,9 @@ set(CMAKE_TOOLCHAIN_FILE "C:/Users/seung/scoop/apps/vcpkg/current/scripts/builds
 
 set(CMAKE_PREFIX_PATH "C:/Users/seung/scoop/apps/vcpkg/current/packages" ${CMAKE_PREFIX_PATH})
 
+include_directories(${CMAKE_SOURCE_DIR}/bass)
+link_directories(${CMAKE_SOURCE_DIR}/bass)
+
 find_package(TagLib REQUIRED)
 
 add_executable(${BINARY_NAME} WIN32
@@ -43,7 +46,7 @@ target_compile_definitions(${BINARY_NAME} PRIVATE "NOMINMAX")
 
 # Add dependency libraries and include directories. Add any application-specific
 # dependencies here.
-target_link_libraries(${BINARY_NAME} PRIVATE flutter flutter_wrapper_app TagLib::TagLib)
+target_link_libraries(${BINARY_NAME} PRIVATE flutter flutter_wrapper_app TagLib::TagLib bass)
 target_link_libraries(${BINARY_NAME} PRIVATE "dwmapi.lib")
 target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}")
 

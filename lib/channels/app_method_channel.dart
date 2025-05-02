@@ -18,6 +18,9 @@ class AppMethodChannel extends MethodChannel {
         final position = await getPlaybackPosition();
         if(playerService.isPlaying) {
           await onPlaybackChanged(position);
+          if(position + 50 >= playerService.musicDuration) {
+            playerService.playNext(localeCode);
+          }
         }
       });
     }

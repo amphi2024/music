@@ -46,9 +46,9 @@ bool FlutterWindow::OnCreate()
       &flutter::StandardMethodCodec::GetInstance());
   channel.SetMethodCallHandler(
       [this](const flutter::MethodCall<> &call,
-         std::unique_ptr<flutter::MethodResult<>> result)
+             std::unique_ptr<flutter::MethodResult<>> result)
       {
-        //methodChannelMutex.lock();
+        // methodChannelMutex.lock();
         if (call.method_name() == "get_music_metadata")
         {
           const auto *map_arg = std::get_if<std::map<flutter::EncodableValue, flutter::EncodableValue>>(call.arguments());
@@ -58,21 +58,24 @@ bool FlutterWindow::OnCreate()
 
           result->Success(data);
         }
-        else if (call.method_name() == "pause_music") {
+        else if (call.method_name() == "pause_music")
+        {
           AudioPlayer::GetInstance().Pause();
           result->Success();
-      }
-      else if (call.method_name() == "resume_music") {
+        }
+        else if (call.method_name() == "resume_music")
+        {
           AudioPlayer::GetInstance().Resume();
           result->Success();
-      }
-      else if (call.method_name() == "stop_music") {
+        }
+        else if (call.method_name() == "stop_music")
+        {
           AudioPlayer::GetInstance().Stop();
           result->Success();
-      }
+        }
         else if (call.method_name() == "set_media_source")
         {
-          const auto* map_arg = std::get_if<std::map<flutter::EncodableValue, flutter::EncodableValue>>(call.arguments());
+          const auto *map_arg = std::get_if<std::map<flutter::EncodableValue, flutter::EncodableValue>>(call.arguments());
           auto path_iter = map_arg->find(flutter::EncodableValue("path"));
           std::string path = std::get<std::string>(path_iter->second);
 
@@ -86,7 +89,27 @@ bool FlutterWindow::OnCreate()
         }
         else if (call.method_name() == "apply_playback_position")
         {
-          result->NotImplemented();
+          const auto *map_arg = std::get_if<std::map<flutter::EncodableValue, flutter::EncodableValue>>(call.arguments());
+          auto position_iter = map_arg->find(flutter::EncodableValue("position"));
+          if (std::holds_alternative<std::int32_t>(position_iter->second))
+          {
+            auto value = std::get<std::int32_t>(position_iter->second);
+            AudioPlayer::GetInstance().SeekTo((long)value);
+          }
+          if (std::holds_alternative<std::int64_t>(position_iter->second))
+          {
+            auto value = std::get<std::int64_t>(position_iter->second);
+            AudioPlayer::GetInstance().SeekTo((long)value);
+          }
+          result->Success(true);
+        }
+        else if (call.method_name() == "set_volume")
+        {
+          const auto *map_arg = std::get_if<std::map<flutter::EncodableValue, flutter::EncodableValue>>(call.arguments());
+          auto iter = map_arg->find(flutter::EncodableValue("volume"));
+          auto value = std::get<double>(iter->second);
+          AudioPlayer::GetInstance().SetVolume(value);
+          result->Success(true);
         }
         else if (call.method_name() == "get_playback_position")
         {
@@ -96,10 +119,11 @@ bool FlutterWindow::OnCreate()
         {
           result->Success(flutter::EncodableValue(AudioPlayer::GetInstance().GetMusicDuration()));
         }
-        else if (call.method_name() == "is_music_playing") {
+        else if (call.method_name() == "is_music_playing")
+        {
           bool playing = AudioPlayer::GetInstance().IsPlaying();
           result->Success(flutter::EncodableValue(playing));
-      }
+        }
         else
         {
           result->NotImplemented();
@@ -107,24 +131,21 @@ bool FlutterWindow::OnCreate()
         // methodChannelMutex.unlock();
       });
 
-      // methodChannel = &channel;
+  // methodChannel = &channel;
 
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
   flutter_controller_->engine()->SetNextFrameCallback([&]()
-                                                      { 
-                                                        this->Show(); 
-                                                      });
+                                                      { this->Show(); });
 
   // Flutter can complete the first frame before the "show window" callback is
   // registered. The following call ensures a frame is pending to ensure the
   // window is shown. It is a no-op if the first frame hasn't completed yet.
   flutter_controller_->ForceRedraw();
-  //StartPositionTracking();
+  // StartPositionTracking();
 
   return true;
 }
-
 
 // void FlutterWindow::StartPositionTracking() {
 //   position_thread_ = std::make_unique<std::thread>([this]() {

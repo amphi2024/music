@@ -1,9 +1,9 @@
 #ifndef AUDIO_PLAYER_H
 #define AUDIO_PLAYER_H
 
-#include "miniaudio.h"
 #include <string>
 #include <mutex>
+#include "bass.h"
 
 using namespace std;
 
@@ -16,8 +16,10 @@ public:
     void Pause();
     void Resume();
     void Stop();
+    void SeekTo(long position);
     long GetPlaybackPosition();
     long GetMusicDuration();
+    void SetVolume(double volume);
 
     bool IsPlaying() const;
 
@@ -25,11 +27,11 @@ private:
     AudioPlayer();
     ~AudioPlayer();
 
-    ma_engine engine_;
-    ma_sound sound_;
     bool initialized_ = false;
     bool sound_loaded_ = false;
     mutable std::mutex mutex_;
+    HSTREAM stream;
+    float volume_ = 1.0f;
 };
 
 #endif
