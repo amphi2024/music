@@ -12,13 +12,16 @@ class SongFile {
   Lyrics lyrics = Lyrics();
   Map<String, dynamic> data = {};
   bool get mediaFileExists => mediaFilepath.isNotEmpty;
+  String get format => data["format"] ?? "flac";
+  set format(value) => data["format"] = value;
 
   late String id;
   late String songId;
 
   String get url {
-    final filename = PathUtils.basename(mediaFilepath);
-    return "${appWebChannel.serverAddress}/songs//${filename}";
+    final filename = PathUtils.basename(infoFilepath);
+    final nameOnly = FilenameUtils.nameOnly(filename);
+    return "${appWebChannel.serverAddress}/music/songs/${songId}/${nameOnly}.${format}";
   }
 
   SongFile({
@@ -43,6 +46,7 @@ class SongFile {
       mediaFilepath: songFile.path
     );
     result.id = FilenameUtils.nameOnly(songFilename);
+    result.format = FilenameUtils.extensionName(songFile.path);
     return result;
   }
 

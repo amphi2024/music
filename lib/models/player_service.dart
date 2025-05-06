@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:music/channels/app_method_channel.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/playlist.dart';
@@ -31,6 +33,9 @@ class PlayerService {
     if(playMode > playOnce) {
       playMode = 0;
     }
+    if(Platform.isAndroid || Platform.isIOS) {
+      appMethodChannel.syncPlaylistState();
+    }
   }
 
   void toggleShuffle() {
@@ -46,6 +51,9 @@ class PlayerService {
       if(playlist.songs[i] == playingSongId) {
         index = i; // Sync index of playing song
       }
+    }
+    if(Platform.isAndroid || Platform.isIOS) {
+      appMethodChannel.syncPlaylistState();
     }
   }
 
@@ -75,6 +83,9 @@ class PlayerService {
         appMethodChannel.localeCode = localeCode;
       }
       await appMethodChannel.setMediaSource(song: song, playNow: true);
+      if(Platform.isAndroid || Platform.isIOS) {
+        await appMethodChannel.syncPlaylistState();
+      }
       musicDuration = await appMethodChannel.getMusicDuration();
     }
   }

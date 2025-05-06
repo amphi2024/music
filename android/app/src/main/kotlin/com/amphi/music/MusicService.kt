@@ -6,6 +6,7 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
 import android.util.Log
@@ -13,9 +14,12 @@ import androidx.annotation.OptIn
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
+import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaStyleNotificationHelper
 import io.flutter.plugin.common.MethodChannel
@@ -27,7 +31,11 @@ class MusicService : Service() {
     private val binder = LocalBinder()
 
     lateinit var player: ExoPlayer
+    val list: MutableList<PlayableItem> = mutableListOf()
     var isPlaying = false
+    var index = 0
+    var playMode = 0
+    var token = ""
     var title = ""
     var artist = ""
     var albumCoverFilePath: String? = null
@@ -102,15 +110,17 @@ class MusicService : Service() {
         intent?.let {
             when (it.action) {
                 "PLAY_PREVIOUS" -> {
-                    if(player.currentPosition > 0) {
+                    if(player.currentPosition > 1500) {
                         player.seekTo(0)
                     }
                     else {
-                        methodChannel?.invokeMethod("play_previous", null)
+                        //methodChannel?.invokeMethod("play_previous", null)
+                        playPrevious()
                     }
                 }
                 "PLAY_NEXT" -> {
-                    methodChannel?.invokeMethod("play_next", null)
+                    playNext()
+                    //methodChannel?.invokeMethod("play_next", null)
                 }
                 "PAUSE" -> {
                     if(isPlaying) {
@@ -131,10 +141,97 @@ class MusicService : Service() {
         return START_STICKY
     }
 
+    @OptIn(UnstableApi::class)
+    fun setSource(url: String, filePath: String, playNow: Boolean = true) {
+        val file = File(filePath)
+        if(file.exists()) {
+            val uri = Uri.fromFile(file)
+            val mediaItem = MediaItem.fromUri(uri)
+            player.setMediaItem(mediaItem)
+        }
+        else {
+            val mediaItem = MediaItem.fromUri(Uri.parse(url))
+
+            val dataSourceFactory = DefaultHttpDataSource.Factory()
+                .setDefaultRequestProperties(
+                    mapOf("Authorization" to token)
+                )
+
+            val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(mediaItem)
+            player.setMediaSource(mediaSource)
+        }
+
+        player.prepare()
+        if(playNow) {
+            player.play()
+            isPlaying = true
+        }
+        else {
+            isPlaying = false
+        }
+    }
+
+    private fun playPrevious() {
+        index--
+        if(index < 0) {
+            index = list.lastIndex
+        }
+        val item = list[index]
+        title = item.title
+        artist = item.artist
+        albumCoverFilePath = item.albumCoverFilePath
+
+        setSource(url = item.url, filePath = item.mediaFilePath, playNow = true)
+
+        updateNotification()
+    }
+
+    private fun playNext() {
+        index++
+        if(index >= list.size) {
+            index = 0
+        }
+        val item = list[index]
+        title = item.title
+        artist = item.artist
+        albumCoverFilePath = item.albumCoverFilePath
+        setSource(url = item.url, filePath = item.mediaFilePath, playNow = true)
+        updateNotification()
+    }
+
+    @OptIn(UnstableApi::class)
     fun updateNotification() {
 
-        notificationBuilder.setContentTitle(title)
+        val previousIntent = PendingIntent.getBroadcast(
+            this, 0, Intent(this, com.amphi.music.MediaButtonReceiver::class.java).apply {
+                action = "PLAY_PREVIOUS"
+            }, PendingIntent.FLAG_IMMUTABLE
+        )
+        val nextIntent = PendingIntent.getBroadcast(
+            this, 0, Intent(this, com.amphi.music.MediaButtonReceiver::class.java).apply {
+                action = "PLAY_NEXT"
+            }, PendingIntent.FLAG_IMMUTABLE
+        )
+        val playPauseIntent = PendingIntent.getBroadcast(
+            this, 0, Intent(this, com.amphi.music.MediaButtonReceiver::class.java).apply {
+                action = "PAUSE"
+            }, PendingIntent.FLAG_IMMUTABLE
+        )
+
+        notificationBuilder = NotificationCompat.Builder(this, MusicApplication.MUSIC_NOTIFICATION_CHANNEL_ID)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setContentTitle(title)
             .setContentText(artist)
+            .setSmallIcon(R.drawable.logo)
+            .addAction(NotificationCompat.Action(R.drawable.previous, "Previous", previousIntent
+            ))
+            .addAction(NotificationCompat.Action( if(isPlaying) R.drawable.pause else R.drawable.play, "Pause", playPauseIntent
+            ))
+            .addAction(NotificationCompat.Action(R.drawable.next, "Pause", nextIntent
+            ))
+            .setStyle(MediaStyleNotificationHelper.MediaStyle(mediaSession).setShowActionsInCompactView(1))
+            .setOngoing(true)
 
         albumCoverFilePath?.let {
             val file = File(it)

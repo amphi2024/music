@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:music/models/app_settings.dart';
-import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
+import 'package:music/models/music/playlist.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
 
@@ -13,12 +13,12 @@ class AppMethodChannel extends MethodChannel {
   static final AppMethodChannel _instance = AppMethodChannel._internal("music_method_channel");
 
   AppMethodChannel._internal(super.name) {
-    if(Platform.isWindows) {
+    if (Platform.isWindows) {
       timer = Timer.periodic(Duration(milliseconds: 500), (timer) async {
         final position = await getPlaybackPosition();
-        if(playerService.isPlaying) {
+        if (playerService.isPlaying) {
           await onPlaybackChanged(position);
-          if(position + 50 >= playerService.musicDuration) {
+          if (position + 50 >= playerService.musicDuration) {
             playerService.playNext(localeCode);
           }
         }
@@ -54,16 +54,15 @@ class AppMethodChannel extends MethodChannel {
   }
 
   Future<void> onPlaybackChanged(int position) async {
-    if(position <= playerService.musicDuration) {
+    if (position <= playerService.musicDuration) {
       playerService.playbackPosition = position;
-      if(position < 1500) {
+      if (position < 1500) {
         playerService.musicDuration = await getMusicDuration();
       }
       for (var fun in playbackListeners) {
         fun(playerService.playbackPosition);
       }
-    }
-    else {
+    } else {
       playerService.musicDuration = await appMethodChannel.getMusicDuration();
     }
   }
@@ -75,49 +74,49 @@ class AppMethodChannel extends MethodChannel {
   Timer? timer;
   int systemVersion = 0;
   bool needsBottomPadding = false;
-  String? localeCode;
+  String? _localeCode;
+
+  set localeCode(value) => _localeCode = value;
+
+  String get localeCode => _localeCode ?? "default";
 
   void createDirectoryIfNotExists(String path) {
     Directory directory = Directory(path);
-    if(!directory.existsSync()) {
+    if (!directory.existsSync()) {
       directory.createSync();
     }
   }
 
   Future<Map> getMusicMetadata(String filePath) async {
     var result = await invokeMethod("get_music_metadata", {"path": filePath});
-    if(result is Map) {
+    if (result is Map) {
       return result;
-    }
-    else {
+    } else {
       return {};
     }
   }
 
   Future<List<int>> getAlbumCover(String filePath) async {
-    if(!Platform.isWindows) {
-    var result = await invokeMethod("get_album_cover", {"path": filePath});
-    if(result is List && result.length > 4) {
-      return result.map((e) {
-        if(e is int) {
-         return e;
-        }
-        else {
-          return 0;
-        }
-      }).toList();
-    }
-    else {
-      return [];
-    }
-    }
-    else {
+    if (!Platform.isWindows) {
+      var result = await invokeMethod("get_album_cover", {"path": filePath});
+      if (result is List && result.length > 4) {
+        return result.map((e) {
+          if (e is int) {
+            return e;
+          } else {
+            return 0;
+          }
+        }).toList();
+      } else {
+        return [];
+      }
+    } else {
       return [];
     }
   }
 
   void setNavigationBarColor(Color color) {
-    if(Platform.isAndroid) {
+    if (Platform.isAndroid) {
       invokeMethod("set_navigation_bar_color", {"color": color.value, "transparent_navigation_bar": appSettings.transparentNavigationBar});
     }
   }
@@ -146,12 +145,33 @@ class AppMethodChannel extends MethodChannel {
     await invokeMethod("set_volume", {"volume": volume});
   }
 
+  Future<void> syncPlaylistState() async {
+    List<Map<String, dynamic>> list = [];
+    for (String songId in playerService.playlist.songs) {
+      var song = appStorage.songs.get(songId);
+      var songFile = song.playingFile();
+      list.add({
+        "media_file_path": songFile.mediaFilepath,
+        "url": songFile.url,
+        "title": song.title.byLocaleCode(localeCode),
+        "artist": song.artist.name.byLocaleCode(localeCode),
+        "album_cover_file_path": song.album.covers.firstOrNull,
+        "song_id": song.id
+      });
+    }
+    await invokeMethod("sync_playlist_state", {
+      "list": list,
+      "play_mode": playerService.playMode,
+      "index": playerService.index
+    });
+  }
+
   Future<void> setMediaSource({required Song song, String? localeCode, bool playNow = true}) async {
     await invokeMethod("set_media_source", {
       "path": song.songFilePath(),
       "play_now": playNow,
-      "title": song.title.byLocaleCode(this.localeCode ?? "default"),
-      "artist": song.artist.name.byLocaleCode(this.localeCode ?? "default"),
+      "title": song.title.byLocaleCode(this.localeCode),
+      "artist": song.artist.name.byLocaleCode(this.localeCode),
       "album_cover": song.album.covers.firstOrNull,
       "url": song.playingFile().url,
       "token": appStorage.selectedUser.token
@@ -159,9 +179,7 @@ class AppMethodChannel extends MethodChannel {
   }
 
   Future<void> applyPlaybackPosition(int position) async {
-    await invokeMethod("apply_playback_position", {
-      "position": position
-    });
+    await invokeMethod("apply_playback_position", {"position": position});
   }
 
   Future<int> getMusicDuration() async {

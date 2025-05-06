@@ -10,6 +10,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
+import android.util.Log
 import android.view.WindowManager
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
@@ -18,7 +19,7 @@ import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.*
 import java.io.File
 
-class MainActivity: FlutterActivity() {
+class MainActivity : FlutterActivity() {
 
     private val scope = CoroutineScope(Dispatchers.Main)
     private var isTracking = false
@@ -108,34 +109,33 @@ class MainActivity: FlutterActivity() {
                         )
 
                     }
-
+                    result.success(true)
                 }
 
                 "resume_music" -> {
                     musicService?.player?.play()
                     musicService?.isPlaying = true
                     musicService?.updateNotification()
+                    result.success(true)
                 }
 
                 "pause_music" -> {
                     musicService?.player?.pause()
                     musicService?.isPlaying = false
                     musicService?.updateNotification()
+                    result.success(true)
                 }
 
                 "is_music_playing" -> {
                     result.success(musicService?.isPlaying ?: false)
                 }
+
                 "set_media_source" -> {
                     call.argument<String>("path")?.let { filePath ->
                         val uri = Uri.fromFile(File(filePath))
 
-                        // Create a MediaItem using the local URI
                         val mediaItem = MediaItem.fromUri(uri)
 
-                        // Prepare the media source
-//                        val mediaSource: MediaSource = ProgressiveMediaSource.Factory(DefaultDataSourceFactory(this, "exoMusicPlayer.getPlayer(context)"))
-//                            .createMediaSource(mediaItem)
                         musicService?.let { service ->
                             service.player.setMediaItem(mediaItem)
                             service.player.prepare()
@@ -143,26 +143,47 @@ class MainActivity: FlutterActivity() {
                             service.artist = call.argument<String>("artist") ?: ""
                             service.albumCoverFilePath = call.argument<String>("album_cover")
                             val playNow = call.argument<Any>("play_now")
-                            if(playNow == true) {
+                            if (playNow == true) {
                                 service.player.play()
                                 service.isPlaying = true
                             }
                             service.updateNotification()
                         }
-
-
                     }
+                    result.success(true)
+                }
+
+                "sync_playlist_state" -> {
+                    musicService?.let {
+                        it.list.clear()
+                        val list = call.argument<List<HashMap<String, Any>>>("list")
+                        val playMode = call.argument<Int>("play_mode")
+                        val index = call.argument<Int>("index")
+                        it.playMode = playMode!!
+                        it.index = index!!
+                        list?.forEach { map ->
+                            val item = PlayableItem(
+                                mediaFilePath = map["media_file_path"] as String,
+                                url = map["url"] as String,
+                                title = map["title"] as String,
+                                artist = map["artist"] as String,
+                                albumCoverFilePath = map["album_cover_file_path"] as? String,
+                                songId = map["song_id"] as String
+                            )
+                            it.list.add(item)
+                        }
+                    }
+                    result.success(true)
                 }
 
                 "apply_playback_position" -> {
                     val position = call.argument<Any>("position")
-                    if(position is Int) {
+                    if (position is Int) {
                         musicService?.player?.seekTo(position.toLong())
-                    }
-                    else if(position is Long) {
+                    } else if (position is Long) {
                         musicService?.player?.seekTo(position)
                     }
-
+                    result.success(true)
                 }
 
                 "get_music_duration" -> {
@@ -199,7 +220,7 @@ class MainActivity: FlutterActivity() {
             while (isTracking) {
                 musicService?.let { service ->
                     val currentPosition = service.player.currentPosition
-                    if(currentPosition > 0) {
+                    if (currentPosition > 0) {
                         methodChannel.invokeMethod(
                             "on_playback_changed", mapOf(
                                 "position" to currentPosition
