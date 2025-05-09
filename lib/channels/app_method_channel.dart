@@ -168,11 +168,11 @@ class AppMethodChannel extends MethodChannel {
 
   Future<void> setMediaSource({required Song song, String? localeCode, bool playNow = true}) async {
     await invokeMethod("set_media_source", {
-      "path": song.songFilePath(),
+      "path": song.songFilePath() ?? "",
       "play_now": playNow,
       "title": song.title.byLocaleCode(this.localeCode),
       "artist": song.artist.name.byLocaleCode(this.localeCode),
-      "album_cover": song.album.covers.firstOrNull,
+      "album_cover": song.album.covers.firstOrNull ?? "",
       "url": song.playingFile().url,
       "token": appStorage.selectedUser.token
     });
