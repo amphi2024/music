@@ -14,6 +14,7 @@ class AppThemeData {
   Color checkBoxCheckColor;
   Color errorColor;
   Color navigationBarBackgroundColor;
+  Color cardBackgroundColor;
 
   AppThemeData({
     this.backgroundColor = AppTheme.midnight,
@@ -25,7 +26,8 @@ class AppThemeData {
     this.checkBoxColor = AppTheme.lightBlue,
     this.checkBoxCheckColor = AppTheme.white,
     this.errorColor = AppTheme.red,
-    this.navigationBarBackgroundColor = AppTheme.charCoal
+    this.navigationBarBackgroundColor = AppTheme.charCoal,
+    this.cardBackgroundColor = AppTheme.charCoal
   });
 
   ThemeData themeData({required Brightness brightness, required BuildContext context}) {
@@ -116,7 +118,7 @@ class AppThemeData {
       disabledColor: inactiveColor,
       highlightColor: accentColor,
       scaffoldBackgroundColor: backgroundColor,
-      cardColor: backgroundColor,
+      cardColor: cardBackgroundColor,
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: navigationBarBackgroundColor
       ),

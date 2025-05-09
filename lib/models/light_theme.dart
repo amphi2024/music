@@ -7,7 +7,7 @@ class LightTheme extends AppThemeData {
 
   LightTheme(
       {
-        super.backgroundColor = AppTheme.white,
+        super.backgroundColor = const Color.fromARGB(255, 250, 250, 250),
         super.textColor = AppTheme.midnight,
         super.accentColor = AppTheme.cherry,
         super.inactiveColor = AppTheme.inactiveGray,
@@ -16,7 +16,8 @@ class LightTheme extends AppThemeData {
         super.checkBoxColor = AppTheme.cherry,
         super.checkBoxCheckColor = AppTheme.white,
         super.errorColor = AppTheme.red,
-        super.navigationBarBackgroundColor = AppTheme.lightGray
+        super.navigationBarBackgroundColor = AppTheme.lightGray,
+        super.cardBackgroundColor = AppTheme.white
       });
   ThemeData toThemeData(BuildContext context) {
     return themeData(
