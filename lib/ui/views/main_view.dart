@@ -52,7 +52,13 @@ class _MainViewState extends State<MainView> {
 
   @override
   Widget build(BuildContext context) {
-    appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor);
+    final themeData = Theme.of(context);
+    if(appState.playingBarExpanded) {
+      appMethodChannel.setNavigationBarColor(themeData.cardColor);
+    }
+    else {
+      appMethodChannel.setNavigationBarColor(themeData.scaffoldBackgroundColor);
+    }
 
     var fragments = [
       SongsFragment(),
@@ -116,6 +122,11 @@ class _MainViewState extends State<MainView> {
           }
         },
         child: Scaffold(
+          extendBodyBehindAppBar: true,
+          extendBody: true,
+          appBar: AppBar(
+            toolbarHeight: 0 // This is needed to change the status bar text (icon) color on Android
+          ),
           body: Stack(
             children: [
               Positioned(
