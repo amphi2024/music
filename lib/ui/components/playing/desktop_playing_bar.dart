@@ -25,7 +25,8 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
     final song = widget.song;
 
     return Positioned(
-        left: 200,
+        //left: 200,
+      left: 0,
         right: 0,
         bottom: 0,
         child: Container(
@@ -76,6 +77,7 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  Icon( playerService.volume > 0.5 ? Icons.volume_up : playerService.volume > 0.1 ? Icons.volume_down : Icons.volume_mute ),
                   Theme(
                       data: ThemeData(
                           sliderTheme: SliderThemeData(
