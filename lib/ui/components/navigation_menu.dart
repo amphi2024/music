@@ -70,6 +70,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
       //     ),
       //   ),
       // ),
+      _MenuHeader(text: "Library"),
       _MenuItem(title: "Songs", icon: Icons.music_note, onPressed: () {
         appState.setMainViewState(() {
           appState.fragmentIndex = 0;
@@ -102,6 +103,22 @@ class _NavigationMenuState extends State<NavigationMenu> {
           saveWindowSize();
         }
       }),
+      _MenuItem(title: "Archive", icon: Icons.archive, onPressed: () {
+        appState.setMainViewState(() {
+          appState.fragmentIndex = 3;
+        });
+        if(App.isDesktop()) {
+          saveWindowSize();
+        }
+      }),
+       // Padding(
+       //   padding: const EdgeInsets.only(left: 10, right: 10),
+       //   child: Divider(
+       //    color: Theme.of(context).dividerColor,
+       //    thickness: 1,
+       //         ),
+       // )
+      _MenuHeader(text: "Playlists"),
     ];
 
     if(Platform.isMacOS && !appWindow.isMaximized) {
@@ -161,6 +178,25 @@ class _NavigationMenuState extends State<NavigationMenu> {
     );
   }
 }
+
+class _MenuHeader extends StatelessWidget {
+  
+  final String text;
+  const _MenuHeader({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0),
+      child: Text(text, style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Theme.of(context).disabledColor,
+        fontSize: 12
+      )),
+    );
+  }
+}
+
 
 class _MenuItem extends StatelessWidget {
 

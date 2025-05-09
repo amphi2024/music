@@ -37,7 +37,7 @@ class _FloatingMenuState extends State<FloatingMenu> {
 
   @override
   Widget build(BuildContext context) {
-    final double height = 300;
+    final double height = 350;
     final screenHeight = MediaQuery.of(context).size.height;
     double verticalPadding = (screenHeight - height) / 2;
 
@@ -133,7 +133,7 @@ class _FloatingMenuState extends State<FloatingMenu> {
                               });
                             });
                           });
-                        }),
+                        })
                       ];
                     },
                   ),
@@ -187,6 +187,14 @@ class _Buttons extends StatelessWidget {
         FloatingMenuButton(
             icon: Icons.music_note,
             label: "Genres",
+            onPressed: () {
+              appState.setMainViewState(() {
+                appState.fragmentIndex = 3;
+              });
+            }),
+        FloatingMenuButton(
+            icon: Icons.archive,
+            label: "Archive",
             onPressed: () {
               appState.setMainViewState(() {
                 appState.fragmentIndex = 3;
