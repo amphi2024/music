@@ -33,8 +33,6 @@ class Song {
   Artist get artist => appStorage.artists[data["artist"]] ?? Artist();
   String get artistId => data["artist"];
 
-  Artist get albumArtist => appStorage.artists[data["albumArtist"]] ?? Artist();
-  String get albumArtistId => data["albumArtistId"];
   String get albumId => data["album"];
   set album(value) => data["album"] = value;
   Album get album => appStorage.albums[data["album"]] ?? Album();
@@ -115,10 +113,16 @@ class Song {
     if(discNumber is String && discNumber.isNotEmpty) {
       song.discNumber = int.tryParse(discNumber) ?? 0;
     }
+    else if(discNumber is int) {
+      song.discNumber = discNumber;
+    }
 
     var trackNumber = metadata["trackNumber"];
     if(trackNumber is String && trackNumber.isNotEmpty) {
       song.trackNumber = int.tryParse(trackNumber) ?? 0;
+    }
+    else if(trackNumber is int) {
+      song.trackNumber = trackNumber;
     }
 
     if(file != null) {
