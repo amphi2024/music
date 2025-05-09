@@ -18,7 +18,7 @@ flutter::EncodableValue MusicMetadata(std::string filePath)
       data["artist"] = tag->artist().toCString();
       data["album"] = tag->album().toCString();
       data["year"] = std::to_string(tag->year());
-      data["track"] = std::to_string(tag->track());
+      data["trackNumber"] = std::to_string(tag->track());
       data["comment"] = tag->comment().toCString();
       data["genre"] = tag->genre().toCString();
   }
