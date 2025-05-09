@@ -15,7 +15,7 @@ import java.io.File
             map["album"] = tag.getFirst(FieldKey.ALBUM) ?: ""
             map["genre"] = tag.getFirst(FieldKey.GENRE) ?: ""
             map["year"] = tag.getFirst(FieldKey.YEAR) ?: ""
-            map["track"] = tag.getFirst(FieldKey.TRACK) ?: ""
+            map["trackNumber"] = tag.getFirst(FieldKey.TRACK) ?: ""
             map["discNumber"] = tag.getFirst(FieldKey.DISC_NO) ?: ""
             map["comment"] = tag.getFirst(FieldKey.COMMENT) ?: ""
             map["composer"] = tag.getFirst(FieldKey.COMPOSER) ?: ""
