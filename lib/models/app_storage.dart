@@ -56,6 +56,44 @@ class AppStorage extends AppStorageCore {
     createDirectoryIfNotExists(playlistsPath);
   }
 
+  Artist? existingArtist(String? input) {
+    if(input == null) {
+      return null;
+    }
+    RegExp regExp = RegExp(r'(.+?)\s?\((.*?)\)');
+
+    Artist? result;
+    var match = regExp.firstMatch(input);
+
+    if (match != null) {
+      var frontPart = match.group(1);
+      var backPart = match.group(2);
+      if(frontPart != null || backPart != null) {
+        appStorage.artists.forEach((key, artist) {
+          if(artist.name.containsValue(frontPart) || artist.name.containsValue(backPart)) {
+            result = artist;
+          }
+        });
+      }
+    }
+    return result;
+  }
+
+  Album? existingAlbum(String? input) {
+    if (input == null) {
+      return null;
+    }
+
+    Album? result;
+
+    appStorage.albums.forEach((key, album) {
+      if (album.title.containsValue(input)) {
+        result = album;
+      }
+    });
+    return result;
+  }
+
   void selectMusicFilesAndSave() async {
     var result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
@@ -77,18 +115,35 @@ class AppStorage extends AppStorageCore {
     print(metadata);
     print(albumCover.length);
 
-    var artist = Artist.created(metadata);
-    artists[artist.id] = artist;
-    artistIdList.add(artist.id);
-    artist.save();
+    var artistName = metadata["artist"];
+    Artist? artist = existingArtist(artistName);
+    if(artistName is String && artist == null) {
+      artist = Artist.created(metadata);
+      artists[artist.id] = artist;
+      artistIdList.add(artist.id);
+      artist.save();
+    }
 
-    var album = Album.created(metadata: metadata, artistId: artist.id, albumCover: albumCover);
-    artist.albums.add(album.id);
-    albums[album.id] = album;
-    albumIdList.add(album.id);
-    album.save();
+    var albumArtistName = metadata["albumArtist"];
+    Artist? albumArtist = existingArtist(albumArtistName);
+    if(albumArtistName is String && artist == null) {
+      albumArtist = Artist.created(metadata);
+      artists[albumArtist.id] = albumArtist;
+      artistIdList.add(albumArtist.id);
+      albumArtist.save();
+    }
 
-    var song = Song.created(metadata: metadata, artistId: artist.id, albumId: album.id, file: File(filePath));
+    var albumName = metadata["album"];
+    Album? album = existingAlbum(albumName);
+    if(albumName is String && album == null) {
+      album = Album.created(metadata: metadata, artistId: albumArtist?.id ?? "", albumCover: albumCover);
+      artist?.albums.add(album.id);
+      albums[album.id] = album;
+      albumIdList.add(album.id);
+      album.save();
+    }
+
+    var song = Song.created(metadata: metadata, artistId: artist?.id ?? "", albumId: album?.id ?? "", file: File(filePath));
     song.save();
     songs[song.id] = song;
     songIdList.add(song.id);
