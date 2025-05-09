@@ -114,9 +114,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         debugShowCheckedModeBanner: false,
         theme: ThemeData(scaffoldBackgroundColor: AppTheme.lightGray),
         darkTheme: ThemeData(scaffoldBackgroundColor: AppTheme.charCoal),
-        home: Scaffold(
-          appBar: AppBar(), // This is needed to change the status bar text (icon) color on Android
-        ),
+        home: Scaffold(),
       );
     }
   }
