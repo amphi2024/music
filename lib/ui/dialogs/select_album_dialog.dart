@@ -57,6 +57,7 @@ class _SelectAlbumDialogState extends State<SelectAlbumDialog> {
               return GestureDetector(
                 onTap: () {
                   widget.onSelected(album.id);
+                  Navigator.pop(context);
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),

@@ -12,6 +12,10 @@ import 'package:music/ui/fragments/songs_fragment.dart';
 
 import '../../channels/app_method_channel.dart';
 import '../../models/app_storage.dart';
+import '../../models/music/album.dart';
+import '../../models/music/artist.dart';
+import '../dialogs/edit_album_dialog.dart';
+import '../dialogs/edit_artist_dialog.dart';
 import '../dialogs/edit_playlist_dialog.dart';
 import '../fragments/albums_fragment.dart';
 import '../fragments/artists_fragment.dart';
@@ -57,6 +61,11 @@ class _WideMainViewState extends State<WideMainView> {
     appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor);
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      extendBody: true,
+      appBar: AppBar(
+          toolbarHeight: 0 // This is needed to change the status bar text (icon) color on Android
+      ),
       body: Stack(
         children: [
           AnimatedPositioned(
@@ -84,6 +93,30 @@ class _WideMainViewState extends State<WideMainView> {
                       PopupMenuItem(child: Text("Song"), onTap: () async {
                         appStorage.selectMusicFilesAndSave();
                       }),
+                      PopupMenuItem(
+                          child: Text("Album"), onTap: () {
+                        showDialog(context: context, builder: (context) {
+                          return EditAlbumDialog(album: Album.created(metadata: {}, artistId: "", albumCover: []), onSave: (album) {
+                            setState(() {
+                              appStorage.albums[album.id] = album;
+                              appStorage.albumIdList.add(album.id);
+                              appStorage.albumIdList.sortAlbumList();
+                            });
+                          });
+                        });
+                      }),
+                      PopupMenuItem(
+                          child: Text("Artist"), onTap: () {
+                        showDialog(context: context, builder: (context) {
+                          return EditArtistDialog(artist: Artist.created({}), onSave: (artist) {
+                            setState(() {
+                              appStorage.artists[artist.id] = artist;
+                              appStorage.artistIdList.add(artist.id);
+                              appStorage.artistIdList.sortArtistList();
+                            });
+                          });
+                        });
+                      }),
                       PopupMenuItem(child: Text("Playlist"), onTap: () {
                         showDialog(context: context, builder: (context) {
                           return EditPlaylistDialog(onSave: (playlist) {
@@ -92,7 +125,7 @@ class _WideMainViewState extends State<WideMainView> {
                             });
                           });
                         });
-                      }),
+                      })
                     ];
                   }),
                   IconButton(onPressed: () {
@@ -111,8 +144,8 @@ class _WideMainViewState extends State<WideMainView> {
               ),
             ),
           ),
-          DesktopPlayingBar(song: playerService.nowPlaying(),),
           NavigationMenu(),
+          DesktopPlayingBar(song: playerService.nowPlaying(),),
         ],
       ),
     );
