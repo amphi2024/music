@@ -156,6 +156,7 @@ class MusicService : Service() {
                 .setDefaultRequestProperties(
                     mapOf("Authorization" to token)
                 )
+            Log.d("heyyyyy", token)
 
             val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
                 .createMediaSource(mediaItem)
