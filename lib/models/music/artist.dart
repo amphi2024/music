@@ -107,6 +107,13 @@ class Artist {
     });
   }
 
+  @override
+  String toString() {
+    return """
+    id: ${id}
+    name: ${name}
+    """;
+  }
 }
 
 

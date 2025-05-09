@@ -133,4 +133,13 @@ class Album {
       });
     }
   }
+
+  @override
+  String toString() {
+    return """
+    id: ${id}
+    artist: ${artist.toString()},
+    title: ${title}
+    """;
+  }
 }
