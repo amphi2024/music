@@ -14,7 +14,7 @@ class FragmentTitle extends StatelessWidget {
     double scaleValue = (textTheme.bodyMedium?.fontSize ?? 15) / ( textTheme.headlineMedium?.fontSize ?? 20);
 
     return Container(
-      height: 60,
+      height: 55,
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor.withAlpha(125)
       ),
