@@ -93,9 +93,13 @@ class SongFile {
 
   }
 
-  Future<void> save() async {
+  Future<void> save({bool upload = true}) async {
     var infoFile = File(infoFilepath);
     data["lyrics"] = lyrics.toMap();
     await infoFile.writeAsString(jsonEncode(data));
+
+    if(upload) {
+      appWebChannel.uploadSongFile(songId: songId, filePath: infoFilepath);
+    }
   }
 }
