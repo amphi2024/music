@@ -131,24 +131,24 @@ class MainActivity : FlutterActivity() {
                 }
 
                 "set_media_source" -> {
-                    call.argument<String>("path")?.let { filePath ->
-                        val uri = Uri.fromFile(File(filePath))
-
-                        val mediaItem = MediaItem.fromUri(uri)
-
+                    val filePath = call.argument<String>("path")!!
+                    val title =  call.argument<String>("title")!!
+                    val artist = call.argument<String>("artist")!!
+                    val url = call.argument<String>("url")!!
+                    val token = call.argument<String>("token")!!
+                    val albumCoverPath = call.argument<String>("album_cover")
+                    val playNow = call.argument<Boolean>("play_now")!!
                         musicService?.let { service ->
-                            service.player.setMediaItem(mediaItem)
-                            service.player.prepare()
-                            service.title = call.argument<String>("title") ?: ""
-                            service.artist = call.argument<String>("artist") ?: ""
-                            service.albumCoverFilePath = call.argument<String>("album_cover")
-                            val playNow = call.argument<Any>("play_now")
-                            if (playNow == true) {
-                                service.player.play()
-                                service.isPlaying = true
-                            }
+                            service.title = title
+                            service.artist = artist
+                            service.albumCoverFilePath = albumCoverPath
+                            service.token = token
+                            service.setSource(
+                                url = url,
+                                playNow = playNow,
+                                filePath = filePath
+                            )
                             service.updateNotification()
-                        }
                     }
                     result.success(true)
                 }
@@ -228,7 +228,7 @@ class MainActivity : FlutterActivity() {
                         )
                     }
                 }
-                delay(1000L)
+                delay(500)
             }
         }
     }
