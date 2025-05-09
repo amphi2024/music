@@ -67,7 +67,6 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                             return SelectArtistDialog(excepting: song.artistId, onSelected: (artistId) {
                               setState(() {
                                 song.data["artist"] = artistId;
-                                song.album.data["artist"] = artistId;
                               });
                             });
                           });
@@ -82,7 +81,11 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                         Expanded(child: Text(song.album.title.byContext(context))),
                         IconButton(onPressed: () {
                           showDialog(context: context, builder: (context) {
-                            return SelectAlbumDialog(excepting: song.albumId, onSelected: (albumId) {});
+                            return SelectAlbumDialog(excepting: song.albumId, onSelected: (albumId) {
+                              setState(() {
+                                song.data["album"] = albumId;
+                              });
+                            });
                           });
                         }, icon: Icon(Icons.edit))
                       ],
