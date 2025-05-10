@@ -86,6 +86,7 @@ bool FlutterWindow::OnCreate()
           std::string token = std::get<std::string>(token_iter->second);
 
           AudioPlayer::GetInstance().Play(path, url, token);
+          result->Success();
         }
         else if (call.method_name() == "apply_playback_position")
         {
