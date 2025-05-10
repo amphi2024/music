@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:music/models/app_settings.dart';
 import 'package:music/models/app_storage.dart';
-import 'package:music/models/music/playlist.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
 
@@ -168,7 +167,7 @@ class AppMethodChannel extends MethodChannel {
 
   Future<void> setMediaSource({required Song song, String? localeCode, bool playNow = true}) async {
     await invokeMethod("set_media_source", {
-      "path": song.songFilePath() ?? "",
+      "path": song.playingFile().mediaFilepath,
       "play_now": playNow,
       "title": song.title.byLocaleCode(this.localeCode),
       "artist": song.artist.name.byLocaleCode(this.localeCode),
