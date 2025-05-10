@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:music/models/music/album.dart';
 import 'package:music/ui/components/item/album_grid_item.dart';
 
 import '../../models/app_state.dart';

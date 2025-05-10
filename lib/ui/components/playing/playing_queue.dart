@@ -3,8 +3,6 @@ import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
 import 'package:music/ui/components/playing/playing_queue_item.dart';
-import 'package:music/ui/components/repeat_icon.dart';
-import 'package:music/ui/components/shuffle_icon.dart';
 
 class PlayingQueue extends StatelessWidget {
   const PlayingQueue({super.key});

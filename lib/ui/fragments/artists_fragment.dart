@@ -6,7 +6,6 @@ import 'package:music/ui/components/item/artist_linear_item.dart';
 import 'package:music/ui/views/artist_view.dart';
 
 import '../../models/app_state.dart';
-import '../../models/music/artist.dart';
 
 class ArtistsFragment extends StatefulWidget {
   const ArtistsFragment({super.key});

@@ -4,7 +4,6 @@ import 'dart:ui';
 
 import 'package:amphi/models/app_storage_core.dart';
 import 'package:amphi/models/update_event.dart';
-import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:music/channels/app_method_channel.dart';
@@ -529,7 +528,6 @@ class AppStorage extends AppStorageCore {
         var split = value.split(";");
         if(split.length > 1) {
           var id = split[0];
-          var filename = split[1];
           var song = songs.get(id);
         }
         break;

@@ -4,7 +4,6 @@ import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/ui/components/item/song_list_item.dart';
 
-import '../../models/music/song.dart';
 
 class SongsFragment extends StatefulWidget {
   const SongsFragment({super.key});
