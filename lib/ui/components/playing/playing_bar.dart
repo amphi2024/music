@@ -142,6 +142,7 @@ class _PlayingBarState extends State<PlayingBar> {
                                         .byContext(context),
                                     style:
                                         Theme.of(context).textTheme.titleMedium,
+                                    maxLines: 2,
                                   ),
                                   Text(
                                     playerService
