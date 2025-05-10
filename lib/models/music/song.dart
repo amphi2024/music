@@ -74,15 +74,6 @@ class Song {
   }
 
   Map<String, SongFile> files = {};
-  String? songFilePath() {
-    var path = files.entries.firstOrNull?.value.mediaFilepath;
-    if(path != null && File(path).existsSync()) {
-      return path;
-    }
-    else {
-      return null;
-    }
-  }
 
   SongFile playingFile() {
     return files.entries.firstOrNull?.value ?? SongFile();
@@ -184,40 +175,6 @@ class Song {
 
     if(upload) {
       appWebChannel.uploadSongInfo(song: this);
-      appWebChannel.getSongFiles(songId: id, onSuccess: (list) {
-          files.forEach((key, songFile) {
-            bool infoExists = false;
-            bool mediaExists = false;
-            for(var map in list) {
-              var filename = map["filename"];
-              if(filename == PathUtils.basename(songFile.mediaFilepath)) {
-                // my-music.mp3 == my-music.mp3
-                mediaExists = true;
-                break;
-              }
-              if(filename == PathUtils.basename(songFile.infoFilepath)) {
-                // my-music.json == my-music.json
-                infoExists = true;
-                break;
-              }
-            }
-            if(!infoExists) {
-              appWebChannel.uploadSongFile(songId: id, filePath: songFile.infoFilepath);
-            }
-            if(!mediaExists) {
-              appWebChannel.uploadSongFile(songId: id, filePath: songFile.mediaFilepath, onSuccess: () {
-                // If metadata is empty
-                // if(title["default"] == null) {
-                //   appWebChannel.getSongInfo(id: id, onSuccess: (map) async {
-                //     title["default"] = map["title"]["default"];
-                //     await infoFile.writeAsString(jsonEncode(data));
-                //   });
-                // }
-              });
-            }
-          });
-      });
-
     }
   }
 
