@@ -67,8 +67,6 @@ class PlayerService {
   }
 
   Future<void> startPlay({required Song song, String? localeCode}) async {
-    var songFilePath = song.songFilePath();
-    if(songFilePath != null) {
       playlistKey = "";
       index = 0;
       for(int i = 0; i < playlist.songs.length; i++) {
@@ -82,12 +80,13 @@ class PlayerService {
       if(localeCode != null) {
         appMethodChannel.localeCode = localeCode;
       }
+
       await appMethodChannel.setMediaSource(song: song, playNow: true);
       if(Platform.isAndroid || Platform.isIOS) {
         await appMethodChannel.syncPlaylistState();
       }
       musicDuration = await appMethodChannel.getMusicDuration();
-    }
+
   }
 
   Future<void> playPrevious(String? localeCode) async {
@@ -106,7 +105,8 @@ class PlayerService {
       await appMethodChannel.setMediaSource(song: nowPlaying(), playNow: isPlaying);
   }
 
-  void playNext(String? localeCode) async {
+  Future<void> playNext(String? localeCode) async {
+
     index++;
     if(index >= playlist.songs.length) {
       index = 0;
@@ -135,13 +135,10 @@ class PlayerService {
     }
     index = i;
     playingSongId = playlist.songs[i];
-    var songFilePath = playerService.nowPlaying().songFilePath();
-    if(songFilePath != null) {
       await appMethodChannel.setMediaSource(song: nowPlaying());
       await appMethodChannel.resumeMusic();
       musicDuration = await appMethodChannel.getMusicDuration();
      appState.setState(() {});
-    }
   }
 
 }
