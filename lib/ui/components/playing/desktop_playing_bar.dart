@@ -1,7 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:music/channels/app_method_channel.dart';
-import 'package:music/models/app_state.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
 import 'package:music/ui/components/album_cover.dart';
@@ -23,16 +21,25 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
   Widget build(BuildContext context) {
     var themeData = Theme.of(context);
     final song = widget.song;
+    final screenWidth = MediaQuery.of(context).size.width;
+    double controlsPanelWidth = 750;
+    if(screenWidth <= 1300) {
+      controlsPanelWidth = 350;
+    }
 
-    return Positioned(
-        //left: 200,
-      left: 0,
-        right: 0,
-        bottom: 0,
-        child: Container(
-          height: 80,
+    return AnimatedPositioned(
+      duration: Duration(milliseconds: 1000),
+        curve: Curves.easeOutQuint,
+      left: 15,
+        right: 15,
+        bottom: 15,
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 1000),
+          curve: Curves.easeOutQuint,
+          height: 60,
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
                 color: Theme.of(context).shadowColor,
@@ -51,10 +58,7 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: SizedBox(
-                          width: 50,
-                          height: 50,
-                          child: ClipRRect(borderRadius: BorderRadius.circular(5), child: AlbumCover(album: playerService.nowPlaying().album))),
+                      child: ClipRRect(borderRadius: BorderRadius.circular(10), child: AlbumCover(album: playerService.nowPlaying().album)),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 8),
@@ -69,7 +73,8 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
                   ],
                 ),
               ),
-              Expanded(
+              SizedBox(
+                width: controlsPanelWidth,
                 child: DesktopPlayControls(
                   setState: setState,
                 ),
@@ -102,6 +107,7 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
                             }),
                       )),
                   IconButton(onPressed: () {}, icon: Icon(Icons.lyrics)),
+                  IconButton(onPressed: () {}, icon: Icon(Icons.devices)),
                   IconButton(onPressed: () {}, icon: Icon(Icons.list)),
                 ],
               ),

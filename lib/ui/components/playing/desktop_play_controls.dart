@@ -49,14 +49,14 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             IconButton(
-                icon: ShuffleIcon(),
+                icon: ShuffleIcon(size: 15),
                 onPressed: () {
                   setState(() {
                     playerService.toggleShuffle();
                   });
                 }),
             IconButton(
-                icon: Icon(Icons.fast_rewind, size: 20),
+                icon: Icon(Icons.fast_rewind, size: 15),
                 onPressed: () {
                   playerService.playPrevious(Localizations.localeOf(context).languageCode);
                 }),
@@ -65,7 +65,7 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
                     playerService.isPlaying
                         ? Icons.pause
                         : Icons.play_arrow,
-                    size: 30),
+                    size: 25),
                 onPressed: () {
                   if(playerService.isPlaying) {
                     appMethodChannel.pauseMusic();
@@ -87,13 +87,13 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
             IconButton(
                 icon: Icon(
                   Icons.fast_forward,
-                  size: 20,
+                  size: 15,
                 ),
                 onPressed: () {
                   playerService.playNext(Localizations.localeOf(context).languageCode);
                 }),
             IconButton(
-                icon: RepeatIcon(),
+                icon: RepeatIcon(size: 15),
                 onPressed: () {
                   setState(() {
                     playerService.togglePlayMode();
@@ -107,10 +107,13 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
           children: [
             Text(
               DurationConverter.convertedDuration(playerService.playbackPosition),
+              style: TextStyle(
+                fontSize: 13
+              ),
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(left: 8.0, right: 8, bottom: 0, top: 0),
                 child: Slider(
                     min: 0,
                     max: playerService.musicDuration.toDouble(),
@@ -132,6 +135,9 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
             ),
             Text(
               DurationConverter.convertedDuration(playerService.musicDuration),
+              style: TextStyle(
+                  fontSize: 13
+              ),
             ),
           ],
         )
