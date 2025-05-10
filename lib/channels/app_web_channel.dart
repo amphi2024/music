@@ -256,9 +256,15 @@ class AppWebChannel extends AppWebChannelCore {
   void uploadSongFile({required String songId, required String filePath, void Function(int?)? onFailed, void Function()? onSuccess}) async {
     var filename = PathUtils.basename(filePath);
     var updateEvent = UpdateEvent(action: UpdateEvent.uploadSongFile, value: "$songId;$filename", timestamp: DateTime.now().toUtc());
-
-    uploadFile(
-        url: "$serverAddress/music/songs/$songId/$filename", filePath: filePath, onSuccess: onSuccess, onFailed: onFailed, updateEvent: updateEvent);
+    if(filename.endsWith(".json")) {
+      var file = File(filePath);
+      uploadJson(
+          url: "$serverAddress/music/songs/$songId/$filename", jsonBody: await file.readAsString(), onSuccess: onSuccess, onFailed: onFailed, updateEvent: updateEvent);
+    }
+    else {
+      uploadFile(
+          url: "$serverAddress/music/songs/$songId/$filename", filePath: filePath, onSuccess: onSuccess, onFailed: onFailed, updateEvent: updateEvent);
+    }
   }
 
   void uploadPlaylist({required Playlist playlist, void Function(int?)? onFailed, void Function()? onSuccess}) async {
