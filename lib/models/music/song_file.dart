@@ -102,4 +102,15 @@ class SongFile {
       appWebChannel.uploadSongFile(songId: songId, filePath: infoFilepath);
     }
   }
+
+  @override
+  String toString() {
+    return """
+    {
+    info: ${infoFilepath},
+    media: ${mediaFilepath},
+    data: ${data}
+    }
+    """;
+  }
 }
