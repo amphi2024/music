@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:music/models/app_state.dart';
 import 'package:music/ui/components/repeat_icon.dart';
 
 import '../../../channels/app_method_channel.dart';
@@ -51,7 +52,7 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
             IconButton(
                 icon: ShuffleIcon(size: 15),
                 onPressed: () {
-                  setState(() {
+                  appState.setState(() {
                     playerService.toggleShuffle();
                   });
                 }),
