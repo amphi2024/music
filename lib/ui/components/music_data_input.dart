@@ -72,6 +72,9 @@ class _MusicDataInputState extends State<MusicDataInput> {
                   onChanged: (text) {
                     widget.data[key] = text;
                   },
+                  decoration: InputDecoration(
+                    hintText: "Title"
+                  ),
                   controller: controllers.putIfAbsent(key, () => TextEditingController(text: widget.data[key])),
                 )),
             SizedBox(
