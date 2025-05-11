@@ -22,9 +22,9 @@ class Artist {
   DateTime get added => DateTime.fromMillisecondsSinceEpoch(data["added"], isUtc: true).toLocal();
   DateTime get modified => DateTime.fromMillisecondsSinceEpoch(data["modified"], isUtc: true).toLocal();
   List<String> profileImages = [];
-  late String id;
+  String id = "";
 
-  late String path;
+  String path = "";
 
   void refreshAlbums() {
     albums.clear();
