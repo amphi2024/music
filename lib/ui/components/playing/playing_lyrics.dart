@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:music/models/music/lyrics.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../../channels/app_method_channel.dart';
 import '../../../models/player_service.dart';
@@ -14,12 +15,9 @@ class PlayingLyrics extends StatefulWidget {
 }
 
 class _PlayingLyricsState extends State<PlayingLyrics> {
-
   double opacity = 0;
   bool following = true;
-  Lyrics lyrics =  playerService.nowPlaying().playingFile().lyrics;
-  late List<LyricLine> lines = lyrics.getLinesByLocale(context);
-  final ScrollController scrollController = ScrollController();
+  final scrollController = ItemScrollController();
 
   void playbackListener(int position) {
     var lyrics = playerService.nowPlaying().playingFile().lyrics;
@@ -27,7 +25,7 @@ class _PlayingLyricsState extends State<PlayingLyrics> {
     setState(() {
       for(int i = 0; i < lines.length; i ++) {
         if(lines[i].endsAt >= position && position >= lines[i].startsAt) {
-          scrollController.animateTo(i * 50, duration: Duration(milliseconds: 500), curve: Curves.easeOutQuint);
+          scrollController.scrollTo(index: i, duration: Duration(milliseconds: 500), curve: Curves.easeOutQuint);
           break;
         }
       }
@@ -53,6 +51,8 @@ class _PlayingLyricsState extends State<PlayingLyrics> {
 
   @override
   Widget build(BuildContext context) {
+    Lyrics lyrics =  playerService.nowPlaying().playingFile().lyrics;
+    List<LyricLine> lines = lyrics.getLinesByLocale(context);
 
     return PopScope(
       onPopInvokedWithResult: (didPop, result) {
@@ -71,40 +71,46 @@ class _PlayingLyricsState extends State<PlayingLyrics> {
             duration: Duration(milliseconds: 500),
             color: Color.fromRGBO(15, 15, 15, opacity),
             curve: Curves.easeOutQuint,
-           child: AnimatedOpacity(
-             duration: Duration(milliseconds: 500),
-             opacity: opacity * 2,
-             curve: Curves.easeOutQuint,
-             child: Padding(
-                  padding: EdgeInsets.only(left: 25, right: 25, top: MediaQuery.of(context).padding.top, bottom: 0),
-                  child: ListView.builder(
-                    controller: scrollController,
-                    itemCount: lines.length,
-                    padding: EdgeInsets.zero,
-                    itemBuilder: (context, index) {
-                      var focused = false;
-                      var line = lines[index];
-                      if(line.startsAt <= playerService.playbackPosition && line.endsAt >= playerService.playbackPosition) {
-                        focused = true;
-                      }
-                      return SelectableText(
-                        onTap: () {
-                           appMethodChannel.applyPlaybackPosition(line.startsAt);
-                        },
-                        lines[index].text,
-                        minLines: 1,
-                        maxLines: 200,
-                        style: TextStyle(
-                            fontSize: 30,
-                            color: focused ? Theme.of(context).highlightColor : Colors.white,
-                            fontWeight: focused ? FontWeight.bold : null
-                        ),
-                      );
-                    },
+            child: AnimatedOpacity(
+              duration: Duration(milliseconds: 500),
+              opacity: opacity * 2,
+              curve: Curves.easeOutQuint,
+              child: Padding(
+                padding: EdgeInsets.only(left: 25, right: 25, top: MediaQuery
+                    .of(context)
+                    .padding
+                    .top, bottom: 0),
+                child: ScrollablePositionedList.builder(
+                  itemScrollController: scrollController,
+                  itemCount: lines.length,
+                  padding: EdgeInsets.zero,
+                  itemBuilder: (context, index) {
+                    var focused = false;
+                    var line = lines[index];
+                    if (line.startsAt <= playerService.playbackPosition &&
+                        line.endsAt >= playerService.playbackPosition) {
+                      focused = true;
+                    }
+                    return SelectableText(
+                      onTap: () {
+                        appMethodChannel.applyPlaybackPosition(line.startsAt);
+                      },
+                      lines[index].text,
+                      minLines: 1,
+                      maxLines: 200,
+                      style: TextStyle(
+                          fontSize: 30,
+                          color: focused ? Theme
+                              .of(context)
+                              .highlightColor : Colors.white,
+                          fontWeight: focused ? FontWeight.bold : null
+                      ),
+                    );
+                  },
 
-                  ),
                 ),
-           ),
+              ),
+            ),
           ),
         ),
       ),
