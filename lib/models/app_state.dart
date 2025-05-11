@@ -10,6 +10,7 @@ class AppState {
   bool playingBarShowing = true;
   bool accountButtonExpanded = false;
   bool fragmentTitleMinimized = false;
+  bool floatingMenuShowing = false;
 
   List<String>? selectedSongs;
 
