@@ -103,9 +103,7 @@ class AppWebChannel extends AppWebChannelCore {
     );
     if (response.statusCode == HttpStatus.ok) {
       List<dynamic> decoded = jsonDecode(utf8.decode(response.bodyBytes));
-      print(decoded.length);
       for (Map<String, dynamic> map in decoded) {
-        print(map);
         UpdateEvent updateEvent =
             UpdateEvent(action: map["action"], value: map["value"], timestamp: DateTime.fromMillisecondsSinceEpoch(map["timestamp"]).toLocal());
         list.add(updateEvent);
