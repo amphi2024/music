@@ -18,7 +18,6 @@ class AlbumCover extends StatelessWidget {
       return AbsoluteAlbumCover(filePath: coverFilePath, fit: fit);
     }
     else {
-      album.downloadMissingCovers();
       return Image.asset("assets/images/music.png", fit: fit);
     }
   }
