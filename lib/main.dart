@@ -72,7 +72,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       if(App.isDesktop()) {
         doWhenWindowReady(() {
           final win = appWindow;
-          const initialSize = Size(800, 450);
+          const initialSize = Size(1250, 600);
           win.minSize = Size(500, 300);
           win.size = initialSize;
           win.alignment = Alignment.center;
