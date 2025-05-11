@@ -5,6 +5,7 @@ import 'package:music/models/app_state.dart';
 import 'package:music/models/player_service.dart';
 import 'package:music/ui/components/account/account_button.dart';
 import 'package:music/ui/components/fragment_title.dart';
+import 'package:music/ui/components/menu/desktop_floating_menu.dart';
 import 'package:music/ui/components/navigation_menu.dart';
 import 'package:music/ui/components/playing/desktop_playing_bar.dart';
 import 'package:music/ui/dialogs/settings_dialog.dart';
@@ -60,93 +61,113 @@ class _WideMainViewState extends State<WideMainView> {
   Widget build(BuildContext context) {
     appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor);
 
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      extendBody: true,
-      appBar: AppBar(
-          toolbarHeight: 0 // This is needed to change the status bar text (icon) color on Android
-      ),
-      body: Stack(
-        children: [
-          AnimatedPositioned(
-              left: 200,
-              top: 0,
-              bottom: 80,
-              right: 0,
-              duration: Duration(milliseconds: 1000), curve: Curves.easeOutQuint, child: fragments[appState.fragmentIndex]),
-          Positioned(
-            top: 0,
-            left: 200,
-            right: 0,
-            child: SizedBox(
-              height: 50,
-              child: Row(
-                children: [
-                  Expanded(child: MoveWindow(child: FragmentTitle(title: titles[appState.fragmentIndex],))),
-                  // Expanded(
-                  //     child: MoveWindow()
-                  // ),
-                  AccountButton(),
-                  PopupMenuButton(icon: Icon(Icons.add_circle_outline),
-                      itemBuilder: (context) {
-                    return [
-                      PopupMenuItem(child: Text("Song"), onTap: () async {
-                        appStorage.selectMusicFilesAndSave();
-                      }),
-                      PopupMenuItem(
-                          child: Text("Album"), onTap: () {
-                        showDialog(context: context, builder: (context) {
-                          return EditAlbumDialog(album: Album.created(metadata: {}, artistId: "", albumCover: []), onSave: (album) {
-                            setState(() {
-                              appStorage.albums[album.id] = album;
-                              appStorage.albumIdList.add(album.id);
-                              appStorage.albumIdList.sortAlbumList();
-                            });
-                          });
-                        });
-                      }),
-                      PopupMenuItem(
-                          child: Text("Artist"), onTap: () {
-                        showDialog(context: context, builder: (context) {
-                          return EditArtistDialog(artist: Artist.created({}), onSave: (artist) {
-                            setState(() {
-                              appStorage.artists[artist.id] = artist;
-                              appStorage.artistIdList.add(artist.id);
-                              appStorage.artistIdList.sortArtistList();
-                            });
-                          });
-                        });
-                      }),
-                      PopupMenuItem(child: Text("Playlist"), onTap: () {
-                        showDialog(context: context, builder: (context) {
-                          return EditPlaylistDialog(onSave: (playlist) {
-                            appState.setMainViewState(() {
-                              appStorage.playlists[playlist.id] = playlist;
-                            });
-                          });
-                        });
-                      })
-                    ];
-                  }),
-                  IconButton(onPressed: () {
-                    showDialog(context: context, builder: (context) => SettingsDialog());
-                  }, icon: Icon(Icons.settings)),
-                  MinimizeWindowButton(),
-                  appWindow.isMaximized
-                      ? RestoreWindowButton(
-                    onPressed: maximizeOrRestore,
-                  )
-                      : MaximizeWindowButton(
-                    onPressed: maximizeOrRestore,
-                  ),
-                  CloseWindowButton()
-                ],
-              ),
-            ),
+    return PopScope(
+      canPop: !appState.floatingMenuShowing,
+      onPopInvokedWithResult: (didPop, result) {
+        if(appState.floatingMenuShowing) {
+          setState(() {
+            appState.floatingMenuShowing = false;
+          });
+        }
+      },
+      child: GestureDetector(
+        onTap: () {
+          if(appState.floatingMenuShowing) {
+            setState(() {
+              appState.floatingMenuShowing = false;
+            });
+          }
+        },
+        child: Scaffold(
+          extendBodyBehindAppBar: true,
+          extendBody: true,
+          appBar: AppBar(
+              toolbarHeight: 0 // This is needed to change the status bar text (icon) color on Android
           ),
-          NavigationMenu(),
-          DesktopPlayingBar(song: playerService.nowPlaying(),),
-        ],
+          body: Stack(
+            children: [
+              AnimatedPositioned(
+                  left: 200,
+                  top: 0,
+                  bottom: 0,
+                  right: 0,
+                  duration: Duration(milliseconds: 1000), curve: Curves.easeOutQuint, child: fragments[appState.fragmentIndex]),
+              Positioned(
+                top: 0,
+                left: 200,
+                right: 0,
+                child: SizedBox(
+                  height: 50,
+                  child: Row(
+                    children: [
+                      Expanded(child: MoveWindow(child: FragmentTitle(title: titles[appState.fragmentIndex],))),
+                      // Expanded(
+                      //     child: MoveWindow()
+                      // ),
+                      AccountButton(),
+                      PopupMenuButton(icon: Icon(Icons.add_circle_outline),
+                          itemBuilder: (context) {
+                        return [
+                          PopupMenuItem(child: Text("Song"), onTap: () async {
+                            appStorage.selectMusicFilesAndSave();
+                          }),
+                          PopupMenuItem(
+                              child: Text("Album"), onTap: () {
+                            showDialog(context: context, builder: (context) {
+                              return EditAlbumDialog(album: Album.created(metadata: {}, artistId: "", albumCover: []), onSave: (album) {
+                                setState(() {
+                                  appStorage.albums[album.id] = album;
+                                  appStorage.albumIdList.add(album.id);
+                                  appStorage.albumIdList.sortAlbumList();
+                                });
+                              });
+                            });
+                          }),
+                          PopupMenuItem(
+                              child: Text("Artist"), onTap: () {
+                            showDialog(context: context, builder: (context) {
+                              return EditArtistDialog(artist: Artist.created({}), onSave: (artist) {
+                                setState(() {
+                                  appStorage.artists[artist.id] = artist;
+                                  appStorage.artistIdList.add(artist.id);
+                                  appStorage.artistIdList.sortArtistList();
+                                });
+                              });
+                            });
+                          }),
+                          PopupMenuItem(child: Text("Playlist"), onTap: () {
+                            showDialog(context: context, builder: (context) {
+                              return EditPlaylistDialog(onSave: (playlist) {
+                                appState.setMainViewState(() {
+                                  appStorage.playlists[playlist.id] = playlist;
+                                });
+                              });
+                            });
+                          })
+                        ];
+                      }),
+                      IconButton(onPressed: () {
+                        showDialog(context: context, builder: (context) => SettingsDialog());
+                      }, icon: Icon(Icons.settings)),
+                      MinimizeWindowButton(),
+                      appWindow.isMaximized
+                          ? RestoreWindowButton(
+                        onPressed: maximizeOrRestore,
+                      )
+                          : MaximizeWindowButton(
+                        onPressed: maximizeOrRestore,
+                      ),
+                      CloseWindowButton()
+                    ],
+                  ),
+                ),
+              ),
+              NavigationMenu(),
+              DesktopPlayingBar(song: playerService.nowPlaying(),),
+              DesktopFloatingMenu()
+            ],
+          ),
+        ),
       ),
     );
   }
