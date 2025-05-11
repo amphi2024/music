@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:amphi/models/app.dart';
+import 'package:music/ui/custom_slider_track_shape.dart';
 
 import 'app_theme.dart';
 class AppThemeData {
@@ -66,7 +67,8 @@ class AppThemeData {
         trackHeight: 5,
         inactiveTrackColor: inactiveColor,
           thumbShape: RoundSliderThumbShape(enabledThumbRadius: 0.0),
-          overlayShape: SliderComponentShape.noOverlay
+          overlayShape: SliderComponentShape.noOverlay,
+       trackShape: CustomSliderTrackShape()
       ),
       dividerColor: inactiveColor,
       dropdownMenuTheme: DropdownMenuThemeData(
