@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:marquee/marquee.dart';
 import 'package:music/channels/app_method_channel.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/music/song.dart';
