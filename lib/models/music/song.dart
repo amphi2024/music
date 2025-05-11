@@ -19,7 +19,6 @@ class Song {
     "title": <String, dynamic>{},
     "genre": [],
     "artist": "",
-    "albumArtist": "",
     "album": "",
     "added": DateTime.now().toUtc().millisecondsSinceEpoch,
     "modified": DateTime.now().toUtc().millisecondsSinceEpoch,
@@ -53,8 +52,6 @@ class Song {
   Artist? get arranger => appStorage.artists[data["arranger"]];
 
   Artist? get producer => appStorage.artists[data["producer"]];
-
-  Artist? get encoder => appStorage.artists[data["encoder"]];
 
   int get trackNumber => data["trackNumber"] ?? 0;
   set trackNumber(int value) => data["trackNumber"] = value;
