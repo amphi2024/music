@@ -63,6 +63,9 @@ class _ArtistsFragmentState extends State<ArtistsFragment> {
       children.add(artistWidget);
     }
 
+    children.add(Container(
+      height: 80,
+    ));
     return ListView(
       controller: scrollController,
       children: children,

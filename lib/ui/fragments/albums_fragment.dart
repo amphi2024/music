@@ -53,6 +53,13 @@ class _AlbumsFragmentState extends State<AlbumsFragment> {
       var albumWidget = AlbumGridItem(album: appStorage.albums.get(id));
       children.add(albumWidget);
     }
+
+    for(int i = 0; i < axisCount; i++) {
+
+      children.add(Container(
+        height: 80,
+      ));
+    }
     return MasonryGridView(
       controller: scrollController,
       gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(crossAxisCount: axisCount),

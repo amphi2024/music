@@ -54,6 +54,10 @@ class _GenresFragmentState extends State<GenresFragment> {
       children.add(child);
     }
 
+    children.add(Container(
+        height: 80
+    ));
+
     return ListView(
       controller: scrollController,
       children: children,

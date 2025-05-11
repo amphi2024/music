@@ -25,9 +25,16 @@ class _SongsFragmentState extends State<SongsFragment> {
   @override
   void initState() {
     scrollController.addListener(() {
-      appState.setMainViewState(() {
-        appState.fragmentTitleMinimized = scrollController.offset > 60 && appState.selectedSongs == null;
-      });
+      if(scrollController.offset > 60 && appState.selectedSongs == null) {
+        appState.setMainViewState(() {
+          appState.fragmentTitleMinimized = true;
+        });
+      }
+      else {
+        appState.setMainViewState(() {
+          appState.fragmentTitleMinimized = false;
+        });
+      }
     });
     appState.requestScrollToTop = () {
       scrollController.animateTo(0, duration: Duration(milliseconds: 750), curve: Curves.easeOutQuint);
@@ -46,6 +53,9 @@ class _SongsFragmentState extends State<SongsFragment> {
       var song = appStorage.songs.get(id);
       children.add(SongListItem(song: song));
     }
+    children.add(Container(
+      height: 80,
+    ));
     return ListView(
       controller: scrollController,
       children: children,
