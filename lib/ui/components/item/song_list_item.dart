@@ -1,8 +1,10 @@
 import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
+import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/app_state.dart';
+import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/ui/dialogs/edit_song_info_dialog.dart';
 
@@ -77,7 +79,7 @@ class SongListItem extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              song.title["default"] ?? "unknown",
+                              song.title.byContext(context),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style: TextStyle(
@@ -86,7 +88,7 @@ class SongListItem extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              song.artist.name["default"] ?? "unknown",
+                              song.artist.name.byContext(context),
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: playerService.nowPlaying().id == song.id ? Theme.of(context).highlightColor : null
                               ),
@@ -126,7 +128,22 @@ class SongListItem extends StatelessWidget {
                               return EditSongInfoDialog(song: song);
                             });
                           }),
-                          PopupMenuItem(child: Text("Delete")),
+                          PopupMenuItem(child: Text("Delete"), onTap: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return ConfirmationDialog(
+                                    title: "",
+                                    onConfirmed: () {
+                                      song.delete();
+                                      appState.setState(() {
+                                        appStorage.songs.remove(song.id);
+                                        appStorage.songIdList.remove(song.id);
+                                      });
+                                    },
+                                  );
+                                });
+                          }),
                         ];
                       },
                     )
