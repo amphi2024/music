@@ -146,7 +146,7 @@ class AppStorage extends AppStorageCore {
     song.save();
     songs[song.id] = song;
     songIdList.add(song.id);
-    appState.setMainViewState(() {
+    appState.setFragmentState(() {
       songIdList.sortSongList();
       artistIdList.sortArtistList();
       albumIdList.sortAlbumList();
