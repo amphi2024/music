@@ -42,6 +42,12 @@ class _MusicDataInputState extends State<MusicDataInput> {
   };
 
   @override
+  void dispose() {
+    controllers.forEach((key, value) => value.dispose());
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
 
     List<Widget> children = [];
