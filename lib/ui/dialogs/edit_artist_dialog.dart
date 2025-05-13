@@ -15,7 +15,8 @@ class EditArtistDialog extends StatefulWidget {
 
   final Artist artist;
   final void Function(Artist) onSave;
-  const EditArtistDialog({super.key, required this.artist, required this.onSave});
+  final bool creating;
+  const EditArtistDialog({super.key, required this.artist, required this.onSave, this.creating = false});
 
   @override
   State<EditArtistDialog> createState() => _EditArtistDialogState();
@@ -24,6 +25,7 @@ class EditArtistDialog extends StatefulWidget {
 class _EditArtistDialogState extends State<EditArtistDialog> {
   final controller = TextEditingController();
   late Artist artist = widget.artist;
+  late List<PlatformFile>? selectedFiles = widget.creating ? [] : null;
 
   @override
   void dispose() {
@@ -68,6 +70,32 @@ class _EditArtistDialogState extends State<EditArtistDialog> {
           pageViewChildren.add(child);
     }
 
+    if(widget.creating) {
+      for(int i = 0; i < selectedFiles!.length; i++) {
+        var filePath = selectedFiles![i].xFile.path;
+        var child = GestureDetector(
+          onLongPress: () {
+            showConfirmationDialog("@", () async {
+              setState(() {
+                selectedFiles!.removeAt(i);
+                i--;
+              });
+            });
+          },
+          child: Center(
+            child: SizedBox(
+              width: imageSize,
+              height: imageSize,
+              child: ClipRRect(
+                  borderRadius: borderRadius,
+                  child: AbsoluteArtistProfileImage(filePath: filePath)),
+            ),
+          ),
+        );
+        pageViewChildren.add(child);
+      }
+    }
+
     var plusButton = GestureDetector(
       onTap: () async {
         final result = await FilePicker.platform.pickFiles(type: FileType.custom, allowMultiple: false, allowedExtensions: [
@@ -79,14 +107,21 @@ class _EditArtistDialogState extends State<EditArtistDialog> {
         if(result != null) {
           var selectedFile = result.files.firstOrNull;
           if(selectedFile != null) {
-            var filename = FilenameUtils.generatedFileName(".${selectedFile.extension!}", artist.path);
-            var file = File(PathUtils.join(artist.path, filename));
-            var bytes = await selectedFile.xFile.readAsBytes();
-            await file.writeAsBytes(bytes);
-            setState(() {
-              artist.profileImages.add(file.path);
-            });
-            appWebChannel.uploadArtistFile(id: artist.id, filePath: file.path);
+            if(widget.creating) {
+              setState(() {
+                selectedFiles!.add(selectedFile);
+              });
+            }
+            else {
+              var filename = FilenameUtils.generatedFileName(".${selectedFile.extension!}", artist.path);
+              var file = File(PathUtils.join(artist.path, filename));
+              var bytes = await selectedFile.xFile.readAsBytes();
+              await file.writeAsBytes(bytes);
+              setState(() {
+                artist.profileImages.add(file.path);
+              });
+              appWebChannel.uploadArtistFile(id: artist.id, filePath: file.path);
+            }
           }
         }
       },
@@ -132,62 +167,6 @@ class _EditArtistDialogState extends State<EditArtistDialog> {
                     padding: const EdgeInsets.all(8.0),
                     child: MusicDataInput(data: artist.name),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        // Expanded(child: Text(artist.name.byContext(context))),
-                        // IconButton(onPressed: () {
-                        //   showDialog(context: context, builder: (context) {
-                        //     return SelectArtistDialog(excepting: song.artistId, onSelected: (artistId) {
-                        //       setState(() {
-                        //         song.data["artist"] = artistId;
-                        //       });
-                        //     });
-                        //   });
-                        // }, icon: Icon(Icons.edit))
-                      ],
-                    ),
-                  ),
-                  // Padding(
-                  //   padding: const EdgeInsets.all(8.0),
-                  //   child: Row(
-                  //     children: [
-                  //       Expanded(child: Text(song.album.name.byContext(context))),
-                  //       IconButton(onPressed: () {
-                  //         showDialog(context: context, builder: (context) {
-                  //           return SelectAlbumDialog(excepting: song.albumId, onSelected: (albumId) {});
-                  //         });
-                  //       }, icon: Icon(Icons.edit))
-                  //     ],
-                  //   ),
-                  // ),
-                  // Padding(
-                  //   padding: const EdgeInsets.all(8.0),
-                  //   child: GestureDetector(
-                  //     onTap: () {
-                  //       appState.setMainViewState(() {
-                  //         appState.playingBarShowing = false;
-                  //       });
-                  //       Navigator.push(context, CupertinoPageRoute(builder: (context) {
-                  //         lyricsEditingController.readOnly = false;
-                  //         return EditLyricsView(lyricsEditingController: lyricsEditingController, onChanged: (lyrics) {
-                  //           setState(() {
-                  //             songFile.lyrics.data["default"] = lyrics.data.get("default");
-                  //           });
-                  //           songFile.save();
-                  //         });
-                  //       }));
-                  //     },
-                  //     child: SizedBox(
-                  //       height: 500,
-                  //       child: LyricsEditor(
-                  //         lyricsEditingController: lyricsEditingController,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // )
-
                 ],
               ),
             ),
@@ -203,7 +182,12 @@ class _EditArtistDialogState extends State<EditArtistDialog> {
                 IconButton(
                   icon: Icon(Icons.check),
                   onPressed: () {
-                    artist.save();
+                    if(widget.creating) {
+                      artist.save(selectedCoverFiles: selectedFiles);
+                    }
+                    else {
+                      artist.save();
+                    }
                     widget.onSave(artist);
                     Navigator.pop(context);
                   },
