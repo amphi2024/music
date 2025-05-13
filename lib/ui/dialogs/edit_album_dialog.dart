@@ -17,7 +17,8 @@ class EditAlbumDialog extends StatefulWidget {
   
   final Album album;
   final void Function(Album) onSave;
-  const EditAlbumDialog({super.key, required this.album, required this.onSave});
+  final bool creating;
+  const EditAlbumDialog({super.key, required this.album, required this.onSave, this.creating = false});
 
   @override
   State<EditAlbumDialog> createState() => _EditAlbumDialogState();
@@ -26,6 +27,7 @@ class EditAlbumDialog extends StatefulWidget {
 class _EditAlbumDialogState extends State<EditAlbumDialog> {
   final controller = TextEditingController();
   late Album album = widget.album;
+  late List<PlatformFile>? selectedFiles = widget.creating ? [] : null;
 
   @override
   void dispose() {
@@ -48,14 +50,14 @@ class _EditAlbumDialogState extends State<EditAlbumDialog> {
       var filePath = album.covers[i];
       var child = GestureDetector(
         onLongPress: () {
-          showConfirmationDialog("@", () async {
-            var file = File(filePath);
-            await file.delete();
-            appWebChannel.deleteAlbumCover(id: album.id, filePath: filePath);
-            setState(() {
-              album.covers.removeAt(i);
+            showConfirmationDialog("@", () async {
+              var file = File(filePath);
+              await file.delete();
+              appWebChannel.deleteAlbumCover(id: album.id, filePath: filePath);
+              setState(() {
+                album.covers.removeAt(i);
+              });
             });
-          });
         },
         child: Center(
           child: SizedBox(
@@ -70,6 +72,32 @@ class _EditAlbumDialogState extends State<EditAlbumDialog> {
       pageViewChildren.add(child);
     }
 
+    if(widget.creating) {
+      for(int i = 0; i < selectedFiles!.length; i++) {
+        var filePath = selectedFiles![i].xFile.path;
+        var child = GestureDetector(
+          onLongPress: () {
+            showConfirmationDialog("@", () async {
+              setState(() {
+                selectedFiles!.removeAt(i);
+                i--;
+              });
+            });
+          },
+          child: Center(
+            child: SizedBox(
+              width: imageSize,
+              height: imageSize,
+              child: ClipRRect(
+                  borderRadius: borderRadius,
+                  child: AbsoluteAlbumCover(filePath: filePath)),
+            ),
+          ),
+        );
+        pageViewChildren.add(child);
+      }
+    }
+
     var plusButton = GestureDetector(
       onTap: () async {
         final result = await FilePicker.platform.pickFiles(type: FileType.custom, allowMultiple: false, allowedExtensions: [
@@ -81,14 +109,21 @@ class _EditAlbumDialogState extends State<EditAlbumDialog> {
         if(result != null) {
           var selectedFile = result.files.firstOrNull;
           if(selectedFile != null) {
-            var filename = FilenameUtils.generatedFileName(".${selectedFile.extension!}", album.path);
-            var file = File(PathUtils.join(album.path, filename));
-            var bytes = await selectedFile.xFile.readAsBytes();
-            await file.writeAsBytes(bytes);
-            setState(() {
-              album.covers.add(file.path);
-            });
-            appWebChannel.uploadAlbumCover(albumId: album.id, filePath: file.path);
+            if(widget.creating) {
+              setState(() {
+                selectedFiles!.add(selectedFile);
+              });
+            }
+            else {
+              var filename = FilenameUtils.generatedFileName(".${selectedFile.extension!}", album.path);
+              var file = File(PathUtils.join(album.path, filename));
+              var bytes = await selectedFile.xFile.readAsBytes();
+              await file.writeAsBytes(bytes);
+              setState(() {
+                album.covers.add(file.path);
+              });
+              appWebChannel.uploadAlbumCover(albumId: album.id, filePath: file.path);
+            }
           }
         }
       },
@@ -173,7 +208,12 @@ class _EditAlbumDialogState extends State<EditAlbumDialog> {
                 IconButton(
                   icon: Icon(Icons.check),
                   onPressed: () {
-                    album.save();
+                    if(widget.creating) {
+                      album.save(selectedCoverFiles: selectedFiles);
+                    }
+                    else {
+                      album.save();
+                    }
                     widget.onSave(album);
                     Navigator.pop(context);
                   },
