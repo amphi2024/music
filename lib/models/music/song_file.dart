@@ -15,8 +15,8 @@ class SongFile {
   String get format => data["format"] ?? "flac";
   set format(value) => data["format"] = value;
 
-  late String id;
-  late String songId;
+  String id = "";
+  String songId = "";
 
   String get url {
     final filename = PathUtils.basename(infoFilepath);
