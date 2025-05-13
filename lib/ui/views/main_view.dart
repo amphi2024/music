@@ -47,7 +47,19 @@ class _MainViewState extends State<MainView> {
     });
   }
 
+  var fragments = [
+    SongsFragment(),
+    ArtistsFragment(),
+    AlbumsFragment(),
+    GenresFragment()
+  ];
 
+  var titles = [
+    "Songs",
+    "Artists",
+    "Albums",
+    "Genres"
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -58,19 +70,6 @@ class _MainViewState extends State<MainView> {
     else {
       appMethodChannel.setNavigationBarColor(themeData.scaffoldBackgroundColor);
     }
-
-    var fragments = [
-      SongsFragment(),
-      ArtistsFragment(),
-      AlbumsFragment(),
-      GenresFragment()
-    ];
-    var titles = [
-      "Songs",
-      "Artists",
-      "Albums",
-      "Genres"
-    ];
 
      List<Song> songList = [];
      appStorage.songs.forEach((key, music) {
