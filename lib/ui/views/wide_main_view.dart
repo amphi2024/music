@@ -37,14 +37,14 @@ class _WideMainViewState extends State<WideMainView> {
     });
   }
 
-  var titles = [
+  final titles = [
     "Songs",
     "Artists",
     "Albums",
     "Genres"
   ];
 
-  List<Widget> fragments = [
+   final List<Widget> fragments = [
     SongsFragment(),
     ArtistsFragment(),
     AlbumsFragment(),
@@ -114,11 +114,11 @@ class _WideMainViewState extends State<WideMainView> {
                           PopupMenuItem(
                               child: Text("Album"), onTap: () {
                             showDialog(context: context, builder: (context) {
-                              return EditAlbumDialog(album: Album.created(metadata: {}, artistId: "", albumCover: []), onSave: (album) {
-                                setState(() {
-                                  appStorage.albums[album.id] = album;
-                                  appStorage.albumIdList.add(album.id);
-                                  appStorage.albumIdList.sortAlbumList();
+                              return EditAlbumDialog(creating: true, album: Album.created(metadata: {}, artistId: "", albumCover: []), onSave: (album) {
+                                appState.setFragmentState(() {
+  appStorage.albums[album.id] = album;
+  appStorage.albumIdList.add(album.id);
+  appStorage.albumIdList.sortAlbumList();
                                 });
                               });
                             });
@@ -127,10 +127,11 @@ class _WideMainViewState extends State<WideMainView> {
                               child: Text("Artist"), onTap: () {
                             showDialog(context: context, builder: (context) {
                               return EditArtistDialog(artist: Artist.created({}), onSave: (artist) {
+                                appStorage.artists[artist.id] = artist;
+                                appStorage.artistIdList.add(artist.id);
+                                appStorage.artistIdList.sortArtistList();
                                 setState(() {
-                                  appStorage.artists[artist.id] = artist;
-                                  appStorage.artistIdList.add(artist.id);
-                                  appStorage.artistIdList.sortArtistList();
+
                                 });
                               });
                             });
@@ -138,7 +139,7 @@ class _WideMainViewState extends State<WideMainView> {
                           PopupMenuItem(child: Text("Playlist"), onTap: () {
                             showDialog(context: context, builder: (context) {
                               return EditPlaylistDialog(onSave: (playlist) {
-                                appState.setMainViewState(() {
+                                appState.setFragmentState(() {
                                   appStorage.playlists[playlist.id] = playlist;
                                 });
                               });

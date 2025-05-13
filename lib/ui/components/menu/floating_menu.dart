@@ -104,8 +104,8 @@ class _FloatingMenuState extends State<FloatingMenu> {
                         PopupMenuItem(
                             child: Text("Album"), onTap: () {
                           showDialog(context: context, builder: (context) {
-                            return EditAlbumDialog(album: Album.created(metadata: {}, artistId: "", albumCover: []), onSave: (album) {
-                              setState(() {
+                            return EditAlbumDialog(creating: true, album: Album.created(metadata: {}, artistId: "", albumCover: []), onSave: (album) {
+                              appState.setFragmentState(() {
                                 appStorage.albums[album.id] = album;
                                 appStorage.albumIdList.add(album.id);
                                 appStorage.albumIdList.sortAlbumList();
@@ -117,7 +117,7 @@ class _FloatingMenuState extends State<FloatingMenu> {
                             child: Text("Artist"), onTap: () {
                           showDialog(context: context, builder: (context) {
                             return EditArtistDialog(artist: Artist.created({}), onSave: (artist) {
-                              setState(() {
+                              appState.setFragmentState(() {
                                 appStorage.artists[artist.id] = artist;
                                 appStorage.artistIdList.add(artist.id);
                                 appStorage.artistIdList.sortArtistList();
@@ -128,7 +128,7 @@ class _FloatingMenuState extends State<FloatingMenu> {
                         PopupMenuItem(child: Text("Playlist"), onTap: () {
                           showDialog(context: context, builder: (context) {
                             return EditPlaylistDialog(onSave: (playlist) {
-                              appState.setMainViewState(() {
+                              appState.setFragmentState(() {
                                 appStorage.playlists[playlist.id] = playlist;
                               });
                             });
