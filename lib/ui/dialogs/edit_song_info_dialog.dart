@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/lyrics_editing_controller.dart';
 import 'package:music/models/music/artist.dart';
 import 'package:music/models/music/lyrics.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/music/song_file.dart';
+import 'package:music/ui/components/edit_music_genre.dart';
 import 'package:music/ui/components/lyrics_editor.dart';
 import 'package:music/ui/components/music_data_input.dart';
 import 'package:music/ui/dialogs/select_album_dialog.dart';
@@ -97,6 +99,7 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                       ],
                     ),
                   ),
+                  EditMusicGenre(genre: song.genre),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -135,6 +138,28 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Expanded(child: Text("Released: ${DateFormat.yMMMEd(Localizations.localeOf(context).languageCode.toString()).format(song.released)}")),
+                        IconButton(
+                            onPressed: () async {
+                              final now = DateTime.now();
+                              DateTime? result = await showDatePicker(context: context, firstDate: DateTime(1600), lastDate: DateTime(
+                                  now.year + 100
+                              ), initialDate: song.released, );
+
+                              if(result != null) {
+                                setState(() {
+                                  song.released = result;
+                                });
+                              }
+                            },
+                            icon: Icon(Icons.edit))
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
                       onTap: () {
                         appState.setMainViewState(() {
@@ -155,7 +180,7 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                         }));
                       },
                       child: SizedBox(
-                        height: 500,
+                        height: 300,
                         child: LyricsEditor(
                           lyricsEditingController: lyricsEditingController,
                         ),
