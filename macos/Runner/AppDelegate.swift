@@ -4,11 +4,13 @@ import IOKit.ps
 import AVFoundation
 
 @main
-class AppDelegate: FlutterAppDelegate, AVAudioPlayerDelegate {
+class AppDelegate: FlutterAppDelegate {
     
     private var methodChannel: FlutterMethodChannel?
-    private var player: AVAudioPlayer?
     private var volume: Double = 0.5
+    private var stream: HSTREAM = 0
+    private var duration: Int = 0
+    private var soundLoaded: Bool = false
     
     @available(macOS 11.0, *)
     private var timerTask: Task<Void, Never>?
@@ -22,12 +24,16 @@ class AppDelegate: FlutterAppDelegate, AVAudioPlayerDelegate {
     }
     
     override func applicationWillTerminate(_ aNotification: Notification) {
+        BASS_StreamFree(stream)
+        BASS_Free()
         if #available(macOS 11.0, *) {
             timerTask?.cancel()
         }
     }
     
     override func applicationDidFinishLaunching(_ notification: Notification) {
+        BASS_Init(-1, 44100, 0, nil, nil)
+        
         mainFlutterWindow?.toolbar = NSToolbar()
         if #available(macOS 11.0, *) {
             mainFlutterWindow?.toolbarStyle = .unified
@@ -35,8 +41,7 @@ class AppDelegate: FlutterAppDelegate, AVAudioPlayerDelegate {
         
         let controller : FlutterViewController = mainFlutterWindow?.contentViewController as! FlutterViewController
         
-        methodChannel = FlutterMethodChannel(name: "music_method_channel",
-                                             binaryMessenger: controller.engine.binaryMessenger)
+        methodChannel = FlutterMethodChannel(name: "music_method_channel", binaryMessenger: controller.engine.binaryMessenger)
         
         methodChannel?.setMethodCallHandler { [weak self] call, result in
             
@@ -56,13 +61,13 @@ class AppDelegate: FlutterAppDelegate, AVAudioPlayerDelegate {
                     result(FlutterError(code: "INVALID_ARGUMENT", message: "Missing path argument", details: nil))
                 }
             case "resume_music":
-                self?.player?.play()
-                //result(true)
+                BASS_ChannelPlay(self?.stream ?? 0, 0)
+                result(true)
             case "pause_music":
-                self?.player?.pause()
-                //result(true)
+                BASS_ChannelPause(self?.stream ?? 0)
+                result(true)
             case "is_music_playing":
-                result(self?.player?.isPlaying)
+                result( BASS_ChannelIsActive(self?.stream ?? 0) == 1)
             case "set_media_source":
                 if let arguments = call.arguments as? [String: Any], let volume = self?.volume as? Double {
                     let path = arguments["path"]! as! String
@@ -70,32 +75,56 @@ class AppDelegate: FlutterAppDelegate, AVAudioPlayerDelegate {
                     let url = arguments["url"]! as! String
                     let token = arguments["token"]! as! String
                     
-                    let fileURL = URL(fileURLWithPath: path)
-                    do {
-                        self?.player = try AVAudioPlayer(contentsOf: fileURL)
-                        self?.player?.volume = Float(volume)
-                        self?.player?.delegate = self
-                        self?.player?.prepareToPlay()
-                        if(playNow) {
-                            self?.player?.play()
+                    BASS_StreamFree(self?.stream ?? 0)
+                    
+                    let fileManager = FileManager.default
+                    
+                    if fileManager.fileExists(atPath: path) && !path.isEmpty {
+                        let stream = BASS_StreamCreateFile(0, path, 0, 0, 0)
+                        self?.stream = stream
+                        
+                        BASS_ChannelSetAttribute(stream, 2, Float(volume))
+                        if playNow {
+                            BASS_ChannelPlay(stream, 0)
                         }
-                    } catch {
-                       // let NetworkUrl = URL(
+                    }
+                    else {
+                        let stream = BASS_StreamCreateURL("\(url)\r\nAuthorization:\(token)\r\n", 0, 0, nil , nil)
+                        self?.stream = stream
+                        
+                        BASS_ChannelSetAttribute(stream, 2, Float(volume))
+                        if playNow {
+                            BASS_ChannelPlay(stream, 0)
+                        }
                     }
                 }
+                result(true)
             case "apply_playback_position":
-                if let arguments = call.arguments as? [String: Any] {
+                if let arguments = call.arguments as? [String: Any] , let stream = self?.stream as? HSTREAM {
                     let position = arguments["position"]! as! Int
-                    self?.player?.currentTime = TimeInterval(position) / 1000
+                    let timeMs = Double(position) / 1000
+                    let pos = BASS_ChannelSeconds2Bytes(stream, timeMs)
+                    BASS_ChannelSetPosition(stream, pos, 0)
                 }
+                result(true)
             case "set_volume":
-                if let arguments = call.arguments as? [String: Any] {
-                    self?.volume = arguments["volume"]! as! Double
-                    self?.player?.volume = Float(arguments["volume"]! as! Double)
+                if let arguments = call.arguments as? [String: Any], let stream = self?.stream as? HSTREAM {
+                    let volume = arguments["volume"]! as! Double
+                    self?.volume = volume
+                    BASS_ChannelSetAttribute(stream, 2, Float(volume))
                 }
+                result(true)
             case "get_music_duration":
-                let duration = self?.player?.duration ?? 0
-                result(Int(duration) * 1000)
+                let pos = BASS_ChannelGetLength(self?.stream ?? 0, 0)
+                let timeMs = BASS_ChannelBytes2Seconds(self?.stream ?? 0, pos) * 1000
+                let duration = Int(timeMs)
+                if duration > 0 {
+                    self?.duration = duration
+                    result(duration)
+                }
+                else {
+                    result(0)
+                }
             default:
                 result(FlutterMethodNotImplemented)
             }
@@ -107,13 +136,14 @@ class AppDelegate: FlutterAppDelegate, AVAudioPlayerDelegate {
         if #available(macOS 11.0, *) {
             timerTask = Task {
                        while !Task.isCancelled {
-                           let pos = player?.currentTime ?? 0
-                           let duration = player?.duration ?? 0
+                           let pos = BASS_ChannelGetPosition(stream, 0)
+                           let timeMs = BASS_ChannelBytes2Seconds(stream, pos) * 1000
+                           let position = Int(timeMs)
                            
-                           let position = Int(pos) * 1000
-                           methodChannel?.invokeMethod("on_playback_changed", arguments: ["position": position])
-                           
-                           if(pos >= duration) {
+                           if position > 0 {
+                               methodChannel?.invokeMethod("on_playback_changed", arguments: ["position": position])
+                           }
+                           if(position + 50 >= duration && duration > 0) {
                                methodChannel?.invokeMethod("play_next", arguments: [])
                            }
                            try? await Task.sleep(nanoseconds: 500_000_000)
@@ -133,12 +163,6 @@ class AppDelegate: FlutterAppDelegate, AVAudioPlayerDelegate {
             mainFlutterWindow?.toolbarStyle = .unified
         }
        methodChannel?.invokeMethod("on_exit_fullscreen", arguments: nil)
-    }
-    
-    func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
-          if flag {
-            methodChannel?.invokeMethod("play_next", arguments: [])
-          }
     }
     
     private func getMusicMetadata(filePath: String) -> [String: Any] {
