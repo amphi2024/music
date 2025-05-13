@@ -24,6 +24,7 @@ class _GenresFragmentState extends State<GenresFragment> {
 
   @override
   void initState() {
+    appState.setFragmentState = setState;
     scrollController.addListener(() {
       appState.setMainViewState(() {
         appState.fragmentTitleMinimized = scrollController.offset > 60 && appState.selectedSongs == null;
