@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/music/album.dart';
@@ -8,6 +9,7 @@ import 'package:music/ui/components/artist_profile_image.dart';
 import 'package:music/ui/dialogs/edit_artist_dialog.dart';
 
 import '../../models/app_storage.dart';
+import 'album_view.dart';
 
 class ArtistView extends StatelessWidget {
 
@@ -65,7 +67,13 @@ class ArtistView extends StatelessWidget {
           ),
           SliverGrid.builder(
               itemCount: albumList.length,
-              itemBuilder: (context, index) => AlbumGridItem(album: albumList[index]),
+              itemBuilder: (context, index) => AlbumGridItem(album: albumList[index], onPressed: () {
+                Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => AlbumView(album: albumList[index]),
+                    ));
+              }),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
                 childAspectRatio: 0.6))
         ]
