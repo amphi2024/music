@@ -128,8 +128,33 @@ class Song {
 
     var releasedYear = metadata["year"];
 
-    if(releasedYear != null && releasedYear is int) {
+    if(releasedYear is int && releasedYear < 10000) {
       song.released = DateTime(releasedYear);
+    }
+    else if(releasedYear is String) {
+      switch(releasedYear.length) {
+        case 4:
+          var year = int.tryParse(releasedYear);
+          if(year != null) {
+            song.released = DateTime(year);
+          }
+          break;
+        case 6:
+          var year = int.tryParse(releasedYear.substring(0 , 4));
+          var month = int.tryParse(releasedYear.substring(4, 6));
+          if(year != null && month != null) {
+            song.released = DateTime(year, month);
+          }
+          break;
+        case 8:
+          var year = int.tryParse(releasedYear.substring(0 , 4));
+          var month = int.tryParse(releasedYear.substring(4, 6));
+          var day = int.tryParse(releasedYear.substring(6, 8));
+          if(year != null && month != null && day != null) {
+            song.released = DateTime(year, month, day);
+          }
+          break;
+      }
     }
 
     return song;
