@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/utils/random_alphabet.dart';
@@ -73,13 +74,24 @@ class Artist {
     return artist;
   }
 
-  Future<void> save({bool upload = true}) async {
+  Future<void> save({bool upload = true, List<PlatformFile>? selectedCoverFiles}) async {
     var directory = Directory(path);
     if(!await directory.exists()) {
       await directory.create(recursive: true);
     }
     var infoFile = File(PathUtils.join(path, "info.json"));
     await infoFile.writeAsString(jsonEncode(data));
+
+    if(selectedCoverFiles != null) {
+      for(var selectedCover in selectedCoverFiles) {
+        var filename = FilenameUtils.generatedFileName(".${selectedCover.extension!}", path);
+        var file = File(PathUtils.join(path, filename));
+        var bytes = await selectedCover.xFile.readAsBytes();
+        await file.writeAsBytes(bytes);
+        profileImages.add(file.path);
+        appWebChannel.uploadArtistFile(id: id, filePath: file.path);
+      }
+    }
 
     if(upload) {
       appWebChannel.uploadArtistInfo(artist: this);
