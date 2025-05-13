@@ -17,6 +17,7 @@ class AppState {
   late void Function(void Function()) setState;
 
   late void Function(void Function()) setMainViewState;
+  late void Function(void Function()) setFragmentState;
   void Function() requestScrollToTop = () {};
 
 }
