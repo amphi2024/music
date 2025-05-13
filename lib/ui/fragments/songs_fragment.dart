@@ -24,6 +24,7 @@ class _SongsFragmentState extends State<SongsFragment> {
 
   @override
   void initState() {
+    appState.setFragmentState = setState;
     scrollController.addListener(() {
       if(scrollController.offset > 60 && appState.selectedSongs == null) {
         appState.setMainViewState(() {
