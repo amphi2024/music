@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:music/models/music/album.dart';
 import 'package:music/models/music/song.dart';
 
-import '../../views/album_view.dart';
 import '../album_cover.dart';
 
 class AlbumGridItem extends StatelessWidget {
   final Album album;
-  const AlbumGridItem({super.key, required this.album});
+  final void Function()? onPressed;
+  final void Function()? onLongPressed;
+  const AlbumGridItem({super.key, required this.album, this.onPressed, this.onLongPressed});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(context, CupertinoPageRoute(builder: (context) => AlbumView(album: album)));
-      },
+      onTap: onPressed,
+      onLongPress: onLongPressed,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
