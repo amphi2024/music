@@ -80,34 +80,37 @@ class _PlayingLyricsState extends State<PlayingLyrics> {
                     .of(context)
                     .padding
                     .top, bottom: 0),
-                child: ScrollablePositionedList.builder(
-                  itemScrollController: scrollController,
-                  itemCount: lines.length,
-                  padding: EdgeInsets.zero,
-                  itemBuilder: (context, index) {
-                    var focused = false;
-                    var line = lines[index];
-                    if (line.startsAt <= playerService.playbackPosition &&
-                        line.endsAt >= playerService.playbackPosition) {
-                      focused = true;
-                    }
-                    return SelectableText(
-                      onTap: () {
-                        appMethodChannel.applyPlaybackPosition(line.startsAt);
-                      },
-                      lines[index].text,
-                      minLines: 1,
-                      maxLines: 200,
-                      style: TextStyle(
-                          fontSize: 30,
-                          color: focused ? Theme
-                              .of(context)
-                              .highlightColor : Colors.white,
-                          fontWeight: focused ? FontWeight.bold : null
-                      ),
-                    );
-                  },
+                child: PageStorage(
+                  bucket: PageStorageBucket(),
+                  child: ScrollablePositionedList.builder(
+                    itemScrollController: scrollController,
+                    itemCount: lines.length,
+                    padding: EdgeInsets.zero,
+                    itemBuilder: (context, index) {
+                      var focused = false;
+                      var line = lines[index];
+                      if (line.startsAt <= playerService.playbackPosition &&
+                          line.endsAt >= playerService.playbackPosition) {
+                        focused = true;
+                      }
+                      return SelectableText(
+                        onTap: () {
+                          appMethodChannel.applyPlaybackPosition(line.startsAt);
+                        },
+                        lines[index].text,
+                        minLines: 1,
+                        maxLines: 200,
+                        style: TextStyle(
+                            fontSize: 30,
+                            color: focused ? Theme
+                                .of(context)
+                                .highlightColor : Colors.white,
+                            fontWeight: focused ? FontWeight.bold : null
+                        ),
+                      );
+                    },
 
+                  ),
                 ),
               ),
             ),
