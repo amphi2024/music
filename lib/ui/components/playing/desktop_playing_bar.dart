@@ -1,5 +1,7 @@
+import 'package:amphi/models/app.dart';
 import 'package:flutter/material.dart';
 import 'package:music/channels/app_method_channel.dart';
+import 'package:music/models/app_cache.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
@@ -32,7 +34,7 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
         curve: Curves.easeOutQuint,
       left: 215,
         right: 15,
-        bottom: 15,
+        bottom: 15 + MediaQuery.of(context).padding.bottom,
         child: AnimatedContainer(
           duration: Duration(milliseconds: 1000),
           curve: Curves.easeOutQuint,
@@ -96,15 +98,20 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
                   Icon( playerService.volume > 0.5 ? Icons.volume_up : playerService.volume > 0.1 ? Icons.volume_down : Icons.volume_mute ),
                   SizedBox(
                     width: 80,
-                    child: Slider(
-                        max: 1,
-                        value: playerService.volume,
-                        onChanged: (value) {
-                          appMethodChannel.setVolume(value);
-                          setState(() {
-                            playerService.volume = value;
-                          });
-                        }),
+                    child: Visibility(
+                      visible: App.isDesktop(),
+                      child: Slider(
+                          max: 1,
+                          value: playerService.volume,
+                          onChanged: (value) {
+                            appCacheData.volume = value;
+                            appCacheData.save();
+                            appMethodChannel.setVolume(value);
+                            setState(() {
+                              playerService.volume = value;
+                            });
+                          }),
+                    ),
                   ),
                   IconButton(onPressed: () {
                     appState.setMainViewState(() {
