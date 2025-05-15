@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:amphi/models/app_web_channel_core.dart';
 import 'package:amphi/models/update_event.dart';
@@ -260,6 +261,7 @@ class AppWebChannel extends AppWebChannelCore {
           url: "$serverAddress/music/songs/$songId/$filename", jsonBody: await file.readAsString(), onSuccess: onSuccess, onFailed: onFailed, updateEvent: updateEvent);
     }
     else {
+      
       uploadFile(
           url: "$serverAddress/music/songs/$songId/$filename", filePath: filePath, onSuccess: onSuccess, onFailed: onFailed, updateEvent: updateEvent);
     }
@@ -355,9 +357,6 @@ class AppWebChannel extends AppWebChannelCore {
         Uri.parse(url),
         headers: <String, String>{'Content-Type': 'application/json; charset=UTF-8', "Authorization": token},
       );
-      print(url);
-      print(response.statusCode);
-      print(response.body);
       if (response.statusCode == 200) {
         var file = File(filePath);
         await file.writeAsBytes(response.bodyBytes);
@@ -383,7 +382,35 @@ class AppWebChannel extends AppWebChannelCore {
     if(!await directory.exists()) {
       await directory.create(recursive: true);
     }
-    await _downloadFile(url: url, filePath: filePath , onSuccess: onSuccess, onFailed: onFailed);
+
+    try {
+      final request = Request('GET', Uri.parse(url));
+      request.headers.addAll({'Content-Type': 'application/json; charset=UTF-8', "Authorization": token});
+      final response = await Client().send(request);
+      final file = File(filePath);
+      final sink = file.openWrite();
+
+      await response.stream.pipe(sink);
+      await sink.close();
+
+      print("${song.title.byLocaleCode("en")} downloaded ${response.statusCode}");
+
+      if(response.statusCode == 200) {
+        if(onSuccess != null) {
+          onSuccess();
+        }
+      }
+      else if(onFailed != null) {
+        onFailed(response.statusCode);
+      }
+    }
+    catch(e) {
+      if(onFailed != null) {
+        onFailed(null);
+      }
+    }
+
+    //await _downloadFile(url: url, filePath: filePath , onSuccess: onSuccess, onFailed: onFailed);
   }
 
   Future<void> downloadAlbumCover({required Album album, required String filename, void Function()? onSuccess, void Function(int?)? onFailed}) async {
