@@ -144,6 +144,7 @@ class AppStorage extends AppStorageCore {
 
     var song = Song.created(metadata: metadata, artistId: artist?.id ?? "", albumId: album?.id ?? "", file: File(filePath));
     song.save();
+    song.transferring = true;
     songs[song.id] = song;
     songIdList.add(song.id);
     appState.setFragmentState(() {
