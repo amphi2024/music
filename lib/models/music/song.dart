@@ -26,6 +26,8 @@ class Song {
     "released": DateTime.now().toUtc().millisecondsSinceEpoch
   };
 
+  bool? transferring;
+
   Map<String, dynamic> get title => data["title"];
   List<dynamic> get genre => data["genre"];
   set artist(value) => data["artist"] = value;
@@ -185,6 +187,14 @@ class Song {
     }
 
     return song;
+  }
+
+  void removeDownload() async {
+    files.forEach((key, value) async {
+      var file = File(value.mediaFilepath);
+      value.mediaFilepath = "";
+      file.delete();
+    });
   }
 
   Future<void> save({bool upload = true}) async {
