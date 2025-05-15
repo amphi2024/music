@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:music/models/app_cache.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/ui/components/repeat_icon.dart';
 
@@ -44,6 +45,7 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -54,6 +56,8 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
                 onPressed: () {
                   appState.setState(() {
                     playerService.toggleShuffle();
+                    appCacheData.shuffled = playerService.shuffled;
+                    appCacheData.save();
                   });
                 }),
             IconButton(
@@ -98,49 +102,53 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
                 onPressed: () {
                   setState(() {
                     playerService.togglePlayMode();
+                    appCacheData.playMode = playerService.playMode;
+                    appCacheData.save();
                   });
                 }),
           ],
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              DurationConverter.convertedDuration(playerService.playbackPosition),
-              style: TextStyle(
-                fontSize: 13
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8.0, right: 8, bottom: 0, top: 0),
-                child: Slider(
-                    min: 0,
-                    max: playerService.musicDuration.toDouble(),
-                    value: playerService.playbackPosition.toDouble(),
-                    onChangeStart: (d) {
-                      changingPosition = true;
-                    },
-                    onChanged: (d) {
-                      setState(() {
-                        playerService.playbackPosition = d.toInt();
-                      });
-                    },
-                  onChangeEnd: (d) {
-                    appMethodChannel.applyPlaybackPosition(d.toInt());
-                    changingPosition = false;
-                  },
-                    ),
-              ),
-            ),
-            Text(
-              DurationConverter.convertedDuration(playerService.musicDuration),
-              style: TextStyle(
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                DurationConverter.convertedDuration(playerService.playbackPosition),
+                style: TextStyle(
                   fontSize: 13
+                ),
               ),
-            ),
-          ],
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0, right: 8, bottom: 0, top: 0),
+                  child: Slider(
+                      min: 0,
+                      max: playerService.musicDuration.toDouble(),
+                      value: playerService.playbackPosition.toDouble(),
+                      onChangeStart: (d) {
+                        changingPosition = true;
+                      },
+                      onChanged: (d) {
+                        setState(() {
+                          playerService.playbackPosition = d.toInt();
+                        });
+                      },
+                    onChangeEnd: (d) {
+                      appMethodChannel.applyPlaybackPosition(d.toInt());
+                      changingPosition = false;
+                    },
+                      ),
+                ),
+              ),
+              Text(
+                DurationConverter.convertedDuration(playerService.musicDuration),
+                style: TextStyle(
+                    fontSize: 13
+                ),
+              ),
+            ],
+          ),
         )
       ],
     );
