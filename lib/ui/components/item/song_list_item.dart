@@ -27,7 +27,7 @@ class SongListItem extends StatelessWidget {
       onTap: () {
         appState.setState(() {
           playerService.isPlaying = true;
-          playerService.startPlay(song: song, localeCode: Localizations.localeOf(context).languageCode);
+          playerService.startPlay(song: song, localeCode: Localizations.localeOf(context).languageCode, playlistId: "");
         });
       },
       child: Padding(
@@ -97,8 +97,11 @@ class SongListItem extends StatelessWidget {
                         )
                     ),
                     Visibility(
-                      visible: !song.availableOnOffline(),
+                      visible: !song.availableOnOffline() && song.transferring == null,
                         child: IconButton(onPressed: () async {
+                          appState.setFragmentState(() {
+                            song.transferring = true;
+                          });
                           appWebChannel.getSongFiles(songId: song.id, onSuccess: (list) async {
                             for(var fileInfo in list) {
                               String filename = fileInfo["filename"];
@@ -106,7 +109,8 @@ class SongListItem extends StatelessWidget {
                               if(!filename.endsWith(".json")) {
                                 appWebChannel.downloadSongFile(song: song, filename: filename, onSuccess: () {
                                   var mediaFilePath = PathUtils.join(song.path, filename);
-                                  appState.setState(() {
+                                  appState.setFragmentState(() {
+                                    song.transferring = null;
                                     song.files[id]?.mediaFilepath = mediaFilePath;
                                   });
                                 });
@@ -117,15 +121,39 @@ class SongListItem extends StatelessWidget {
                           Icons.arrow_downward_outlined,
                           size: 13,
                         ))),
+                    Visibility(
+                      visible: song.transferring == true,
+                        child: const CircularProgressIndicator(
+                         constraints: BoxConstraints(
+                           minWidth: 15,
+                           minHeight: 15,
+                           maxWidth: 15,
+                           maxHeight: 15
+                         ),
+                        )),
                     PopupMenuButton(
                       icon: Icon(Icons.more_vert),
                       itemBuilder: (context) {
                         return [
-                          PopupMenuItem(child: Text("Remove Download")),
+                          PopupMenuItem(child: Text("Remove Download"), onTap: () {
+                            appState.setFragmentState(() {
+                              song.removeDownload();
+                            });
+                          }),
                           PopupMenuItem(child: Text("Add to Playlist")),
                           PopupMenuItem(child: Text("Edit Info"), onTap: () {
                             showDialog(context: context, builder: (context) {
                               return EditSongInfoDialog(song: song);
+                            });
+                          }),
+                          PopupMenuItem(child: Text("Upload"), onTap: () {
+                            appState.setFragmentState(() {
+                              song.transferring = true;
+                            });
+                            appWebChannel.uploadSongFile(songId: song.id, filePath: song.playingFile().mediaFilepath, onSuccess: () {
+                              appState.setFragmentState(() {
+                                song.transferring = null;
+                              });
                             });
                           }),
                           PopupMenuItem(child: Text("Delete"), onTap: () {
@@ -136,7 +164,7 @@ class SongListItem extends StatelessWidget {
                                     title: "",
                                     onConfirmed: () {
                                       song.delete();
-                                      appState.setState(() {
+                                      appState.setFragmentState(() {
                                         appStorage.songs.remove(song.id);
                                         appStorage.songIdList.remove(song.id);
                                       });
