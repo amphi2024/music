@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:music/channels/app_method_channel.dart';
+import 'package:music/models/app_cache.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/playlist.dart';
 
@@ -17,14 +18,14 @@ class PlayerService {
   static final PlayerService _instance = PlayerService();
   static PlayerService getInstance() => _instance;
 
-  String playlistKey = "";
-  Playlist get playlist => appStorage.playlists[playlistKey] ?? Playlist();
+  String playlistId = "";
+  Playlist get playlist => appStorage.playlists[playlistId] ?? Playlist();
   int index = 0;
   String playingSongId = "";
   int musicDuration = 0;
   int playbackPosition = 0;
   bool isPlaying = false;
-  double volume = 0.5;
+  double volume = 1;
   bool shuffled = false;
   int playMode = repeatAll;
 
@@ -66,8 +67,12 @@ class PlayerService {
     }
   }
 
-  Future<void> startPlay({required Song song, String? localeCode}) async {
-      playlistKey = "";
+  Future<void> startPlay({required Song song, String? localeCode, required String playlistId, bool playNow = true}) async {
+    appCacheData.lastPlayedPlaylistId = playlistId;
+    appCacheData.lastPlayedSongId = song.id;
+    appCacheData.save();
+
+    this.playlistId = playlistId;
       index = 0;
       for(int i = 0; i < playlist.songs.length; i++) {
         var id = playlist.songs[i];
@@ -81,12 +86,11 @@ class PlayerService {
         appMethodChannel.localeCode = localeCode;
       }
 
-      await appMethodChannel.setMediaSource(song: song, playNow: true);
+      await appMethodChannel.setMediaSource(song: song, playNow: playNow);
       if(Platform.isAndroid || Platform.isIOS) {
         await appMethodChannel.syncPlaylistState();
       }
       musicDuration = await appMethodChannel.getMusicDuration();
-
   }
 
   Future<void> playPrevious(String? localeCode) async {
@@ -103,6 +107,8 @@ class PlayerService {
 
       });
       await appMethodChannel.setMediaSource(song: nowPlaying(), playNow: isPlaying);
+      appCacheData.lastPlayedSongId = playingSongId;
+      appCacheData.save();
   }
 
   Future<void> playNext(String? localeCode) async {
@@ -121,7 +127,8 @@ class PlayerService {
 
     });
       await appMethodChannel.setMediaSource(song: nowPlaying(), playNow: isPlaying);
-
+    appCacheData.lastPlayedSongId = playingSongId;
+    appCacheData.save();
   }
 
   Future<void> pauseMusicIfPlaying() async {
@@ -135,7 +142,7 @@ class PlayerService {
     }
     index = i;
     playingSongId = playlist.songs[i];
-      await appMethodChannel.setMediaSource(song: nowPlaying());
+      await appMethodChannel.setMediaSource(song: nowPlaying(), playNow: isPlaying);
       await appMethodChannel.resumeMusic();
       musicDuration = await appMethodChannel.getMusicDuration();
      appState.setState(() {});
