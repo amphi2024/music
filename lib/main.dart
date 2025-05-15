@@ -6,9 +6,12 @@ import 'package:amphi/models/app_localizations.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:music/models/app_cache.dart';
 import 'package:music/models/app_settings.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
+import 'package:music/models/music/song.dart';
+import 'package:music/models/player_service.dart';
 import 'package:music/ui/views/main_view.dart';
 import 'package:music/ui/views/wide_main_view.dart';
 
@@ -54,6 +57,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
+    appCacheData.getData();
     appStorage.initialize(() {
       appSettings.getData();
       appStorage.initMusic();
@@ -61,6 +65,20 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         initialized = true;
       });
 
+      var lastPlayedSongId = appCacheData.lastPlayedSongId;
+
+      if(lastPlayedSongId.isNotEmpty) {
+        playerService.startPlay(song: appStorage.songs.get(lastPlayedSongId), playlistId: appCacheData.lastPlayedPlaylistId, playNow: false);
+      }
+      playerService.playMode = appCacheData.playMode;
+      if(appCacheData.shuffled) {
+        playerService.toggleShuffle();
+      }
+
+      if(App.isDesktop()) {
+        playerService.volume = appCacheData.volume;
+        appMethodChannel.setVolume(playerService.volume);
+      }
       appState.setState = setState;
 
       if (appSettings.useOwnServer) {
@@ -76,7 +94,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           win.minSize = Size(500, 300);
           win.size = initialSize;
           win.alignment = Alignment.center;
-          win.title = "";
+          win.title = "Music";
           win.show();
         });
       }
