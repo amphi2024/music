@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
 import 'package:music/ui/components/album_cover.dart';
+import 'package:music/ui/components/playing/mobile_playing_queue.dart';
 import 'package:music/ui/components/playing/play_controls.dart';
 import 'package:music/ui/components/playing/playing_lyrics.dart';
+import 'package:music/ui/components/playing/playing_queue.dart';
 
 import '../../../channels/app_method_channel.dart';
 import '../../../models/app_state.dart';
@@ -117,7 +119,9 @@ class _PlayingBarState extends State<PlayingBar> {
                         child: ClipRRect(
                             borderRadius: BorderRadius.circular(10),
                             child: AlbumCover(
-                                album: playerService.nowPlaying().album))),
+                                album: playerService.nowPlaying().album)
+                        )
+                    ),
                   ),
                   Positioned(
                       left: 60,
@@ -218,79 +222,23 @@ class _PlayingBarState extends State<PlayingBar> {
 
                                   }, icon: Icon(Icons.devices, size: 30)),
                                   IconButton(onPressed: () {
-
+                                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                                      final overlay = Overlay.of(context);
+                                      overlayEntry = OverlayEntry(
+                                        builder: (context) => MobilePlayingQueue(
+                                          onRemove: () async {
+                                            await Future.delayed(const Duration(milliseconds: 500));
+                                            overlayEntry.remove();
+                                          },
+                                        ),
+                                      );
+                                      overlay.insert(overlayEntry);
+                                    });
                                   }, icon: Icon(Icons.list, size: 30))
                                 ],
                               )
                             ],
                           ),
-
-
-                          // child: Column(
-                          //   children: [
-                          //     Padding(
-                          //       padding: const EdgeInsets.only(bottom: 30),
-                          //       child: Center(
-                          //           child: SmoothPageIndicator(
-                          //             controller: pageController, count: 3,
-                          //             effect: WormEffect(
-                          //               dotColor: Theme.of(context).dividerColor,
-                          //               activeDotColor: Theme.of(context).highlightColor,
-                          //               dotHeight: 15,
-                          //               dotWidth: 15,
-                          //             ),
-                          //             onDotClicked: (index) {
-                          //               pageController.animateToPage(index, duration: Duration(milliseconds: 1000), curve: Curves.easeOutQuint);
-                          //             },
-                          //           )),
-                          //     ),
-                          //     Expanded(
-                          //       child: PageView(
-                          //         controller: pageController,
-                          //         children: [
-                          //           Padding(
-                          //             padding: const EdgeInsets.only(
-                          //                 left: 30, right: 30),
-                          //             child: PlayingLyrics(),
-                          //           ),
-                          //           Padding(padding: const EdgeInsets.only(left: 30, right: 30),
-                          //             child: PlayControls(),
-                          //           ),
-                          //           Padding(
-                          //             padding: const EdgeInsets.only(
-                          //                 left: 30, right: 30),
-                          //             child: Column(
-                          //               children: [
-                          //                 Expanded(
-                          //                     child: PlayingQueue()
-                          //                 ),
-                          //                 Padding(
-                          //                   padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-                          //                   child: Row(
-                          //                     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          //                     crossAxisAlignment: CrossAxisAlignment.center,
-                          //                     children: [
-                          //                       ElevatedButton(onPressed: () {
-                          //                         setState(() {
-                          //                           playerService.toggleShuffle();
-                          //                         });
-                          //                       }, child: ShuffleIcon()),
-                          //                       ElevatedButton(onPressed: () {
-                          //                         setState(() {
-                          //                           playerService.togglePlayMode();
-                          //                         });
-                          //                       }, child: RepeatIcon())
-                          //                     ],
-                          //                   ),
-                          //                 ),
-                          //               ],
-                          //             ),
-                          //           ),
-                          //         ],
-                          //       ),
-                          //     ),
-                          //   ],
-                          // ),
                         ),
                       ))
                 ],
