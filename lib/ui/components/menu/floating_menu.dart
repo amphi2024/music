@@ -3,14 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
-import 'package:music/models/music/album.dart';
-import 'package:music/models/music/artist.dart';
 import 'package:music/models/music/playlist.dart';
 import 'package:music/ui/components/account/account_button.dart';
+import 'package:music/ui/components/add_item_button.dart';
 import 'package:music/ui/components/menu/floating_menu_button.dart';
-import 'package:music/ui/dialogs/edit_album_dialog.dart';
-import 'package:music/ui/dialogs/edit_artist_dialog.dart';
-import 'package:music/ui/dialogs/edit_playlist_dialog.dart';
 import 'package:music/ui/views/settings_view.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -93,50 +89,7 @@ class _FloatingMenuState extends State<FloatingMenu> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   AccountButton(),
-                  PopupMenuButton(
-                    icon: Icon(Icons.add_circle_outline),
-                    itemBuilder: (context) {
-                      return [
-                        PopupMenuItem(
-                            child: Text("Song"), onTap: () async {
-                         appStorage.selectMusicFilesAndSave();
-                        }),
-                        PopupMenuItem(
-                            child: Text("Album"), onTap: () {
-                          showDialog(context: context, builder: (context) {
-                            return EditAlbumDialog(creating: true, album: Album.created(metadata: {}, artistId: "", albumCover: []), onSave: (album) {
-                              appState.setFragmentState(() {
-                                appStorage.albums[album.id] = album;
-                                appStorage.albumIdList.add(album.id);
-                                appStorage.albumIdList.sortAlbumList();
-                              });
-                            });
-                          });
-                        }),
-                        PopupMenuItem(
-                            child: Text("Artist"), onTap: () {
-                          showDialog(context: context, builder: (context) {
-                            return EditArtistDialog(artist: Artist.created({}), onSave: (artist) {
-                              appState.setFragmentState(() {
-                                appStorage.artists[artist.id] = artist;
-                                appStorage.artistIdList.add(artist.id);
-                                appStorage.artistIdList.sortArtistList();
-                              });
-                            });
-                          });
-                        }),
-                        PopupMenuItem(child: Text("Playlist"), onTap: () {
-                          showDialog(context: context, builder: (context) {
-                            return EditPlaylistDialog(onSave: (playlist) {
-                              appState.setFragmentState(() {
-                                appStorage.playlists[playlist.id] = playlist;
-                              });
-                            });
-                          });
-                        })
-                      ];
-                    },
-                  ),
+                  AddItemButton(),
                   IconButton(icon: Icon(Icons.settings), onPressed: () {
                     Navigator.push(context, CupertinoPageRoute(builder: (context) {
                       return SettingsView();
