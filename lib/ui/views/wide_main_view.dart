@@ -101,55 +101,6 @@ class _WideMainViewState extends State<WideMainView> {
                   child: Row(
                     children: [
                       Expanded(child: MoveWindow(child: FragmentTitle(title: titles[appState.fragmentIndex],))),
-                      // Expanded(
-                      //     child: MoveWindow()
-                      // ),
-                      AccountButton(),
-                      PopupMenuButton(icon: Icon(Icons.add_circle_outline),
-                          itemBuilder: (context) {
-                        return [
-                          PopupMenuItem(child: Text("Song"), onTap: () async {
-                            appStorage.selectMusicFilesAndSave();
-                          }),
-                          PopupMenuItem(
-                              child: Text("Album"), onTap: () {
-                            showDialog(context: context, builder: (context) {
-                              return EditAlbumDialog(creating: true, album: Album.created(metadata: {}, artistId: "", albumCover: []), onSave: (album) {
-                                appState.setFragmentState(() {
-  appStorage.albums[album.id] = album;
-  appStorage.albumIdList.add(album.id);
-  appStorage.albumIdList.sortAlbumList();
-                                });
-                              });
-                            });
-                          }),
-                          PopupMenuItem(
-                              child: Text("Artist"), onTap: () {
-                            showDialog(context: context, builder: (context) {
-                              return EditArtistDialog(artist: Artist.created({}), onSave: (artist) {
-                                appStorage.artists[artist.id] = artist;
-                                appStorage.artistIdList.add(artist.id);
-                                appStorage.artistIdList.sortArtistList();
-                                setState(() {
-
-                                });
-                              });
-                            });
-                          }),
-                          PopupMenuItem(child: Text("Playlist"), onTap: () {
-                            showDialog(context: context, builder: (context) {
-                              return EditPlaylistDialog(onSave: (playlist) {
-                                appState.setFragmentState(() {
-                                  appStorage.playlists[playlist.id] = playlist;
-                                });
-                              });
-                            });
-                          })
-                        ];
-                      }),
-                      IconButton(onPressed: () {
-                        showDialog(context: context, builder: (context) => SettingsDialog());
-                      }, icon: Icon(Icons.settings)),
                       MinimizeWindowButton(),
                       appWindow.isMaximized
                           ? RestoreWindowButton(

@@ -1,5 +1,13 @@
+import 'package:amphi/models/app.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
+import 'package:music/ui/components/add_item_button.dart';
+
+import '../../models/app_storage.dart';
+import '../dialogs/edit_album_dialog.dart';
+import '../dialogs/edit_artist_dialog.dart';
+import '../dialogs/settings_dialog.dart';
+import 'account/account_button.dart';
 
 class FragmentTitle extends StatelessWidget {
 
@@ -16,10 +24,10 @@ class FragmentTitle extends StatelessWidget {
     return Container(
       height: 55,
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor.withAlpha(125)
+         color: Theme.of(context).scaffoldBackgroundColor.withAlpha(125)
       ),
       child: Padding(
-        padding: const EdgeInsets.only(left: 15.0, right: 15),
+        padding: const EdgeInsets.only(left: 15.0, right: 5),
         child: Stack(
           children: [
             AnimatedAlign(
@@ -35,6 +43,27 @@ class FragmentTitle extends StatelessWidget {
                  appState.selectedSongs = null;
                 });
               }, icon: Icon(Icons.check)),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Visibility(
+                      visible: App.isDesktop() || App.isWideScreen(context),
+                      child: AccountButton()),
+                Visibility(
+                    visible: App.isDesktop() || App.isWideScreen(context),
+                    child: AddItemButton()),
+                  Visibility(
+                    visible: App.isDesktop() || App.isWideScreen(context),
+                    child: IconButton(onPressed: () {
+                      showDialog(context: context, builder: (context) => SettingsDialog());
+                    }, icon: Icon(Icons.settings)),
+                  ),
+                  IconButton(onPressed: () {}, icon: Icon(Icons.more_vert_outlined)),
+                ],
+              ),
             )
           ],
         ),
