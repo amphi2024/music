@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:music/models/music/song.dart';
 
 import '../../../models/player_service.dart';
-import '../album_cover.dart';
+import '../image/album_cover.dart';
 
 class PlayingQueueItem extends StatelessWidget {
 
@@ -39,18 +39,18 @@ class PlayingQueueItem extends StatelessWidget {
                    crossAxisAlignment: CrossAxisAlignment.start,
                    children: [
                      Text(
-                       song.title["default"] ?? "unknown",
+                       song.title.byContext(context),
                        overflow: TextOverflow.ellipsis,
                        maxLines: 1,
                        style: TextStyle(
                            fontWeight: FontWeight.bold,
-                           color: playerService.nowPlaying().id == song.id ? Theme.of(context).highlightColor : null
+                           color: playerService.nowPlaying().id == song.id ? Theme.of(context).highlightColor : Colors.white
                        ),
                      ),
                      Text(
-                       song.artist.name["default"] ?? "unknown",
+                       song.artist.name.byContext(context),
                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                           color: playerService.nowPlaying().id == song.id ? Theme.of(context).highlightColor : null
+                           color: playerService.nowPlaying().id == song.id ? Theme.of(context).highlightColor : Colors.white
                        ),
                      )
                    ],
