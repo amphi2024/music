@@ -5,7 +5,7 @@ import 'package:music/models/music/album.dart';
 import 'package:music/models/music/artist.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/ui/components/item/album_grid_item.dart';
-import 'package:music/ui/components/artist_profile_image.dart';
+import 'package:music/ui/components/image/artist_profile_image.dart';
 import 'package:music/ui/dialogs/edit_artist_dialog.dart';
 
 import '../../models/app_storage.dart';
