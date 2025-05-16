@@ -25,7 +25,7 @@ class _EditPlaylistDialogState extends State<EditPlaylistDialog> {
     return Dialog(
       child: SizedBox(
         width: 250,
-        height: 125,
+        height: 115,
         child: Column(
           children: [
             Padding(
