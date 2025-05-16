@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:music/ui/components/icon/shuffle_icon.dart';
 import 'package:music/ui/components/playing/playing_queue.dart';
+
+import '../../../channels/app_method_channel.dart';
+import '../../../models/app_cache.dart';
+import '../../../models/player_service.dart';
+import '../icon/repeat_icon.dart';
 
 class MobilePlayingQueue extends StatefulWidget {
 
@@ -53,7 +59,37 @@ class _MobilePlayingQueueState extends State<MobilePlayingQueue> {
                     .of(context)
                     .padding
                     .top, bottom: 0),
-                child: PlayingQueue(),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Icon( playerService.volume > 0.5 ? Icons.volume_up : playerService.volume > 0.1 ? Icons.volume_down : Icons.volume_mute ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: Slider(
+                                max: 1,
+                                value: playerService.volume,
+                                onChanged: (value) {
+                                  appCacheData.volume = value;
+                                  appCacheData.save();
+                                  appMethodChannel.setVolume(value);
+                                  setState(() {
+                                    playerService.volume = value;
+                                  });
+                                }),
+                          ),
+                        ),
+                        IconButton(onPressed: () {}, icon: ShuffleIcon()),
+                        IconButton(onPressed: () {}, icon: RepeatIcon()),
+                      ],
+                    ),
+                    Expanded(
+                        child: PlayingQueue()
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
