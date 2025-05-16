@@ -14,6 +14,16 @@ class AddItemButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(icon: Icon(Icons.add_circle_outline),
+        onOpened: () {
+          appState.setMainViewState(() {
+            appState.playingBarShowing = false;
+          });
+        },
+        onCanceled: () {
+      appState.setMainViewState(() {
+        appState.playingBarShowing = true;
+      });
+        },
         itemBuilder: (context) {
           return [
             PopupMenuItem(child: Text("Song"), onTap: () async {
