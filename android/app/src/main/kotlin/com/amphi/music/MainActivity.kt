@@ -112,6 +112,12 @@ class MainActivity : FlutterActivity() {
                     result.success(true)
                 }
 
+                "set_volume" -> {
+                    val volume = call.argument<Double>("volume")!!
+                    musicService?.player?.volume = volume.toFloat()
+                    result.success(true)
+                }
+
                 "resume_music" -> {
                     musicService?.player?.play()
                     musicService?.isPlaying = true
