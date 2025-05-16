@@ -111,8 +111,8 @@ class AppStorage extends AppStorageCore {
   void createMusic(String filePath) async {
     var metadata = await appMethodChannel.getMusicMetadata(filePath);
     var albumCover = await appMethodChannel.getAlbumCover(filePath);
-    print(metadata);
-    print(albumCover.length);
+    // print(metadata);
+    // print(albumCover.length);
 
     var artistName = metadata["artist"];
     Artist? artist = existingArtist(artistName);
@@ -526,11 +526,11 @@ class AppStorage extends AppStorageCore {
         song.delete(upload: false);
         break;
       case UpdateEvent.deleteSongFile:
-        var split = value.split(";");
-        if(split.length > 1) {
-          var id = split[0];
-          var song = songs.get(id);
-        }
+        // var split = value.split(";");
+        // if(split.length > 1) {
+        //   var id = split[0];
+        //   var song = songs.get(id);
+        // }
         break;
       case UpdateEvent.deleteAlbum:
         var album = albums.get(value);
