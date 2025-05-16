@@ -1,8 +1,6 @@
 import 'dart:io';
 
-import 'package:amphi/utils/path_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/music/album.dart';
 
 class AlbumCover extends StatelessWidget {
