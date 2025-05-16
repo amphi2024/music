@@ -52,7 +52,7 @@ class _SongsFragmentState extends State<SongsFragment> {
     for (int i = 0; i < appStorage.songIdList.length; i++) {
       final id = appStorage.songIdList[i];
       var song = appStorage.songs.get(id);
-      children.add(SongListItem(song: song));
+      children.add(SongListItem(song: song, playlistId: ""));
     }
     children.add(Container(
       height: 80,
