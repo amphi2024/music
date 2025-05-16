@@ -90,6 +90,7 @@ class AppTheme extends AppThemeCore {
     await super.deleteFile();
   }
 
+  @override
   Map<String, dynamic> toMap() {
     return {
       "title": title,
