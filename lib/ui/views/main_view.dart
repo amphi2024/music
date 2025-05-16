@@ -51,6 +51,7 @@ class _MainViewState extends State<MainView> {
     SongsFragment(),
     ArtistsFragment(),
     AlbumsFragment(),
+    GenresFragment(),
     GenresFragment()
   ];
 
@@ -58,7 +59,8 @@ class _MainViewState extends State<MainView> {
     "Songs",
     "Artists",
     "Albums",
-    "Genres"
+    "Genres",
+    "Archive"
   ];
 
   @override
@@ -84,7 +86,7 @@ class _MainViewState extends State<MainView> {
           });
         }
         if(appState.selectedSongs != null) {
-          setState(() {
+          appState.setState(() {
             appState.selectedSongs = null;
           });
         }
