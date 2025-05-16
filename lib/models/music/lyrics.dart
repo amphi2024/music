@@ -68,7 +68,7 @@ class Lyrics {
       }
       lines.add(LyricLine(
         startsAt: line.startsAt,
-        endsAt: nextLine?.startsAt ?? 0,
+        endsAt: nextLine?.startsAt ?? (i == lrc.lines.length - 1 ? line.startsAt + 3000 : 0),
         text: line.text
       ));
       lyrics.data[localeCode] = lines;
