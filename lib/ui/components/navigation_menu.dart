@@ -238,30 +238,29 @@ class _MenuItem extends StatelessWidget {
   }
 }
 
-class _MenuDivider extends StatelessWidget {
-
-  final String title;
-  const _MenuDivider({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Expanded(child: Divider(
-            color: Theme.of(context).dividerColor,
-          )),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8),
-            child: Text(title),
-          ),
-          Expanded(child: Divider(
-            color: Theme.of(context).dividerColor,
-          )),
-        ],
-      ),
-    );
-  }
-}
-
+// class _MenuDivider extends StatelessWidget {
+//
+//   final String title;
+//   const _MenuDivider({required this.title});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Padding(
+//       padding: const EdgeInsets.all(8.0),
+//       child: Row(
+//         children: [
+//           Expanded(child: Divider(
+//             color: Theme.of(context).dividerColor,
+//           )),
+//           Padding(
+//             padding: const EdgeInsets.only(left: 8.0, right: 8),
+//             child: Text(title),
+//           ),
+//           Expanded(child: Divider(
+//             color: Theme.of(context).dividerColor,
+//           )),
+//         ],
+//       ),
+//     );
+//   }
+// }
