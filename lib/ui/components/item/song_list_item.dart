@@ -1,3 +1,4 @@
+import 'package:amphi/models/app.dart';
 import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
@@ -6,28 +7,31 @@ import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/song.dart';
+import 'package:music/ui/components/select_playlist.dart';
 import 'package:music/ui/dialogs/edit_song_info_dialog.dart';
 
 import '../../../models/player_service.dart';
-import '../album_cover.dart';
+import '../bottom_sheet_drag_handle.dart';
+import '../image/album_cover.dart';
 
 class SongListItem extends StatelessWidget {
 
   final Song song;
-  const SongListItem({super.key, required this.song});
+  final String playlistId;
+  const SongListItem({super.key, required this.song, required this.playlistId});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onLongPress: () {
-        appState.setMainViewState(() {
-          appState.selectedSongs = [];
-        });
+        // appState.setState(() {
+        //   appState.selectedSongs = [];
+        // });
       },
       onTap: () {
         appState.setState(() {
           playerService.isPlaying = true;
-          playerService.startPlay(song: song, localeCode: Localizations.localeOf(context).languageCode, playlistId: "");
+          playerService.startPlay(song: song, localeCode: Localizations.localeOf(context).languageCode, playlistId: playlistId);
         });
       },
       child: Padding(
@@ -140,7 +144,37 @@ class SongListItem extends StatelessWidget {
                               song.removeDownload();
                             });
                           }),
-                          PopupMenuItem(child: Text("Add to Playlist")),
+                          PopupMenuItem(child: Text("Add to Playlist"), onTap: () {
+                            if(App.isDesktop() || App.isWideScreen(context)) {
+                              showDialog(context: context, builder: (context) => Dialog(
+
+                              ));
+                            }
+                            else {
+                              appState.setMainViewState(() {
+                                appState.playingBarShowing = false;
+                              });
+                              showModalBottomSheet(
+                                  context: context, builder: (context) =>
+                                  Container(
+                                height: 500,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).cardColor,
+                                  borderRadius: BorderRadius.circular(15)
+                                ),
+                                child: Column(
+                                  children: [
+                                    BottomSheetDragHandle(),
+                                    Expanded(child: SelectPlaylist(songId: song.id))
+                                  ]
+                                ),
+                              )).then((value) {
+                               appState.setMainViewState(() {
+                                 appState.playingBarShowing = true;
+                               });
+                              });
+                            }
+                          }),
                           PopupMenuItem(child: Text("Edit Info"), onTap: () {
                             showDialog(context: context, builder: (context) {
                               return EditSongInfoDialog(song: song);
