@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/album.dart';
 import 'package:music/models/music/song.dart';
-import 'package:music/ui/components/album_cover.dart';
+import 'package:music/ui/components/image/album_cover.dart';
 import 'package:music/ui/dialogs/edit_album_dialog.dart';
 
 class AlbumView extends StatefulWidget {
