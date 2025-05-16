@@ -86,7 +86,7 @@ class _MobilePlayingQueueState extends State<MobilePlayingQueue> {
                       ],
                     ),
                     Expanded(
-                        child: PlayingQueue()
+                        child: PlayingQueue(textColor: Colors.white)
                     ),
                   ],
                 ),

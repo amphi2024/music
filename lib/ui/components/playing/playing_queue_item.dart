@@ -8,7 +8,8 @@ class PlayingQueueItem extends StatelessWidget {
 
   final Song song;
   final int index;
-  const PlayingQueueItem({super.key, required this.song, required this.index});
+  final Color? textColor;
+  const PlayingQueueItem({super.key, required this.song, required this.index, this.textColor});
 
   @override
   Widget build(BuildContext context) {
@@ -44,13 +45,13 @@ class PlayingQueueItem extends StatelessWidget {
                        maxLines: 1,
                        style: TextStyle(
                            fontWeight: FontWeight.bold,
-                           color: playerService.nowPlaying().id == song.id ? Theme.of(context).highlightColor : Colors.white
+                           color: playerService.nowPlaying().id == song.id ? Theme.of(context).highlightColor : textColor
                        ),
                      ),
                      Text(
                        song.artist.name.byContext(context),
                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                           color: playerService.nowPlaying().id == song.id ? Theme.of(context).highlightColor : Colors.white
+                           color: playerService.nowPlaying().id == song.id ? Theme.of(context).highlightColor : textColor
                        ),
                      )
                    ],

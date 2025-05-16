@@ -5,7 +5,8 @@ import 'package:music/models/player_service.dart';
 import 'package:music/ui/components/playing/playing_queue_item.dart';
 
 class PlayingQueue extends StatelessWidget {
-  const PlayingQueue({super.key});
+  final Color? textColor;
+  const PlayingQueue({super.key, this.textColor});
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +19,7 @@ class PlayingQueue extends StatelessWidget {
       return PlayingQueueItem(
           song: appStorage.songs[playingQueue[index]] ?? Song(),
         index: index,
+          textColor: textColor
       );
     });
   }
