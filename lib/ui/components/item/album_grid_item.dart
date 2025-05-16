@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:music/models/music/album.dart';
 import 'package:music/models/music/song.dart';
 
-import '../album_cover.dart';
+import '../image/album_cover.dart';
 
 class AlbumGridItem extends StatelessWidget {
   final Album album;
