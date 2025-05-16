@@ -9,7 +9,6 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
-import android.util.Log
 import androidx.annotation.OptIn
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -156,7 +155,6 @@ class MusicService : Service() {
                 .setDefaultRequestProperties(
                     mapOf("Authorization" to token)
                 )
-            Log.d("heyyyyy", token)
 
             val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
                 .createMediaSource(mediaItem)
