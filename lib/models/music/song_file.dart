@@ -50,13 +50,7 @@ class SongFile {
     return result;
   }
 
-  void getData() async {
-    var infoFilename = PathUtils.basename(infoFilepath);
-    id = FilenameUtils.nameOnly(infoFilename);
-    var infoFile = File(infoFilepath);
-    var jsonData = await infoFile.readAsString();
-
-    data = jsonDecode(jsonData);
+  void initLyrics() {
     var lyricsData = data["lyrics"];
     if(lyricsData is Map<String, dynamic>) {
       lyricsData.forEach((key, value) {
@@ -90,7 +84,16 @@ class SongFile {
           text: lyricsData.toString()
       ));
     }
+  }
 
+  void getData() async {
+    var infoFilename = PathUtils.basename(infoFilepath);
+    id = FilenameUtils.nameOnly(infoFilename);
+    var infoFile = File(infoFilepath);
+    var jsonData = await infoFile.readAsString();
+
+    data = jsonDecode(jsonData);
+    initLyrics();
   }
 
   Future<void> save({bool upload = true}) async {
