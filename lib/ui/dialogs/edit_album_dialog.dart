@@ -7,7 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/music/album.dart';
 import 'package:music/models/music/song.dart';
-import 'package:music/ui/components/album_cover.dart';
+import 'package:music/ui/components/image/album_cover.dart';
 import 'package:music/ui/dialogs/select_artist_dialog.dart';
 
 import '../../channels/app_web_channel.dart';

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:music/models/app_cache.dart';
 import 'package:music/models/app_state.dart';
-import 'package:music/ui/components/repeat_icon.dart';
+import 'package:music/ui/components/icon/repeat_icon.dart';
 
 import '../../../channels/app_method_channel.dart';
 import '../../../models/player_service.dart';
 import '../../../utils/duration_converter.dart';
-import '../shuffle_icon.dart';
+import '../icon/shuffle_icon.dart';
 
 class DesktopPlayControls extends StatefulWidget {
 

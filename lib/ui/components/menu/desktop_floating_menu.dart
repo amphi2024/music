@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/ui/components/playing/desktop_playing_lyrics.dart';
-import 'package:music/ui/components/playing/playing_lyrics.dart';
 import 'package:music/ui/components/playing/playing_queue.dart';
 
 class DesktopFloatingMenu extends StatefulWidget {

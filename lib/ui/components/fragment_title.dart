@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/ui/components/add_item_button.dart';
 
-import '../../models/app_storage.dart';
-import '../dialogs/edit_album_dialog.dart';
-import '../dialogs/edit_artist_dialog.dart';
 import '../dialogs/settings_dialog.dart';
 import 'account/account_button.dart';
 
@@ -61,7 +58,7 @@ class FragmentTitle extends StatelessWidget {
                       showDialog(context: context, builder: (context) => SettingsDialog());
                     }, icon: Icon(Icons.settings)),
                   ),
-                  IconButton(onPressed: () {}, icon: Icon(Icons.more_vert_outlined)),
+                  IconButton(onPressed: () {}, icon: Icon(Icons.more_horiz_outlined)),
                 ],
               ),
             )

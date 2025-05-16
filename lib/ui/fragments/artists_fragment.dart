@@ -1,6 +1,5 @@
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/ui/components/item/artist_linear_item.dart';
 import 'package:music/ui/views/artist_view.dart';

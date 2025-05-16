@@ -7,7 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/music/artist.dart';
-import 'package:music/ui/components/artist_profile_image.dart';
+import 'package:music/ui/components/image/artist_profile_image.dart';
 
 import '../components/music_data_input.dart';
 

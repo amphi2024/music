@@ -7,6 +7,7 @@ import 'package:music/models/music/playlist.dart';
 import 'package:music/ui/components/account/account_button.dart';
 import 'package:music/ui/components/add_item_button.dart';
 import 'package:music/ui/components/menu/floating_menu_button.dart';
+import 'package:music/ui/views/playlist_view.dart';
 import 'package:music/ui/views/settings_view.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -150,7 +151,7 @@ class _Buttons extends StatelessWidget {
             label: "Archive",
             onPressed: () {
               appState.setMainViewState(() {
-                appState.fragmentIndex = 3;
+                appState.fragmentIndex = 4;
               });
             }),
       ],
@@ -180,7 +181,7 @@ class _Playlists extends StatelessWidget {
             icon: Icons.playlist_play,
             label: playlist.title,
             onPressed: () {
-
+              Navigator.push(context, CupertinoPageRoute(builder: (context) => PlaylistView(playlist: playlist)));
             });
       },
     );
