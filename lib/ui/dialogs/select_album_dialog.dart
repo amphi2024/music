@@ -4,7 +4,7 @@ import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/album.dart';
 import 'package:music/models/music/song.dart';
 
-import '../components/album_cover.dart';
+import '../components/image/album_cover.dart';
 
 class SelectAlbumDialog extends StatefulWidget {
   final String excepting;
