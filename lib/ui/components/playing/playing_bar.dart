@@ -3,11 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
-import 'package:music/ui/components/album_cover.dart';
+import 'package:music/ui/components/image/album_cover.dart';
 import 'package:music/ui/components/playing/mobile_playing_queue.dart';
 import 'package:music/ui/components/playing/play_controls.dart';
 import 'package:music/ui/components/playing/playing_lyrics.dart';
-import 'package:music/ui/components/playing/playing_queue.dart';
 
 import '../../../channels/app_method_channel.dart';
 import '../../../models/app_state.dart';
