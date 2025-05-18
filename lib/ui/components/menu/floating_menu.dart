@@ -169,7 +169,7 @@ class _Playlists extends StatelessWidget {
 
     List<Playlist> playlists = [];
     appStorage.playlists.forEach((id, playlist) {
-      if(id != "") {
+      if(id != "" && !id.contains("!ALBUM") && !id.contains("!ARTIST")) {
         playlists.add(playlist);
       }
     });
