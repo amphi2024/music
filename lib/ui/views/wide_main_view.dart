@@ -2,14 +2,21 @@
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
+import 'package:music/models/app_storage.dart';
+import 'package:music/models/fragment_index.dart';
+import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
 import 'package:music/ui/components/fragment_title.dart';
 import 'package:music/ui/components/menu/desktop_floating_menu.dart';
 import 'package:music/ui/components/navigation_menu.dart';
 import 'package:music/ui/components/playing/desktop_playing_bar.dart';
+import 'package:music/ui/fragments/archive_fragment.dart';
+import 'package:music/ui/fragments/artist_fragment.dart';
+import 'package:music/ui/fragments/desktop_playlist_fragment.dart';
 import 'package:music/ui/fragments/songs_fragment.dart';
 
 import '../../channels/app_method_channel.dart';
+import '../fragments/album_fragment.dart';
 import '../fragments/albums_fragment.dart';
 import '../fragments/artists_fragment.dart';
 import '../fragments/genres_fragment.dart';
@@ -29,24 +36,42 @@ class _WideMainViewState extends State<WideMainView> {
     });
   }
 
-  final titles = [
-    "Songs",
-    "Artists",
-    "Albums",
-    "Genres"
-  ];
-
    final List<Widget> fragments = [
     SongsFragment(),
     ArtistsFragment(),
     AlbumsFragment(),
-    GenresFragment()
+     GenresFragment(),
+     ArchiveFragment(),
+     DesktopPlaylistFragment(),
+     ArtistFragment(),
+     AlbumFragment(),
   ];
 
   @override
   void initState() {
     appState.setMainViewState = setState;
     super.initState();
+  }
+  
+  String fragmentTitle() {
+    switch(appState.fragmentIndex) {
+      case FragmentIndex.songs:
+        return "Songs";
+      case FragmentIndex.artists:
+        return "Artists";
+      case FragmentIndex.albums:
+        return "Albums";
+      case FragmentIndex.genres:
+        return "Genres";
+      case FragmentIndex.archive:
+        return "Archive";
+      case FragmentIndex.playlist:
+        return appStorage.playlists.get(appState.showingPlaylistId ?? "").title;
+      case FragmentIndex.artist:
+        return appStorage.artists.get(appState.showingArtistId ?? "").name.byContext(context);
+      default:
+        return appStorage.albums.get(appState.showingAlbumId ?? "").title.byContext(context);
+    }
   }
 
   @override
@@ -92,7 +117,7 @@ class _WideMainViewState extends State<WideMainView> {
                   height: 50,
                   child: Row(
                     children: [
-                      Expanded(child: MoveWindow(child: FragmentTitle(title: titles[appState.fragmentIndex],))),
+                      Expanded(child: MoveWindow(child: FragmentTitle(title: fragmentTitle()))),
                       MinimizeWindowButton(),
                       appWindow.isMaximized
                           ? RestoreWindowButton(
