@@ -4,6 +4,8 @@ import 'package:music/models/music/playlist.dart';
 import 'package:music/ui/components/item/song_list_item.dart';
 import 'package:music/ui/components/playlist_thumbnail.dart';
 
+import '../components/image/album_cover.dart';
+
 class PlaylistView extends StatelessWidget {
 
   final Playlist playlist;
@@ -16,7 +18,20 @@ class PlaylistView extends StatelessWidget {
     final List<Widget> children = [];
     for(var id in playlist.songs) {
       var song = appStorage.songs.get(id);
-      children.add( SongListItem(song: song, playlistId: playlist.id) );
+      var albumCover = Padding(
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        child: SizedBox(
+            width: 50,
+            height: 50,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: AlbumCover(
+                album: song.album,
+              ),
+            )
+        ),
+      );
+      children.add( SongListItem(song: song, playlistId: playlist.id, albumCover: albumCover) );
     }
     children.add(SizedBox(height: 80));
 

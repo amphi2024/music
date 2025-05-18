@@ -16,9 +16,10 @@ import '../image/album_cover.dart';
 
 class SongListItem extends StatelessWidget {
 
+  final Widget albumCover;
   final Song song;
   final String playlistId;
-  const SongListItem({super.key, required this.song, required this.playlistId});
+  const SongListItem({super.key, required this.song, required this.playlistId, required this.albumCover});
 
   @override
   Widget build(BuildContext context) {
@@ -63,20 +64,7 @@ class SongListItem extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10, right: 10),
-                      child: SizedBox(
-                          width: 50,
-                          height: 50,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: AlbumCover(
-                              album: song.album,
-
-                            ),
-                          )
-                      ),
-                    ),
+                    albumCover,
                     Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,7 +103,7 @@ class SongListItem extends StatelessWidget {
                                   var mediaFilePath = PathUtils.join(song.path, filename);
                                   appState.setFragmentState(() {
                                     song.transferring = null;
-                                    song.files[id]?.mediaFilepath = mediaFilePath;
+                                    song.files[id]!.mediaFilepath = mediaFilePath;
                                   });
                                 });
                               }
@@ -189,6 +177,9 @@ class SongListItem extends StatelessWidget {
                                 song.transferring = null;
                               });
                             });
+                          }),
+                          PopupMenuItem(child: Text("Move to Archive"), onTap: () {
+
                           }),
                           PopupMenuItem(child: Text("Delete"), onTap: () {
                             showDialog(

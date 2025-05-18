@@ -4,6 +4,8 @@ import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/ui/components/item/song_list_item.dart';
 
+import '../components/image/album_cover.dart';
+
 
 class SongsFragment extends StatefulWidget {
   const SongsFragment({super.key});
@@ -52,7 +54,20 @@ class _SongsFragmentState extends State<SongsFragment> {
     for (int i = 0; i < appStorage.songIdList.length; i++) {
       final id = appStorage.songIdList[i];
       var song = appStorage.songs.get(id);
-      children.add(SongListItem(song: song, playlistId: ""));
+      var albumCover = Padding(
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        child: SizedBox(
+            width: 50,
+            height: 50,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: AlbumCover(
+                album: song.album,
+              ),
+            )
+        ),
+      );
+      children.add(SongListItem(song: song, playlistId: "", albumCover: albumCover));
     }
     children.add(Container(
       height: 80,
