@@ -1,3 +1,4 @@
+import 'package:amphi/models/app.dart';
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -27,9 +28,16 @@ class _AlbumsFragmentState extends State<AlbumsFragment> {
   void initState() {
     appState.setFragmentState = setState;
     scrollController.addListener(() {
-      appState.setMainViewState(() {
-        appState.fragmentTitleMinimized = scrollController.offset > 60 && appState.selectedSongs == null;
-      });
+      if(scrollController.offset > 60 && appState.selectedSongs == null) {
+        appState.setMainViewState(() {
+          appState.fragmentTitleMinimized = true;
+        });
+      }
+      else {
+        appState.setMainViewState(() {
+          appState.fragmentTitleMinimized = false;
+        });
+      }
     });
     appState.requestScrollToTop = () {
       scrollController.animateTo(0, duration: Duration(milliseconds: 750), curve: Curves.easeOutQuint);
@@ -56,11 +64,20 @@ class _AlbumsFragmentState extends State<AlbumsFragment> {
       var albumWidget = AlbumGridItem(
           album: album,
           onPressed: () {
-            Navigator.push(
-                context,
-                CupertinoPageRoute(
-                  builder: (context) => AlbumView(album: album),
-                ));
+            if(App.isDesktop() || App.isWideScreen(context)) {
+              appState.setMainViewState(() {
+                appState.fragmentTitleShowing = false;
+                appState.showingAlbumId = album.id;
+                appState.fragmentIndex = 7;
+              });
+            }
+            else {
+              Navigator.push(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => AlbumView(album: album),
+                  ));
+            }
           },
         onLongPressed: () {
             showConfirmationDialog("@", () {

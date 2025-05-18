@@ -1,6 +1,8 @@
+import 'package:amphi/models/app.dart';
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:music/models/app_storage.dart';
+import 'package:music/models/fragment_index.dart';
 import 'package:music/ui/components/item/artist_linear_item.dart';
 import 'package:music/ui/views/artist_view.dart';
 
@@ -26,9 +28,16 @@ class _ArtistsFragmentState extends State<ArtistsFragment> {
   void initState() {
     appState.setFragmentState = setState;
     scrollController.addListener(() {
-      appState.setMainViewState(() {
-        appState.fragmentTitleMinimized = scrollController.offset > 60 && appState.selectedSongs == null;
-      });
+      if(scrollController.offset > 60 && appState.selectedSongs == null) {
+        appState.setMainViewState(() {
+          appState.fragmentTitleMinimized = true;
+        });
+      }
+      else {
+        appState.setMainViewState(() {
+          appState.fragmentTitleMinimized = false;
+        });
+      }
     });
     appState.requestScrollToTop = () {
       scrollController.animateTo(0, duration: Duration(milliseconds: 750), curve: Curves.easeOutQuint);
@@ -49,16 +58,25 @@ class _ArtistsFragmentState extends State<ArtistsFragment> {
       var artistWidget = ArtistLinearItem(
           artist: artist,
           onPressed: () {
-            Navigator.push(context, CupertinoPageRoute(builder: (context) => ArtistView(artist: artist)));
+            if(App.isWideScreen(context) || App.isDesktop()) {
+              appState.setMainViewState(() {
+                appState.fragmentIndex = FragmentIndex.artist;
+                appState.fragmentTitleShowing = false;
+                appState.showingArtistId = artist.id;
+              });
+            }
+            else {
+              Navigator.push(context, CupertinoPageRoute(builder: (context) => ArtistView(artist: artist)));
+            }
           },
           onLongPressed: () {
-            showConfirmationDialog("@", () {
-              artist.delete();
-              setState(() {
-                appStorage.artists.remove(artist.id);
-                appStorage.artistIdList.removeAt(i);
+              showConfirmationDialog("@", () {
+                artist.delete();
+                setState(() {
+                  appStorage.artists.remove(artist.id);
+                  appStorage.artistIdList.removeAt(i);
+                });
               });
-            });
           });
       children.add(artistWidget);
     }
