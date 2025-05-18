@@ -89,7 +89,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         doWhenWindowReady(() {
           final win = appWindow;
           const initialSize = Size(1250, 600);
-          win.minSize = Size(500, 300);
+          win.minSize = Size(550, 300);
           win.size = initialSize;
           win.alignment = Alignment.center;
           win.title = "Music";
