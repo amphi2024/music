@@ -6,6 +6,7 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_cache.dart';
 import 'package:music/models/app_state.dart';
+import 'package:music/models/fragment_index.dart';
 
 import '../../models/app_storage.dart';
 import '../../models/music/playlist.dart';
@@ -73,7 +74,8 @@ class _NavigationMenuState extends State<NavigationMenu> {
       _MenuHeader(text: "Library"),
       _MenuItem(title: "Songs", icon: Icons.music_note, onPressed: () {
         appState.setMainViewState(() {
-          appState.fragmentIndex = 0;
+          appState.fragmentTitleShowing = true;
+          appState.fragmentIndex = FragmentIndex.songs;
         });
         if(App.isDesktop()) {
           saveWindowSize();
@@ -81,7 +83,8 @@ class _NavigationMenuState extends State<NavigationMenu> {
       }),
       _MenuItem(title: "Artists", icon: Icons.people, onPressed: () {
         appState.setMainViewState(() {
-          appState.fragmentIndex = 1;
+          appState.fragmentTitleShowing = true;
+          appState.fragmentIndex = FragmentIndex.artists;
         });
         if(App.isDesktop()) {
           saveWindowSize();
@@ -89,7 +92,8 @@ class _NavigationMenuState extends State<NavigationMenu> {
       }),
       _MenuItem(title: "Albums", icon: Icons.album, onPressed: () {
         appState.setMainViewState(() {
-          appState.fragmentIndex = 2;
+          appState.fragmentTitleShowing = true;
+          appState.fragmentIndex = FragmentIndex.albums;
         });
         if(App.isDesktop()) {
           saveWindowSize();
@@ -97,7 +101,8 @@ class _NavigationMenuState extends State<NavigationMenu> {
       }),
       _MenuItem(title: "Genres", icon: Icons.music_note, onPressed: () {
         appState.setMainViewState(() {
-          appState.fragmentIndex = 3;
+          appState.fragmentTitleShowing = true;
+          appState.fragmentIndex = FragmentIndex.genres;
         });
         if(App.isDesktop()) {
           saveWindowSize();
@@ -105,7 +110,8 @@ class _NavigationMenuState extends State<NavigationMenu> {
       }),
       _MenuItem(title: "Archive", icon: Icons.archive, onPressed: () {
         appState.setMainViewState(() {
-          appState.fragmentIndex = 3;
+          appState.fragmentTitleShowing = true;
+          appState.fragmentIndex = FragmentIndex.archive;
         });
         if(App.isDesktop()) {
           saveWindowSize();
@@ -139,7 +145,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
 
     List<Playlist> playlists = [];
     appStorage.playlists.forEach((id, playlist) {
-      if(id != "") {
+      if(id != "" && !id.contains("!ALBUM") && !id.contains("!ARTIST")) {
         playlists.add(playlist);
       }
     });
@@ -147,7 +153,9 @@ class _NavigationMenuState extends State<NavigationMenu> {
     for(var playlist in playlists) {
       children.add(_MenuItem(title: playlist.title, icon: Icons.playlist_play, onPressed: () {
         appState.setMainViewState(() {
-          appState.fragmentIndex = 3;
+          appState.fragmentTitleShowing = true;
+          appState.showingPlaylistId = playlist.id;
+          appState.fragmentIndex = FragmentIndex.playlist;
         });
         if(App.isDesktop()) {
           saveWindowSize();
