@@ -6,6 +6,7 @@ import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/ui/components/fragment_title.dart';
 import 'package:music/ui/components/playing/playing_bar.dart';
+import 'package:music/ui/fragments/archive_fragment.dart';
 import 'package:music/ui/fragments/genres_fragment.dart';
 import 'package:music/ui/fragments/songs_fragment.dart';
 import 'package:music/ui/fragments/artists_fragment.dart';
@@ -52,7 +53,7 @@ class _MainViewState extends State<MainView> {
     ArtistsFragment(),
     AlbumsFragment(),
     GenresFragment(),
-    GenresFragment()
+    ArchiveFragment()
   ];
 
   var titles = [
