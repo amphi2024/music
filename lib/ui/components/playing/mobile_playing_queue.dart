@@ -64,10 +64,10 @@ class _MobilePlayingQueueState extends State<MobilePlayingQueue> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Icon( playerService.volume > 0.5 ? Icons.volume_up : playerService.volume > 0.1 ? Icons.volume_down : Icons.volume_mute ),
+                        Icon( playerService.volume > 0.5 ? Icons.volume_up : playerService.volume > 0.1 ? Icons.volume_down : Icons.volume_mute ,),
                         Expanded(
                           child: Padding(
-                            padding: const EdgeInsets.only(right: 8),
+                            padding: const EdgeInsets.only(right: 8, left: 5),
                             child: Slider(
                                 max: 1,
                                 value: playerService.volume,
@@ -81,8 +81,16 @@ class _MobilePlayingQueueState extends State<MobilePlayingQueue> {
                                 }),
                           ),
                         ),
-                        IconButton(onPressed: () {}, icon: ShuffleIcon()),
-                        IconButton(onPressed: () {}, icon: RepeatIcon()),
+                        IconButton(onPressed: () {
+                          setState(() {
+                            playerService.toggleShuffle();
+                          });
+                        }, icon: ShuffleIcon()),
+                        IconButton(onPressed: () {
+                          setState(() {
+                            playerService.togglePlayMode();
+                          });
+                        }, icon: RepeatIcon()),
                       ],
                     ),
                     Expanded(
