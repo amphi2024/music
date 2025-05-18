@@ -61,6 +61,9 @@ class Song {
   int get discNumber => data["discNumber"] ?? 0;
   set discNumber(int value) => data["discNumber"] = value;
 
+  bool get archived => data["archived"] ?? false;
+  set archived(value) => data["archived"] = value;
+
   bool availableOnOffline() {
     var available = false;
     files.forEach((id, songFile) {
