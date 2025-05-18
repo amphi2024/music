@@ -39,6 +39,7 @@ class AppStorage extends AppStorageCore {
   List<String> artistIdList = [];
   List<String> albumIdList = [];
   List<String> playlistIdList = [];
+  List<String> archiveIdList = [];
 
   @override
   void initPaths() {
@@ -147,6 +148,13 @@ class AppStorage extends AppStorageCore {
     song.transferring = true;
     songs[song.id] = song;
     songIdList.add(song.id);
+    song.files.forEach((key, songFile) {
+      appWebChannel.uploadSongFile(songId: song.id, filePath: songFile.mediaFilepath, onSuccess: () {
+        appState.setFragmentState(() {
+          song.transferring = null;
+        });
+      });
+    });
     appState.setFragmentState(() {
       songIdList.sortSongList();
       artistIdList.sortArtistList();
@@ -163,11 +171,11 @@ class AppStorage extends AppStorageCore {
             var artist = Artist.fromDirectory(file);
             artists[artist.id] = artist;
             artistIdList.add(artist.id);
-            artistIdList.sortArtistList();
           }
         }
       }
     }
+    artistIdList.sortArtistList();
   }
 
   void initAlbums() {
@@ -179,11 +187,14 @@ class AppStorage extends AppStorageCore {
             var album = Album.fromDirectory(file);
             albums[album.id] = album;
             albumIdList.add(album.id);
-            albumIdList.sortAlbumList();
+            var playlist = Playlist();
+            playlist.songs.addAll(album.songs);
+            playlists["!ALBUM,${album.id}"] = playlist;
           }
         }
       }
     }
+    albumIdList.sortAlbumList();
   }
 
   void initPlaylists() {
@@ -193,9 +204,9 @@ class AppStorage extends AppStorageCore {
         var playlist = Playlist.fromFile(file);
         playlists[playlist.id] = playlist;
         playlistIdList.add(playlist.id);
-        playlistIdList.sortPlaylistList();
       }
     }
+    playlistIdList.sortPlaylistList();
   }
 
   void updateGenres(Map<String, dynamic> genre) {
@@ -223,9 +234,13 @@ class AppStorage extends AppStorageCore {
           if (file is Directory) {
             var song = Song.fromDirectory(file);
             songs[song.id] = song;
-            songIdList.add(song.id);
+            if(song.archived) {
+              archiveIdList.add(song.id);
+            }
+            else {
+              songIdList.add(song.id);
+            }
             playlists[""]!.songs.add(song.id);
-            songIdList.sortSongList();
             playlists[""]!.songs.sortSongList();
             for(var genre in song.genre) {
               if(genre is Map<String, dynamic>) {
@@ -236,7 +251,7 @@ class AppStorage extends AppStorageCore {
         }
       }
     }
-
+    songIdList.sortSongList();
     initAlbums();
     initArtists();
     initPlaylists();
@@ -438,7 +453,15 @@ class AppStorage extends AppStorageCore {
         appWebChannel.getSongInfo(id: value, onSuccess: (info) {
           var song = songs[value];
           if(song != null) {
-            appState.setState(() {
+            if(info["archived"] == true && song.archived == false) {
+              archiveIdList.add(song.id);
+              songIdList.remove(song.id);
+            }
+            else if(info["archived"] == false && song.archived == true) {
+              archiveIdList.remove(song.id);
+              songIdList.add(song.id);
+            }
+            appState.setFragmentState(() {
               song.data = info;
             });
             song.save(upload: false);
@@ -449,8 +472,14 @@ class AppStorage extends AppStorageCore {
             song.path = PathUtils.join(songsPath, value.substring(0, 1), value);
             song.data = info;
             song.save(upload: false);
-            songIdList.add(song.id);
-            appState.setState(() {
+            songs[value] = song;
+            if(song.archived) {
+              archiveIdList.add(song.id);
+            }
+            else {
+              songIdList.add(song.id);
+            }
+            appState.setFragmentState(() {
               songIdList.sortSongList();
             });
           }
