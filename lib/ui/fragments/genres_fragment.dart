@@ -26,9 +26,16 @@ class _GenresFragmentState extends State<GenresFragment> {
   void initState() {
     appState.setFragmentState = setState;
     scrollController.addListener(() {
-      appState.setMainViewState(() {
-        appState.fragmentTitleMinimized = scrollController.offset > 60 && appState.selectedSongs == null;
-      });
+      if(scrollController.offset > 60 && appState.selectedSongs == null) {
+        appState.setMainViewState(() {
+          appState.fragmentTitleMinimized = true;
+        });
+      }
+      else {
+        appState.setMainViewState(() {
+          appState.fragmentTitleMinimized = false;
+        });
+      }
     });
     appState.requestScrollToTop = () {
       scrollController.animateTo(0, duration: Duration(milliseconds: 750), curve: Curves.easeOutQuint);
