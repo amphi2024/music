@@ -11,8 +11,12 @@ class AppState {
   bool accountButtonExpanded = false;
   bool fragmentTitleMinimized = false;
   bool floatingMenuShowing = false;
+  bool fragmentTitleShowing = true;
 
   List<String>? selectedSongs;
+  String? showingPlaylistId;
+  String? showingArtistId;
+  String? showingAlbumId;
 
   late void Function(void Function()) setState;
 
