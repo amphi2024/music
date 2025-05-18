@@ -11,6 +11,8 @@ import 'package:music/ui/views/playlist_view.dart';
 import 'package:music/ui/views/settings_view.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../../models/fragment_index.dart';
+
 class FloatingMenu extends StatefulWidget {
   final bool showing;
   final void Function() requestHide;
@@ -119,7 +121,7 @@ class _Buttons extends StatelessWidget {
             label: "Songs",
             onPressed: () {
               appState.setMainViewState(() {
-                appState.fragmentIndex = 0;
+                appState.fragmentIndex = FragmentIndex.songs;
               });
             }),
         FloatingMenuButton(
@@ -127,7 +129,7 @@ class _Buttons extends StatelessWidget {
             label: "Artists",
             onPressed: () {
               appState.setMainViewState(() {
-                appState.fragmentIndex = 1;
+                appState.fragmentIndex = FragmentIndex.artists;
               });
             }),
         FloatingMenuButton(
@@ -135,7 +137,7 @@ class _Buttons extends StatelessWidget {
             label: "Albums",
             onPressed: () {
               appState.setMainViewState(() {
-                appState.fragmentIndex = 2;
+                appState.fragmentIndex = FragmentIndex.albums;
               });
             }),
         FloatingMenuButton(
@@ -143,7 +145,7 @@ class _Buttons extends StatelessWidget {
             label: "Genres",
             onPressed: () {
               appState.setMainViewState(() {
-                appState.fragmentIndex = 3;
+                appState.fragmentIndex = FragmentIndex.genres;
               });
             }),
         FloatingMenuButton(
@@ -151,7 +153,7 @@ class _Buttons extends StatelessWidget {
             label: "Archive",
             onPressed: () {
               appState.setMainViewState(() {
-                appState.fragmentIndex = 4;
+                appState.fragmentIndex = FragmentIndex.archive;
               });
             }),
       ],
