@@ -27,19 +27,24 @@ class FragmentTitle extends StatelessWidget {
         padding: const EdgeInsets.only(left: 15.0, right: 5),
         child: Stack(
           children: [
-            AnimatedAlign(
-              alignment: appState.fragmentTitleMinimized ? Alignment.center : Alignment.centerLeft,
+            AnimatedOpacity(
+              opacity: appState.fragmentTitleShowing ? 1 : 0,
               curve: Curves.easeOutQuint,
               duration: const Duration(milliseconds: 750),
-              child: appState.selectedSongs == null ? AnimatedScale(
-                scale: appState.fragmentTitleMinimized ? scaleValue : 1,
-                  curve: Curves.easeOutQuint,
-                  duration: const Duration(milliseconds: 750),
-                  child: Text(title, style: Theme.of(context).textTheme.headlineMedium)) : IconButton(onPressed: () {
-                appState.setMainViewState(() {
-                 appState.selectedSongs = null;
-                });
-              }, icon: Icon(Icons.check)),
+              child: AnimatedAlign(
+                alignment: appState.fragmentTitleMinimized ? Alignment.center : Alignment.centerLeft,
+                curve: Curves.easeOutQuint,
+                duration: const Duration(milliseconds: 750),
+                child: appState.selectedSongs == null ? AnimatedScale(
+                  scale: appState.fragmentTitleMinimized ? scaleValue : 1,
+                    curve: Curves.easeOutQuint,
+                    duration: const Duration(milliseconds: 750),
+                    child: Text(title, style: Theme.of(context).textTheme.headlineMedium)) : IconButton(onPressed: () {
+                  appState.setMainViewState(() {
+                   appState.selectedSongs = null;
+                  });
+                }, icon: Icon(Icons.check)),
+              ),
             ),
             Align(
               alignment: Alignment.centerRight,
