@@ -12,7 +12,8 @@ import 'package:music/ui/components/navigation_menu.dart';
 import 'package:music/ui/components/playing/desktop_playing_bar.dart';
 import 'package:music/ui/fragments/archive_fragment.dart';
 import 'package:music/ui/fragments/artist_fragment.dart';
-import 'package:music/ui/fragments/desktop_playlist_fragment.dart';
+import 'package:music/ui/fragments/playlist_fragment.dart';
+import 'package:music/ui/fragments/genre_fragment.dart';
 import 'package:music/ui/fragments/songs_fragment.dart';
 
 import '../../channels/app_method_channel.dart';
@@ -42,9 +43,10 @@ class _WideMainViewState extends State<WideMainView> {
     AlbumsFragment(),
      GenresFragment(),
      ArchiveFragment(),
-     DesktopPlaylistFragment(),
+     PlaylistFragment(),
      ArtistFragment(),
      AlbumFragment(),
+     GenreFragment()
   ];
 
   @override
@@ -69,8 +71,10 @@ class _WideMainViewState extends State<WideMainView> {
         return appStorage.playlists.get(appState.showingPlaylistId ?? "").title;
       case FragmentIndex.artist:
         return appStorage.artists.get(appState.showingArtistId ?? "").name.byContext(context);
-      default:
+      case FragmentIndex.album:
         return appStorage.albums.get(appState.showingAlbumId ?? "").title.byContext(context);
+      default:
+        return appStorage.genres[appState.showingGenre ?? ""]?.byContext(context) ?? "";
     }
   }
 
