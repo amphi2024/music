@@ -171,6 +171,12 @@ class AppStorage extends AppStorageCore {
             var artist = Artist.fromDirectory(file);
             artists[artist.id] = artist;
             artistIdList.add(artist.id);
+            var playlist = Playlist();
+            for(var albumId in artist.albums) {
+              var album = albums.get(albumId);
+              playlist.songs.addAll(album.songs);
+            }
+            playlists["!ARTIST,${artist.id}"] = playlist;
           }
         }
       }
@@ -245,6 +251,9 @@ class AppStorage extends AppStorageCore {
             for(var genre in song.genre) {
               if(genre is Map<String, dynamic>) {
                 updateGenres(genre);
+                var genreName = genre["default"];
+                var playlist = playlists.putIfAbsent("!GENRE,${genreName}", () => Playlist());
+                playlist.songs.add(song.id);
               }
             }
           }
