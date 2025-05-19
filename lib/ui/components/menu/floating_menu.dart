@@ -121,6 +121,7 @@ class _Buttons extends StatelessWidget {
             label: "Songs",
             onPressed: () {
               appState.setMainViewState(() {
+                appState.fragmentTitleMinimized = false;
                 appState.fragmentIndex = FragmentIndex.songs;
               });
             }),
@@ -129,6 +130,7 @@ class _Buttons extends StatelessWidget {
             label: "Artists",
             onPressed: () {
               appState.setMainViewState(() {
+                appState.fragmentTitleMinimized = false;
                 appState.fragmentIndex = FragmentIndex.artists;
               });
             }),
@@ -137,6 +139,7 @@ class _Buttons extends StatelessWidget {
             label: "Albums",
             onPressed: () {
               appState.setMainViewState(() {
+                appState.fragmentTitleMinimized = false;
                 appState.fragmentIndex = FragmentIndex.albums;
               });
             }),
@@ -145,6 +148,7 @@ class _Buttons extends StatelessWidget {
             label: "Genres",
             onPressed: () {
               appState.setMainViewState(() {
+                appState.fragmentTitleMinimized = false;
                 appState.fragmentIndex = FragmentIndex.genres;
               });
             }),
@@ -153,6 +157,7 @@ class _Buttons extends StatelessWidget {
             label: "Archive",
             onPressed: () {
               appState.setMainViewState(() {
+                appState.fragmentTitleMinimized = false;
                 appState.fragmentIndex = FragmentIndex.archive;
               });
             }),
@@ -169,7 +174,7 @@ class _Playlists extends StatelessWidget {
 
     List<Playlist> playlists = [];
     appStorage.playlists.forEach((id, playlist) {
-      if(id != "" && !id.contains("!ALBUM") && !id.contains("!ARTIST")) {
+      if(id != "" && !id.contains("!ALBUM") && !id.contains("!ARTIST") && !id.contains("!GENRE")) {
         playlists.add(playlist);
       }
     });
