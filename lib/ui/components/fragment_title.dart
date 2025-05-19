@@ -40,7 +40,7 @@ class FragmentTitle extends StatelessWidget {
                     curve: Curves.easeOutQuint,
                     duration: const Duration(milliseconds: 750),
                     child: Text(title, style: Theme.of(context).textTheme.headlineMedium)) : IconButton(onPressed: () {
-                  appState.setMainViewState(() {
+                  appState.setState(() {
                    appState.selectedSongs = null;
                   });
                 }, icon: Icon(Icons.check)),
