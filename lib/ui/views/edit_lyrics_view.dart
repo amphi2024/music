@@ -25,7 +25,8 @@ class EditLyricsView extends StatelessWidget {
           }, icon: Icon(Icons.arrow_back_ios)),
           actions: [
             IconButton(onPressed: () async {
-              var lyrics = await Lyrics.fromSelectedFile(Localizations.localeOf(context).languageCode);
+              var lyrics = await Lyrics.fromSelectedFile("default");
+              lyricsEditingController.lyrics = lyrics;
               onChanged(lyrics);
             }, icon: Icon(Icons.import_export)),
             IconButton(onPressed: () {
