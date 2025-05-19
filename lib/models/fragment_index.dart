@@ -7,4 +7,5 @@ abstract final class FragmentIndex {
   static const playlist = 5;
   static const artist = 6;
   static const album = 7;
+  static const genre = 8;
 }
