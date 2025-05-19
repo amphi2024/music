@@ -13,8 +13,8 @@ class DarkTheme extends AppThemeData {
         super.accentColor = AppTheme.cherry,
         super.inactiveColor = AppTheme.inactiveGray,
         super.floatingButtonBackground = AppTheme.white,
-        super.floatingButtonIconColor = AppTheme.lightBlue,
-        super.checkBoxColor = AppTheme.lightBlue,
+        super.floatingButtonIconColor = AppTheme.cherry,
+        super.checkBoxColor = AppTheme.cherry,
         super.checkBoxCheckColor = AppTheme.white,
         super.errorColor = AppTheme.red
       });
