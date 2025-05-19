@@ -17,6 +17,7 @@ class AppState {
   String? showingPlaylistId;
   String? showingArtistId;
   String? showingAlbumId;
+  String? showingGenre;
 
   late void Function(void Function()) setState;
 
