@@ -12,6 +12,7 @@ import 'package:music/ui/fragments/songs_fragment.dart';
 import 'package:music/ui/fragments/artists_fragment.dart';
 import 'package:music/ui/fragments/albums_fragment.dart';
 
+import '../../models/fragment_index.dart';
 import '../components/menu/floating_menu.dart';
 
 class MainView extends StatefulWidget {
@@ -48,22 +49,35 @@ class _MainViewState extends State<MainView> {
     });
   }
 
-  var fragments = [
+  final List<Widget> fragments = [
     SongsFragment(),
     ArtistsFragment(),
     AlbumsFragment(),
     GenresFragment(),
     ArchiveFragment()
   ];
-
-  var titles = [
-    "Songs",
-    "Artists",
-    "Albums",
-    "Genres",
-    "Archive"
-  ];
-
+  String fragmentTitle() {
+    switch(appState.fragmentIndex) {
+      case FragmentIndex.songs:
+        return "Songs";
+      case FragmentIndex.artists:
+        return "Artists";
+      case FragmentIndex.albums:
+        return "Albums";
+      case FragmentIndex.genres:
+        return "Genres";
+      case FragmentIndex.archive:
+        return "Archive";
+      case FragmentIndex.playlist:
+        return appStorage.playlists.get(appState.showingPlaylistId ?? "").title;
+      case FragmentIndex.artist:
+        return appStorage.artists.get(appState.showingArtistId ?? "").name.byContext(context);
+      case FragmentIndex.album:
+        return appStorage.albums.get(appState.showingAlbumId ?? "").title.byContext(context);
+      default:
+        return appStorage.genres[appState.showingGenre ?? ""]?.byContext(context) ?? "";
+    }
+  }
   @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
@@ -152,7 +166,7 @@ class _MainViewState extends State<MainView> {
                         }
                       },
                       child: FragmentTitle(
-                        title: titles[appState.fragmentIndex],
+                        title: fragmentTitle(),
                       )
                   )),
               FloatingMenu(
