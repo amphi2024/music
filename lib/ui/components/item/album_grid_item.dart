@@ -7,9 +7,10 @@ import '../image/album_cover.dart';
 
 class AlbumGridItem extends StatelessWidget {
   final Album album;
+  final bool showArtistName;
   final void Function()? onPressed;
   final void Function()? onLongPressed;
-  const AlbumGridItem({super.key, required this.album, this.onPressed, this.onLongPressed});
+  const AlbumGridItem({super.key, required this.album, this.onPressed, this.onLongPressed, this.showArtistName = true});
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +39,11 @@ class AlbumGridItem extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
             ),
-            Text(
-                album.artist.name.byContext(context)
+            Visibility(
+              visible: showArtistName,
+              child: Text(
+                  album.artist.name.byContext(context)
+              ),
             ),
           ],
         ),

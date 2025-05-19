@@ -67,7 +67,7 @@ class ArtistView extends StatelessWidget {
           ),
           SliverGrid.builder(
               itemCount: albumList.length,
-              itemBuilder: (context, index) => AlbumGridItem(album: albumList[index], onPressed: () {
+              itemBuilder: (context, index) => AlbumGridItem(showArtistName: false, album: albumList[index], onPressed: () {
                 Navigator.push(
                     context,
                     CupertinoPageRoute(
@@ -75,7 +75,7 @@ class ArtistView extends StatelessWidget {
                     ));
               }),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-                childAspectRatio: 0.6))
+                childAspectRatio: 0.65))
         ]
       ),
     );
