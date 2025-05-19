@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:music/models/app_settings.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/fragment_index.dart';
 import 'package:music/ui/components/item/song_list_item.dart';
+import 'package:music/ui/components/track_number.dart';
 import 'package:music/ui/fragments/components/album_fragment_title.dart';
 
 class AlbumFragment extends StatefulWidget {
@@ -76,15 +76,12 @@ class _AlbumFragmentState extends State<AlbumFragment> {
     final album = appStorage.albums.get(appState.showingAlbumId ?? "");
     children.add(
       Padding(
-        padding: const EdgeInsets.only(left: 15.0, right: 15, top: 50),
+        padding: const EdgeInsets.only(left: 15.0, right: 5, top: 50),
         child: AlbumFragmentTitle(album: album),
       )
     );
     for(var songId in album.songs) {
-      var trackNumberWidget = Padding(
-        padding: const EdgeInsets.only(left: 10, right: 10),
-        child: Text(appStorage.songs.get(songId).trackNumber.toString()),
-      );
+      var trackNumberWidget = TrackNumber(trackNumber: appStorage.songs.get(songId).trackNumber);
       children.add(SongListItem(song: appStorage.songs.get(songId), playlistId: "!ALBUM,${album.id}", albumCover: trackNumberWidget));
     }
     children.add(
