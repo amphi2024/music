@@ -74,6 +74,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
       _MenuHeader(text: "Library"),
       _MenuItem(title: "Songs", icon: Icons.music_note, onPressed: () {
         appState.setMainViewState(() {
+          appState.fragmentTitleMinimized = false;
           appState.fragmentTitleShowing = true;
           appState.fragmentIndex = FragmentIndex.songs;
         });
@@ -83,6 +84,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
       }),
       _MenuItem(title: "Artists", icon: Icons.people, onPressed: () {
         appState.setMainViewState(() {
+          appState.fragmentTitleMinimized = false;
           appState.fragmentTitleShowing = true;
           appState.fragmentIndex = FragmentIndex.artists;
         });
@@ -92,6 +94,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
       }),
       _MenuItem(title: "Albums", icon: Icons.album, onPressed: () {
         appState.setMainViewState(() {
+          appState.fragmentTitleMinimized = false;
           appState.fragmentTitleShowing = true;
           appState.fragmentIndex = FragmentIndex.albums;
         });
@@ -101,6 +104,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
       }),
       _MenuItem(title: "Genres", icon: Icons.music_note, onPressed: () {
         appState.setMainViewState(() {
+          appState.fragmentTitleMinimized = false;
           appState.fragmentTitleShowing = true;
           appState.fragmentIndex = FragmentIndex.genres;
         });
@@ -110,6 +114,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
       }),
       _MenuItem(title: "Archive", icon: Icons.archive, onPressed: () {
         appState.setMainViewState(() {
+          appState.fragmentTitleMinimized = false;
           appState.fragmentTitleShowing = true;
           appState.fragmentIndex = FragmentIndex.archive;
         });
@@ -145,7 +150,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
 
     List<Playlist> playlists = [];
     appStorage.playlists.forEach((id, playlist) {
-      if(id != "" && !id.contains("!ALBUM") && !id.contains("!ARTIST")) {
+      if(id != "" && !id.contains("!ALBUM") && !id.contains("!ARTIST") && !id.contains("!GENRE")) {
         playlists.add(playlist);
       }
     });
@@ -153,6 +158,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
     for(var playlist in playlists) {
       children.add(_MenuItem(title: playlist.title, icon: Icons.playlist_play, onPressed: () {
         appState.setMainViewState(() {
+          appState.fragmentTitleMinimized = false;
           appState.fragmentTitleShowing = true;
           appState.showingPlaylistId = playlist.id;
           appState.fragmentIndex = FragmentIndex.playlist;
