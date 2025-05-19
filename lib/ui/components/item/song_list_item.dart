@@ -12,7 +12,6 @@ import 'package:music/ui/dialogs/edit_song_info_dialog.dart';
 
 import '../../../models/player_service.dart';
 import '../bottom_sheet_drag_handle.dart';
-import '../image/album_cover.dart';
 
 class SongListItem extends StatelessWidget {
 
@@ -25,9 +24,9 @@ class SongListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onLongPress: () {
-        // appState.setState(() {
-        //   appState.selectedSongs = [];
-        // });
+        appState.setState(() {
+          appState.selectedSongs = [];
+        });
       },
       onTap: () {
         appState.setState(() {
@@ -41,19 +40,24 @@ class SongListItem extends StatelessWidget {
           height: 55,
           child: Stack(
             children: [
-              AnimatedOpacity(opacity: appState.selectedSongs != null ? 1 : 0,
-                  curve: Curves.easeOutQuint, duration: Duration(milliseconds: 1000), child: Checkbox(value: appState.selectedSongs?.contains(song.id) ?? false, onChanged: (value) {
-                    if(appState.selectedSongs?.contains(song.id) == true) {
-                      appState.setMainViewState(() {
-                        appState.selectedSongs?.remove(song.id);
-                      });
-                    }
-                    else {
-                      appState.setMainViewState(() {
-                        appState.selectedSongs?.add(song.id);
-                      });
-                    }
-                }),),
+              Positioned(
+                left: 15,
+                bottom: 10,
+                child: AnimatedOpacity(opacity: appState.selectedSongs != null ? 1 : 0,
+                    curve: Curves.easeOutQuint, duration: Duration(milliseconds: 1000),
+                  child: Checkbox(value: appState.selectedSongs?.contains(song.id) ?? false, onChanged: (value) {
+                      if(appState.selectedSongs?.contains(song.id) == true) {
+                        appState.setState(() {
+                          appState.selectedSongs?.remove(song.id);
+                        });
+                      }
+                      else {
+                        appState.setState(() {
+                          appState.selectedSongs?.add(song.id);
+                        });
+                      }
+                  }),),
+              ),
               AnimatedPositioned(
                 curve: Curves.easeOutQuint,
                 duration: Duration(milliseconds: 1000),
@@ -126,7 +130,7 @@ class SongListItem extends StatelessWidget {
                     PopupMenuButton(
                       icon: Icon(Icons.more_vert),
                       itemBuilder: (context) {
-                        return [
+                        List<PopupMenuItem> list = [
                           PopupMenuItem(child: Text("Remove Download"), onTap: () {
                             appState.setFragmentState(() {
                               song.removeDownload();
@@ -135,7 +139,26 @@ class SongListItem extends StatelessWidget {
                           PopupMenuItem(child: Text("Add to Playlist"), onTap: () {
                             if(App.isDesktop() || App.isWideScreen(context)) {
                               showDialog(context: context, builder: (context) => Dialog(
-
+                                child: Container(
+                                  width: 300,
+                                  height: 400,
+                                  decoration: BoxDecoration(
+                                      color: Theme.of(context).cardColor,
+                                      borderRadius: BorderRadius.circular(15)
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: [
+                                        IconButton(onPressed: () {
+                                          Navigator.pop(context);
+                                        }, icon: Icon(Icons.cancel_outlined))
+                                      ],),
+                                      Expanded(child: SelectPlaylist(songId: song.id)),
+                                    ],
+                                  ),
+                                ),
                               ));
                             }
                             else {
@@ -181,23 +204,35 @@ class SongListItem extends StatelessWidget {
                           PopupMenuItem(child: Text("Move to Archive"), onTap: () {
 
                           }),
-                          PopupMenuItem(child: Text("Delete"), onTap: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return ConfirmationDialog(
-                                    title: "",
-                                    onConfirmed: () {
-                                      song.delete();
-                                      appState.setFragmentState(() {
-                                        appStorage.songs.remove(song.id);
-                                        appStorage.songIdList.remove(song.id);
-                                      });
-                                    },
-                                  );
-                                });
-                          }),
                         ];
+
+                        if(playlistId != "") {
+                          list.add(PopupMenuItem(child: Text("Remove From Playlist"), onTap: () {
+                            appState.setFragmentState(() {
+                              appStorage.playlists.get(playlistId).songs.remove(song.id);
+                            });
+                            appStorage.playlists.get(playlistId).save();
+                          }));
+                        }
+
+                        list.add(PopupMenuItem(child: Text("Delete"), onTap: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return ConfirmationDialog(
+                                  title: "",
+                                  onConfirmed: () {
+                                    song.delete();
+                                    appState.setFragmentState(() {
+                                      appStorage.songs.remove(song.id);
+                                      appStorage.songIdList.remove(song.id);
+                                    });
+                                  },
+                                );
+                              });
+                        }));
+
+                        return list;
                       },
                     )
                   ],
