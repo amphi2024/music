@@ -48,6 +48,10 @@ class PlayerService {
       shuffled = true;
       playlist.shuffle();
     }
+    syncPlaylistState();
+  }
+
+  void syncPlaylistState() {
     for(int i = 0 ; i < playlist.songs.length; i++) {
       if(playlist.songs[i] == playingSongId) {
         index = i; // Sync index of playing song
@@ -67,12 +71,21 @@ class PlayerService {
     }
   }
 
-  Future<void> startPlay({required Song song, String? localeCode, required String playlistId, bool playNow = true}) async {
+  Future<void> startPlay({required Song song, String? localeCode, required String playlistId, bool playNow = true, bool shuffle = false}) async {
     appCacheData.lastPlayedPlaylistId = playlistId;
     appCacheData.lastPlayedSongId = song.id;
     appCacheData.save();
 
     this.playlistId = playlistId;
+
+    if(shuffle) {
+      shuffled = true;
+      playlist.songs.shuffle();
+    }
+    else {
+      playlist.songs.sortSongList();
+    }
+
       index = 0;
       for(int i = 0; i < playlist.songs.length; i++) {
         var id = playlist.songs[i];
