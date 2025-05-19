@@ -1,5 +1,7 @@
+import 'package:amphi/models/app.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:music/models/app_storage.dart';
+import 'package:music/models/fragment_index.dart';
 import 'package:music/ui/components/item/genre_list_item.dart';
 import 'package:music/ui/views/genre_view.dart';
 
@@ -57,7 +59,16 @@ class _GenresFragmentState extends State<GenresFragment> {
 
     for(var genre in genreList) {
       var child = GenreListItem(genre: genre, onPressed: () {
-        Navigator.push(context, CupertinoPageRoute(builder: (context) => GenreView(genre: genre)));
+        if(App.isDesktop() || App.isWideScreen(context)) {
+          appState.setMainViewState(() {
+            appState.fragmentTitleShowing = false;
+            appState.showingGenre = genre["default"];
+            appState.fragmentIndex = FragmentIndex.genre;
+          });
+        }
+        else {
+          Navigator.push(context, CupertinoPageRoute(builder: (context) => GenreView(genre: genre)));
+        }
       });
       children.add(child);
     }
