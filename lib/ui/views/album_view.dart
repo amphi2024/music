@@ -3,11 +3,12 @@ import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/album.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/ui/components/image/album_cover.dart';
+import 'package:music/ui/components/item/song_list_item.dart';
+import 'package:music/ui/components/track_number.dart';
 import 'package:music/ui/dialogs/edit_album_dialog.dart';
 
 class AlbumView extends StatefulWidget {
   final Album album;
-
   const AlbumView({super.key, required this.album});
 
   @override
@@ -15,6 +16,7 @@ class AlbumView extends StatefulWidget {
 }
 
 class _AlbumViewState extends State<AlbumView> {
+
   @override
   Widget build(BuildContext context) {
     List<Song> songList = [];
@@ -24,8 +26,6 @@ class _AlbumViewState extends State<AlbumView> {
         songList.add(song);
       }
     }
-
-    var themeData = Theme.of(context);
 
     var imageSize = MediaQuery.of(context).size.width - 100;
 
@@ -45,10 +45,11 @@ class _AlbumViewState extends State<AlbumView> {
                   }));
                 },
                 child: Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.all(5.0),
                   child: Text(
                     widget.album.title.byContext(context),
-                    style: TextStyle(fontSize: 15),
+                    style: TextStyle(fontSize: 20),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
@@ -67,35 +68,29 @@ class _AlbumViewState extends State<AlbumView> {
               ),
             ),
           ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 15),
+              child: Text(
+                widget.album.artist.name.byContext(context),
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          ),
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
                 var song = songList[index];
-                return ListTile(
-                title: Text(song.title.byContext(context)),
-                leading: Text(
-                    song.trackNumber.toString(),
-                  style: TextStyle(
-                    fontSize: themeData.textTheme.bodyMedium?.fontSize,
-                    color: themeData.dividerColor
-                  ),
-                ),
-              );
+                var textWidget = TrackNumber(trackNumber: song.trackNumber);
+                return SongListItem(song: song, playlistId: "!ALBUM,${widget.album.id}", albumCover: textWidget);
               },
               childCount: songList.length,
             ),
           ),
         ],
-        // children: [
-        //   Positioned(
-        //       left: 0,
-        //       top: 0,
-        //       child: IconButton(icon: Icon(Icons.arrow_back_ios), onPressed: () {
-        //
-        //   })),
-        //
-        // ],
       ),
     );
   }
+
 }
