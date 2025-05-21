@@ -202,7 +202,19 @@ class SongListItem extends StatelessWidget {
                             });
                           }),
                           PopupMenuItem(child: Text("Move to Archive"), onTap: () {
-
+                            appStorage.songIdList.remove(song.id);
+                            appStorage.archiveIdList.add(song.id);
+                            for(int i = 0 ; i < appStorage.playlists.get("").songs.length; i++) {
+                              if(song.id == appStorage.playlists.get("").songs[i]) {
+                                appStorage.playlists.get("").songs.removeAt(i);
+                                i--;
+                                break;
+                              }
+                            }
+                            appState.setFragmentState(() {
+                              song.archived = true;
+                              song.save();
+                            });
                           }),
                         ];
 
