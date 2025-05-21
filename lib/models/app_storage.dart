@@ -155,6 +155,7 @@ class AppStorage extends AppStorageCore {
         });
       });
     });
+    playlists.get("").songs.add(song.id);
     appState.setFragmentState(() {
       songIdList.sortSongList();
       artistIdList.sortArtistList();
@@ -233,6 +234,7 @@ class AppStorage extends AppStorageCore {
 
   void initMusic() {
     playlists[""] = Playlist();
+    playlists["!ARCHIVE"] = Playlist();
     var directory = Directory(songsPath);
     for (var subDirectory in directory.listSync()) {
       if (subDirectory is Directory) {
@@ -242,12 +244,12 @@ class AppStorage extends AppStorageCore {
             songs[song.id] = song;
             if(song.archived) {
               archiveIdList.add(song.id);
+              playlists["!ARCHIVE"]!.songs.add(song.id);
             }
             else {
               songIdList.add(song.id);
+              playlists[""]!.songs.add(song.id);
             }
-            playlists[""]!.songs.add(song.id);
-            playlists[""]!.songs.sortSongList();
             for(var genre in song.genre) {
               if(genre is Map<String, dynamic>) {
                 updateGenres(genre);
@@ -260,6 +262,7 @@ class AppStorage extends AppStorageCore {
         }
       }
     }
+    playlists[""]!.songs.sortSongList();
     songIdList.sortSongList();
     initAlbums();
     initArtists();
