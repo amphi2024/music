@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:music/models/music/playlist.dart';
 
 import '../../models/app_state.dart';
 import '../../models/app_storage.dart';
@@ -55,9 +56,13 @@ class AddItemButton extends StatelessWidget {
             }),
             PopupMenuItem(child: Text("Playlist"), onTap: () {
               showDialog(context: context, builder: (context) {
-                return EditPlaylistDialog(onSave: (playlist) {
-                  appState.setFragmentState(() {
+                return EditPlaylistDialog(
+                    playlist: Playlist.created(),
+                    onSave: (playlist) {
+                  appState.setState(() {
                     appStorage.playlists[playlist.id] = playlist;
+                    appStorage.playlistIdList.add(playlist.id);
+                    appStorage.playlistIdList.sortPlaylistList();
                   });
                 });
               });
