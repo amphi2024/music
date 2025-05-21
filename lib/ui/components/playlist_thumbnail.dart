@@ -40,6 +40,18 @@ class _PlaylistThumbnailState extends State<PlaylistThumbnail> {
   Widget build(BuildContext context) {
 
     if(widget.playlist.songs.length > 3) {
+      if(indexList.isEmpty) {
+        for (int i = 0; i < 4; i++) {
+          int index = Random().nextInt(widget.playlist.songs.length);
+          if (indexList.contains(index)) {
+            i--;
+          }
+          else {
+            indexList.add(index);
+          }
+        }
+      }
+
       return GridView.builder(
         padding: EdgeInsets.zero,
         physics: NeverScrollableScrollPhysics(),
