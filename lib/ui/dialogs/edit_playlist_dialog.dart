@@ -3,8 +3,9 @@ import 'package:music/models/music/playlist.dart';
 
 class EditPlaylistDialog extends StatefulWidget {
 
+  final Playlist playlist;
   final void Function(Playlist) onSave;
-  const EditPlaylistDialog({super.key, required this.onSave});
+  const EditPlaylistDialog({super.key, required this.onSave, required this.playlist});
 
   @override
   State<EditPlaylistDialog> createState() => _EditPlaylistDialogState();
@@ -12,7 +13,7 @@ class EditPlaylistDialog extends StatefulWidget {
 
 class _EditPlaylistDialogState extends State<EditPlaylistDialog> {
 
-  final controller = TextEditingController();
+  late final controller = TextEditingController(text: widget.playlist.title);
 
   @override
   void dispose() {
@@ -49,9 +50,9 @@ class _EditPlaylistDialogState extends State<EditPlaylistDialog> {
                 IconButton(
                   icon: Icon(Icons.check),
                   onPressed: () {
-                    var playlist = Playlist.created(controller.text);
-                    playlist.save();
-                    widget.onSave(playlist);
+                    widget.playlist.title = controller.text;
+                    widget.playlist.save();
+                    widget.onSave(widget.playlist);
                     Navigator.pop(context);
                   },
                 ),
