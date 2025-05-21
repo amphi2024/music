@@ -88,10 +88,6 @@ class _MainViewState extends State<MainView> {
       appMethodChannel.setNavigationBarColor(themeData.scaffoldBackgroundColor);
     }
 
-     List<Song> songList = [];
-     appStorage.songs.forEach((key, music) {
-       songList.add(music);
-     });
     return PopScope(
       canPop: !appState.accountButtonExpanded && !appState.playingBarExpanded && !menuShowing && appState.selectedSongs == null,
       onPopInvokedWithResult: (didPop, result) {
