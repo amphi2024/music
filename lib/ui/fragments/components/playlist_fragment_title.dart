@@ -4,6 +4,7 @@ import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/playlist.dart';
 import 'package:music/models/player_service.dart';
 import 'package:music/ui/components/playlist_thumbnail.dart';
+import 'package:music/ui/dialogs/edit_playlist_dialog.dart';
 import 'package:music/ui/fragments/components/floating_button.dart';
 
 
@@ -33,7 +34,13 @@ class PlaylistFragmentTitle extends StatelessWidget {
               children: [
                 GestureDetector(
                   onLongPress: () {
+                    showDialog(context: context, builder: (context) => EditPlaylistDialog(
+                        playlist: playlist,
+                        onSave: (result) {
+                          appState.setState(() {
 
+                          });
+                        }));
                   },
                   child: Text(playlist.title, style: TextStyle(
                       fontSize: 25,
