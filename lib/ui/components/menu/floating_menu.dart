@@ -172,18 +172,12 @@ class _Playlists extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    List<Playlist> playlists = [];
-    appStorage.playlists.forEach((id, playlist) {
-      if(id != "" && !id.contains("!ALBUM") && !id.contains("!ARTIST") && !id.contains("!GENRE")) {
-        playlists.add(playlist);
-      }
-    });
-
     return ListView.builder(
       padding: EdgeInsets.zero,
-      itemCount: playlists.length,
+      itemCount: appStorage.playlistIdList.length,
       itemBuilder: (context, index) {
-        var playlist = playlists[index];
+        final id = appStorage.playlistIdList[index];
+        var playlist = appStorage.playlists.get(id);
         return  FloatingMenuButton(
             icon: Icons.playlist_play,
             label: playlist.title,
