@@ -21,12 +21,11 @@ class Playlist {
   List<dynamic> get songs => data["songs"];
   set songs(value) => data["songs"] = value;
 
-  static Playlist created(String title) {
+  static Playlist created() {
     var playlist = Playlist();
     var filename = FilenameUtils.generatedFileName(".playlist", appStorage.playlistsPath);
     playlist.path = PathUtils.join(appStorage.playlistsPath, filename);
     playlist.id = FilenameUtils.nameOnly(filename);
-    playlist.title = title;
     return playlist;
   }
 
@@ -65,5 +64,9 @@ class Playlist {
   void shuffle() {
     Random random = Random();
     songs.shuffle(random);
+  }
+
+  bool isNormalPlaylist() {
+    return id != "" && !id.startsWith("!ALBUM") && !id.startsWith("!ARTIST") && !id.startsWith("!GENRE") && id != "!ARCHIVE";
   }
 }
