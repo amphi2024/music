@@ -395,10 +395,12 @@ class AppWebChannel extends AppWebChannelCore {
       _getJson(
           url: url,
           onSuccess: (data) {
-            appStorage.songs.get(song.id).files[fileId]?.data = data;
-            appStorage.songs.get(song.id).files[fileId]?.lyrics = Lyrics();
-            appStorage.songs.get(song.id).files[fileId]?.initLyrics();
-            appStorage.songs.get(song.id).files[fileId]?.save(upload: false);
+            var songFile = song.files.putIfAbsent(fileId, () => SongFile());
+            songFile.infoFilepath = filePath;
+            songFile.data = data;
+            songFile.lyrics = Lyrics();
+            songFile.initLyrics();
+            songFile.save(upload: false);
             if (onSuccess != null) {
               onSuccess();
             }
