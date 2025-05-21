@@ -148,20 +148,17 @@ class _NavigationMenuState extends State<NavigationMenu> {
 
     //children.add(_MenuDivider(title: "Playlists"));
 
-    List<Playlist> playlists = [];
-    appStorage.playlists.forEach((id, playlist) {
-      if(id != "" && !id.contains("!ALBUM") && !id.contains("!ARTIST") && !id.contains("!GENRE")) {
-        playlists.add(playlist);
-      }
-    });
-
-    for(var playlist in playlists) {
+    for(var playlistId in appStorage.playlistIdList) {
+      var playlist = appStorage.playlists.get(playlistId);
       children.add(_MenuItem(title: playlist.title, icon: Icons.playlist_play, onPressed: () {
         appState.setMainViewState(() {
           appState.fragmentTitleMinimized = false;
           appState.fragmentTitleShowing = true;
           appState.showingPlaylistId = playlist.id;
           appState.fragmentIndex = FragmentIndex.playlist;
+        });
+        appState.setFragmentState(() {
+
         });
         if(App.isDesktop()) {
           saveWindowSize();
