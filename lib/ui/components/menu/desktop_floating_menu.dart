@@ -63,11 +63,17 @@ class _DesktopFloatingMenuState extends State<DesktopFloatingMenu> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  IconButton(onPressed: () {
+                  IconButton(
+                      onLongPress: () {
+                        setState(() {
+                          appState.autoScrollLyrics = !appState.autoScrollLyrics;
+                        });
+                      },
+                      onPressed: () {
                     setState(() {
                       index = 0;
                     });
-                  }, icon: Icon(Icons.lyrics)),
+                  }, icon: Icon(Icons.lyrics, color: appState.autoScrollLyrics ? null : Theme.of(context).disabledColor)),
                   IconButton(onPressed: () {
                     setState(() {
                       index = 1;
