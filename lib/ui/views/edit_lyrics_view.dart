@@ -5,11 +5,16 @@ import 'package:music/ui/components/lyrics_editor.dart';
 import '../../models/app_state.dart';
 import '../../models/music/lyrics.dart';
 
-class EditLyricsView extends StatelessWidget {
+class EditLyricsView extends StatefulWidget {
   final LyricsEditingController lyricsEditingController;
   final void Function(Lyrics) onChanged;
   const EditLyricsView({super.key, required this.lyricsEditingController, required this.onChanged});
 
+  @override
+  State<EditLyricsView> createState() => _EditLyricsViewState();
+}
+
+class _EditLyricsViewState extends State<EditLyricsView> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -26,11 +31,12 @@ class EditLyricsView extends StatelessWidget {
           actions: [
             IconButton(onPressed: () async {
               var lyrics = await Lyrics.fromSelectedFile("default");
-              lyricsEditingController.lyrics = lyrics;
-              onChanged(lyrics);
+
+              widget.lyricsEditingController.lyrics = lyrics;
+              widget.onChanged(lyrics);
             }, icon: Icon(Icons.import_export)),
             IconButton(onPressed: () {
-              onChanged(lyricsEditingController.lyrics);
+              widget.onChanged(widget.lyricsEditingController.lyrics);
               Navigator.pop(context);
             }, icon: Icon(Icons.check_circle_outline))
           ],
@@ -43,7 +49,7 @@ class EditLyricsView extends StatelessWidget {
               top: 0,
               bottom: 0,
               child: LyricsEditor(
-                lyricsEditingController: lyricsEditingController,
+                lyricsEditingController: widget.lyricsEditingController,
               ),
             )
           ],
