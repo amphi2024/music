@@ -288,6 +288,16 @@ class AppStorage extends AppStorageCore {
   }
 
   Future<void> syncMissingData() async {
+    songs.forEach((key, value) {
+      value.downloadMissingFiles();
+    });
+    artists.forEach((key, value) {
+      value.downloadMissingFiles();
+    });
+    albums.forEach((key, value) {
+      value.downloadMissingCovers();
+    });
+
     appWebChannel.getThemes(onSuccess: (list) {
       List<AppTheme> appThemeList = getAllThemes();
 
