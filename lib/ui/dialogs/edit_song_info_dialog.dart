@@ -1,3 +1,4 @@
+import 'package:amphi/models/app.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -10,6 +11,7 @@ import 'package:music/models/music/song_file.dart';
 import 'package:music/ui/components/edit_music_genre.dart';
 import 'package:music/ui/components/lyrics_editor.dart';
 import 'package:music/ui/components/music_data_input.dart';
+import 'package:music/ui/dialogs/edit_lyrics_dialog.dart';
 import 'package:music/ui/dialogs/select_album_dialog.dart';
 import 'package:music/ui/dialogs/select_artist_dialog.dart';
 import 'package:music/ui/views/edit_lyrics_view.dart';
@@ -161,22 +163,33 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
                       onTap: () {
-                        appState.setMainViewState(() {
-                          appState.playingBarShowing = false;
-                        });
-                        Navigator.push(context,
-                            CupertinoPageRoute(builder: (context) {
-                          lyricsEditingController.readOnly = false;
-                          return EditLyricsView(
-                              lyricsEditingController: lyricsEditingController,
-                              onChanged: (lyrics) {
-                                setState(() {
-                                  songFile.lyrics.data["default"] =
-                                      lyrics.data.get("default");
-                                });
-                                songFile.save();
-                              });
-                        }));
+                        lyricsEditingController.readOnly = false;
+                        if(App.isDesktop() || App.isWideScreen(context)) {
+                          showDialog(context: context, builder: (context) {
+                           return EditLyricsDialog(lyricsEditingController: lyricsEditingController, onChanged: (lyrics) {
+                             setState(() {
+                               songFile.lyrics.data["default"] =
+                                   lyrics.data.get("default");
+                             });
+                           });
+                          });
+                        }
+                        else {
+                          appState.setMainViewState(() {
+                            appState.playingBarShowing = false;
+                          });
+                          Navigator.push(context,
+                              CupertinoPageRoute(builder: (context) {
+                                return EditLyricsView(
+                                    lyricsEditingController: lyricsEditingController,
+                                    onChanged: (lyrics) {
+                                      setState(() {
+                                        songFile.lyrics.data["default"] =
+                                            lyrics.data.get("default");
+                                      });
+                                    });
+                              }));
+                        }
                       },
                       child: SizedBox(
                         height: 300,
@@ -248,6 +261,7 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                     song.discNumber = discNumber ?? 0;
 
                     song.save();
+                    songFile.save();
                     Navigator.pop(context);
                     appState.setState(() {
                       song.artist.refreshAlbums();
