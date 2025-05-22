@@ -2,6 +2,7 @@
 import 'dart:io';
 
 import 'package:amphi/models/app.dart';
+import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_cache.dart';
@@ -108,7 +109,19 @@ class _NavigationMenuState extends State<NavigationMenu> {
         if(App.isDesktop()) {
           saveWindowSize();
         }
-      }));
+      },
+      onLongPressed: () {
+        showDialog(context: context, builder: (context) {
+          return ConfirmationDialog(title: "", onConfirmed: () {
+            appState.setState(() {
+              playlist.delete();
+              appStorage.playlists.remove(playlist.id);
+              appStorage.playlistIdList.remove(playlist.id);
+            });
+          });
+        });
+      },
+      ));
     }
 
     return Positioned(
@@ -158,7 +171,8 @@ class _MenuItem extends StatelessWidget {
   final String title;
   final IconData icon;
   final void Function() onPressed;
-  const _MenuItem({required this.title, required this.icon, required this.onPressed});
+  final void Function()? onLongPressed;
+  const _MenuItem({required this.title, required this.icon, required this.onPressed, this.onLongPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -166,6 +180,7 @@ class _MenuItem extends StatelessWidget {
       leading: Icon(icon, color: Theme.of(context).highlightColor, size: 15,),
       title: Text(title, style: Theme.of(context).textTheme.bodyMedium,),
       onTap: onPressed,
+      onLongPress: onLongPressed,
     );
   }
 }

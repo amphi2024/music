@@ -1,4 +1,5 @@
 
+import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
@@ -180,6 +181,17 @@ class _Playlists extends StatelessWidget {
         return  FloatingMenuButton(
             icon: Icons.playlist_play,
             label: playlist.title,
+            onLongPressed: () {
+              showDialog(context: context, builder: (context) {
+                return ConfirmationDialog(title: "", onConfirmed: () {
+                  appState.setState(() {
+                    playlist.delete();
+                    appStorage.playlists.remove(playlist.id);
+                    appStorage.playlistIdList.remove(playlist.id);
+                  });
+                });
+              });
+            },
             onPressed: () {
               Navigator.push(context, CupertinoPageRoute(builder: (context) => PlaylistView(playlist: playlist)));
             });
