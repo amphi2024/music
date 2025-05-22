@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:music/models/app_state.dart';
 import 'package:music/models/music/lyrics.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
@@ -23,10 +24,12 @@ class _PlayingLyricsState extends State<PlayingLyrics> {
     var lyrics = playerService.nowPlaying().playingFile().lyrics;
     var lines = lyrics.getLinesByLocale(context);
     setState(() {
-      for(int i = 0; i < lines.length; i ++) {
-        if(lines[i].endsAt >= position && position >= lines[i].startsAt) {
-          scrollController.scrollTo(index: i, duration: Duration(milliseconds: 500), curve: Curves.easeOutQuint);
-          break;
+      if(appState.autoScrollLyrics) {
+        for (int i = 0; i < lines.length; i ++) {
+          if (lines[i].endsAt >= position && position >= lines[i].startsAt) {
+            scrollController.scrollTo(index: i, duration: Duration(milliseconds: 500), curve: Curves.easeOutQuint);
+            break;
+          }
         }
       }
     });

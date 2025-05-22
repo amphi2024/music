@@ -9,7 +9,6 @@ import 'package:music/models/app_state.dart';
 import 'package:music/models/fragment_index.dart';
 
 import '../../models/app_storage.dart';
-import '../../models/music/playlist.dart';
 
 class NavigationMenu extends StatefulWidget {
   const NavigationMenu({super.key});
@@ -28,49 +27,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
 
   @override
   Widget build(BuildContext context) {
-    //Color borderColor = Theme.of(context).textTheme.bodyMedium!.color!.withValues(alpha: 0.2);
     List<Widget> children = [
-      //_MenuDivider(title: "Library"),
-      // Padding(
-      //   padding: const EdgeInsets.all(8.0),
-      //   child: SizedBox(
-      //     height: 30,
-      //     child: TextField(
-      //       style: TextStyle(
-      //         fontSize: 12.5
-      //       ),
-      //       decoration: InputDecoration(
-      //         prefixIcon: Icon(
-      //           Icons.search,
-      //           size: 15,
-      //           color: borderColor.withValues(alpha: 0.2),
-      //         ),
-      //         contentPadding: EdgeInsets.only(left: 5, right: 5),
-      //         enabledBorder: OutlineInputBorder(
-      //           borderRadius: BorderRadius.circular(5),
-      //           borderSide: BorderSide(
-      //               color: borderColor,
-      //               style: BorderStyle.solid,
-      //               width: 1),
-      //         ),
-      //         border: OutlineInputBorder(
-      //           borderRadius: BorderRadius.circular(5),
-      //           borderSide: BorderSide(
-      //               color: borderColor,
-      //               style: BorderStyle.solid,
-      //               width: 1),
-      //         ),
-      //         focusedBorder: OutlineInputBorder(
-      //           borderRadius: BorderRadius.circular(5),
-      //           borderSide: BorderSide(
-      //               color: Theme.of(context).colorScheme.primary,
-      //               style: BorderStyle.solid,
-      //               width: 2),
-      //         ),
-      //       ),
-      //     ),
-      //   ),
-      // ),
       _MenuHeader(text: "Library"),
       _MenuItem(title: "Songs", icon: Icons.music_note, onPressed: () {
         appState.setMainViewState(() {
@@ -122,13 +79,6 @@ class _NavigationMenuState extends State<NavigationMenu> {
           saveWindowSize();
         }
       }),
-       // Padding(
-       //   padding: const EdgeInsets.only(left: 10, right: 10),
-       //   child: Divider(
-       //    color: Theme.of(context).dividerColor,
-       //    thickness: 1,
-       //         ),
-       // )
       _MenuHeader(text: "Playlists"),
     ];
 
@@ -138,15 +88,10 @@ class _NavigationMenuState extends State<NavigationMenu> {
         child: Row(
           children: [
             Expanded(child: MoveWindow()),
-            // IconButton(onPressed: () {
-            //
-            // }, icon: Icon(Icons.refresh))
           ],
         ),
       ));
     }
-
-    //children.add(_MenuDivider(title: "Playlists"));
 
     for(var playlistId in appStorage.playlistIdList) {
       var playlist = appStorage.playlists.get(playlistId);
@@ -173,7 +118,6 @@ class _NavigationMenuState extends State<NavigationMenu> {
         child: Container(
           width: 200,
           decoration: BoxDecoration(
-            //color: AppTheme.lightGray,
             color: Theme.of(context).cardColor,
             border: Border(
               right: BorderSide(
@@ -223,55 +167,5 @@ class _MenuItem extends StatelessWidget {
       title: Text(title, style: Theme.of(context).textTheme.bodyMedium,),
       onTap: onPressed,
     );
-    // return ElevatedButton(
-    //   style: ElevatedButton.styleFrom(
-    //     shape: RoundedRectangleBorder(
-    //       borderRadius: BorderRadius.zero,
-    //       side: BorderSide.none,
-    //     ),
-    //     backgroundColor: AppTheme.transparent,
-    //     shadowColor: AppTheme.transparent
-    //   ),
-    //   onPressed: onPressed,
-    //   child: Row(
-    //     children: [
-    //       Padding(
-    //         padding: const EdgeInsets.all(8.0),
-    //         child: Icon(icon),
-    //       ),
-    //       Padding(
-    //         padding: const EdgeInsets.all(8.0),
-    //         child: Text(title),
-    //       )
-    //     ],
-    //   ),
-    // );
   }
 }
-
-// class _MenuDivider extends StatelessWidget {
-//
-//   final String title;
-//   const _MenuDivider({required this.title});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.all(8.0),
-//       child: Row(
-//         children: [
-//           Expanded(child: Divider(
-//             color: Theme.of(context).dividerColor,
-//           )),
-//           Padding(
-//             padding: const EdgeInsets.only(left: 8.0, right: 8),
-//             child: Text(title),
-//           ),
-//           Expanded(child: Divider(
-//             color: Theme.of(context).dividerColor,
-//           )),
-//         ],
-//       ),
-//     );
-//   }
-// }

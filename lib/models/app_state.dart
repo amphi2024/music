@@ -12,6 +12,7 @@ class AppState {
   bool fragmentTitleMinimized = false;
   bool floatingMenuShowing = false;
   bool fragmentTitleShowing = true;
+  bool autoScrollLyrics = true;
 
   List<String>? selectedSongs;
   String? showingPlaylistId;
