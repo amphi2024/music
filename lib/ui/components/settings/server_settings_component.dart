@@ -57,8 +57,6 @@ class _ServerSettingComponentState extends State<ServerSettingComponent> {
 
   @override
   Widget build(BuildContext context) {
-    print(AppLocalizations.of(context)
-        .get("@hint_server_address"));
     return Visibility(
         visible: appSettings.useOwnServer,
         child: Padding(
