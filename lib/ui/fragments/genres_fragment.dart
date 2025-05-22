@@ -2,7 +2,6 @@ import 'package:amphi/models/app.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/fragment_index.dart';
-import 'package:music/models/music/song.dart';
 import 'package:music/ui/components/item/genre_list_item.dart';
 import 'package:music/ui/views/genre_view.dart';
 
