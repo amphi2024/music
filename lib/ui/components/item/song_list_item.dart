@@ -22,6 +22,9 @@ class SongListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    bool playing = playerService.nowPlaying().id == song.id && playerService.playlistId == playlistId;
+
     return GestureDetector(
       onLongPress: () {
         appState.setState(() {
@@ -31,7 +34,7 @@ class SongListItem extends StatelessWidget {
       onTap: () {
         appState.setState(() {
           playerService.isPlaying = true;
-          playerService.startPlay(song: song, localeCode: Localizations.localeOf(context).languageCode, playlistId: playlistId);
+          playerService.startPlay(song: song, localeCode: Localizations.localeOf(context).languageCode, playlistId: playlistId, shuffle: playerService.shuffled);
         });
       },
       child: Padding(
@@ -80,13 +83,13 @@ class SongListItem extends StatelessWidget {
                               maxLines: 1,
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: playerService.nowPlaying().id == song.id ? Theme.of(context).highlightColor : null
+                                  color: playing ? Theme.of(context).highlightColor : null
                               ),
                             ),
                             Text(
                               song.artist.name.byContext(context),
                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: playerService.nowPlaying().id == song.id ? Theme.of(context).highlightColor : null
+                                  color: playing? Theme.of(context).highlightColor : null
                               ),
                             )
                           ],
