@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/ui/components/item/song_list_item.dart';
+import 'package:music/ui/fragments/components/fragment_padding.dart';
 
 import '../components/image/album_cover.dart';
 
@@ -47,34 +48,27 @@ class _SongsFragmentState extends State<SongsFragment> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = [];
-    children.add(Container(
-      height: 50,
-    ));
-    for (int i = 0; i < appStorage.songIdList.length; i++) {
-      final id = appStorage.songIdList[i];
-      var song = appStorage.songs.get(id);
-      var albumCover = Padding(
-        padding: const EdgeInsets.only(left: 10, right: 10),
-        child: SizedBox(
-            width: 50,
-            height: 50,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: AlbumCover(
-                album: song.album,
-              ),
-            )
-        ),
-      );
-      children.add(SongListItem(song: song, playlistId: "", albumCover: albumCover));
-    }
-    children.add(Container(
-      height: 80,
-    ));
-    return ListView(
+    return ListView.builder(
+      padding: fragmentPadding(context),
       controller: scrollController,
-      children: children,
+      itemCount: appStorage.songIdList.length,
+      itemBuilder: (context, index) {
+          final id = appStorage.songIdList[index];
+          var song = appStorage.songs.get(id);
+          var albumCover = Padding(
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            child: SizedBox(
+              width: 50,
+              height: 50,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: AlbumCover(album: song.album),
+              ),
+            ),
+          );
+          return SongListItem(song: song, playlistId: "", albumCover: albumCover);
+
+      },
     );
   }
 }

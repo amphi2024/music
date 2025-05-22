@@ -2,10 +2,12 @@ import 'package:amphi/models/app.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/fragment_index.dart';
+import 'package:music/models/music/song.dart';
 import 'package:music/ui/components/item/genre_list_item.dart';
 import 'package:music/ui/views/genre_view.dart';
 
 import '../../models/app_state.dart';
+import 'components/fragment_padding.dart';
 
 class GenresFragment extends StatefulWidget {
   const GenresFragment({super.key});
@@ -16,7 +18,7 @@ class GenresFragment extends StatefulWidget {
 
 class _GenresFragmentState extends State<GenresFragment> {
 
-  var scrollController = ScrollController();
+  final scrollController = ScrollController();
 
   @override
   void dispose() {
@@ -47,39 +49,26 @@ class _GenresFragmentState extends State<GenresFragment> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = [];
-    List<Map<String, dynamic>> genreList = [];
-    appStorage.genres.forEach((key, value) {
-      genreList.add(value);
-    });
 
-    children.add(Container(
-      height: 60
-    ));
-
-    for(var genre in genreList) {
-      var child = GenreListItem(genre: genre, onPressed: () {
-        if(App.isDesktop() || App.isWideScreen(context)) {
-          appState.setMainViewState(() {
-            appState.fragmentTitleShowing = false;
-            appState.showingGenre = genre["default"];
-            appState.fragmentIndex = FragmentIndex.genre;
-          });
-        }
-        else {
-          Navigator.push(context, CupertinoPageRoute(builder: (context) => GenreView(genre: genre)));
-        }
-      });
-      children.add(child);
-    }
-
-    children.add(Container(
-        height: 80
-    ));
-
-    return ListView(
+    return ListView.builder(
+      padding: fragmentPadding(context),
       controller: scrollController,
-      children: children,
+      itemCount: appStorage.genres.length,
+      itemBuilder: (context, index) {
+        final genre = appStorage.genres.entries.elementAt(index).value;
+        return GenreListItem(genre: genre, onPressed: () {
+          if(App.isDesktop() || App.isWideScreen(context)) {
+            appState.setMainViewState(() {
+              appState.fragmentTitleShowing = false;
+              appState.showingGenre = genre["default"];
+              appState.fragmentIndex = FragmentIndex.genre;
+            });
+          }
+          else {
+            Navigator.push(context, CupertinoPageRoute(builder: (context) => GenreView(genre: genre)));
+          }
+        });
+      },
     );
   }
 }

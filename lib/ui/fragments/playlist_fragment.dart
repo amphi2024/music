@@ -4,6 +4,7 @@ import '../../models/app_state.dart';
 import '../../models/app_storage.dart';
 import '../components/image/album_cover.dart';
 import '../components/item/song_list_item.dart';
+import 'components/fragment_padding.dart';
 
 class PlaylistFragment extends StatefulWidget {
   const PlaylistFragment({super.key});
@@ -47,37 +48,37 @@ class _PlaylistFragmentState extends State<PlaylistFragment> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = [];
     final playlist = appStorage.playlists.get(appState.showingPlaylistId ?? "");
-    children.add(
-        Padding(
-          padding: const EdgeInsets.only(left: 15.0, right: 5, top: 50),
-          child: PlaylistFragmentTitle(playlist: playlist)
-        )
-    );
-    for(var songId in playlist.songs) {
-      var song = appStorage.songs.get(songId);
-      var albumCover = Padding(
-        padding: const EdgeInsets.only(left: 10, right: 10),
-        child: SizedBox(
-            width: 50,
-            height: 50,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: AlbumCover(
-                album: song.album,
-              ),
-            )),
-      );
-      children.add(SongListItem(song: appStorage.songs.get(songId), playlistId: playlist.id, albumCover: albumCover));
-    }
-    children.add(
-        SizedBox(height: 80,)
-    );
 
-    return ListView(
+    return ListView.builder(
+      padding: fragmentPadding(context),
       controller: scrollController,
-      children: children,
+      itemCount: playlist.songs.length + 1,
+      itemBuilder: (context, index) {
+        if(index == 0) {
+          return Padding(
+              padding: const EdgeInsets.only(left: 15.0, right: 5),
+              child: PlaylistFragmentTitle(playlist: playlist)
+          );
+        }
+        else {
+          var songId = playlist.songs[index - 1];
+          var song = appStorage.songs.get(songId);
+          var albumCover = Padding(
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            child: SizedBox(
+                width: 50,
+                height: 50,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: AlbumCover(
+                    album: song.album,
+                  ),
+                )),
+          );
+          return SongListItem(song: appStorage.songs.get(songId), playlistId: playlist.id, albumCover: albumCover);
+        }
+      },
     );
   }
 }

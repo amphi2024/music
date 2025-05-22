@@ -8,6 +8,7 @@ import '../../models/fragment_index.dart';
 import '../../models/music/song.dart';
 import '../components/image/album_cover.dart';
 import '../components/item/song_list_item.dart';
+import 'components/fragment_padding.dart';
 
 class GenreFragment extends StatefulWidget {
   const GenreFragment({super.key});
@@ -85,77 +86,70 @@ class _GenreFragmentState extends State<GenreFragment> {
       }
     });
 
-    List<Widget> children = [];
-    children.add(Container(
-      height: 50,
-    ));
-
-    children.add(
-      Padding(
-        padding: const EdgeInsets.only(left: 15.0, bottom: 5),
-        child: Text(genre.byContext(context), style: TextStyle(
-          fontSize: 30,
-          fontWeight: FontWeight.bold
-        ),),
-      )
-    );
-
-    children.add(
-      Row(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(left: 15, bottom: 15),
-            child: FloatingButton(icon: Icons.play_arrow, onPressed: () {
-              appState.setState(() {
-                var song = songList.firstOrNull;
-                if(song != null) {
-                  playerService.isPlaying = true;
-                  playerService.shuffled = false;
-                  playerService.startPlay(song: song, playlistId: playlistId);
-                }
-              });
-            }),
-          ),
-          Padding(
-              padding: EdgeInsets.only(left: 15, bottom: 15),
-              child: FloatingButton(
-                  icon: Icons.shuffle,
-                  onPressed: () {
-                    appState.setState(() {
-                      var song = songList.firstOrNull;
-                      if(song != null) {
-                        playerService.isPlaying = true;
-                        playerService.startPlay(song: song, playlistId: playlistId, shuffle: true);
-                      }
-                    });
-          }))
-        ],
-      )
-    );
-
-    for (int i = 0; i < songList.length; i++) {
-      var song = songList[i];
-      var albumCover = Padding(
-        padding: const EdgeInsets.only(left: 10, right: 10),
-        child: SizedBox(
-            width: 50,
-            height: 50,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: AlbumCover(
-                album: song.album,
-              ),
-            )
-        ),
-      );
-      children.add(SongListItem(song: song, playlistId: playlistId, albumCover: albumCover));
-    }
-    children.add(Container(
-      height: 80,
-    ));
-    return ListView(
+    return ListView.builder(
+      padding: fragmentPadding(context),
       controller: scrollController,
-      children: children,
+      itemCount: songList.length + 2,
+      itemBuilder: (context, index) {
+        if(index == 0) {
+          return Padding(
+            padding: const EdgeInsets.only(left: 15.0, bottom: 5),
+            child: Text(genre.byContext(context), style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold
+            ),),
+          );
+        }
+        else if(index == 1) {
+          return Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 15, bottom: 15),
+                child: FloatingButton(icon: Icons.play_arrow, onPressed: () {
+                  appState.setState(() {
+                    var song = songList.firstOrNull;
+                    if(song != null) {
+                      playerService.isPlaying = true;
+                      playerService.shuffled = false;
+                      playerService.startPlay(song: song, playlistId: playlistId);
+                    }
+                  });
+                }),
+              ),
+              Padding(
+                  padding: const EdgeInsets.only(left: 15, bottom: 15),
+                  child: FloatingButton(
+                      icon: Icons.shuffle,
+                      onPressed: () {
+                        appState.setState(() {
+                          var song = songList.firstOrNull;
+                          if(song != null) {
+                            playerService.isPlaying = true;
+                            playerService.startPlay(song: song, playlistId: playlistId, shuffle: true);
+                          }
+                        });
+                      }))
+            ],
+          );
+        }
+        else {
+          var song = songList[index - 2];
+          var albumCover = Padding(
+            padding: const EdgeInsets.only(left: 10, right: 10),
+            child: SizedBox(
+                width: 50,
+                height: 50,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: AlbumCover(
+                    album: song.album,
+                  ),
+                )
+            ),
+          );
+          return SongListItem(song: song, playlistId: playlistId, albumCover: albumCover);
+        }
+      },
     );
   }
 }

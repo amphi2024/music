@@ -7,6 +7,7 @@ import 'package:music/ui/components/item/album_grid_item.dart';
 import '../../models/app_state.dart';
 import '../../models/app_storage.dart';
 import '../views/album_view.dart';
+import 'components/fragment_padding.dart';
 
 class AlbumsFragment extends StatefulWidget {
   const AlbumsFragment({super.key});
@@ -47,61 +48,46 @@ class _AlbumsFragmentState extends State<AlbumsFragment> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = [];
-
     int axisCount = (MediaQuery.of(context).size.width / 250).toInt();
     if (axisCount < 2) {
       axisCount = 2;
     }
-    for (int i = 0; i < axisCount; i++) {
-      children.add(Container(
-        height: 60,
-      ));
-    }
-    for (int i = 0; i < appStorage.albumIdList.length; i++) {
-      String id = appStorage.albumIdList[i];
-      var album = appStorage.albums.get(id);
-      var albumWidget = AlbumGridItem(
-          album: album,
-          onPressed: () {
-            if(App.isDesktop() || App.isWideScreen(context)) {
-              appState.setMainViewState(() {
-                appState.fragmentTitleShowing = false;
-                appState.showingAlbumId = album.id;
-                appState.fragmentIndex = 7;
-              });
-            }
-            else {
-              Navigator.push(
-                  context,
-                  CupertinoPageRoute(
-                    builder: (context) => AlbumView(album: album),
-                  ));
-            }
-          },
-        onLongPressed: () {
-            showConfirmationDialog("@", () {
-              setState(() {
-                album.delete();
-                appStorage.albums.remove(id);
-                appStorage.albumIdList.removeAt(i);
-                i--;
-              });
-            });
-        },
-      );
-      children.add(albumWidget);
-    }
-
-    for (int i = 0; i < axisCount; i++) {
-      children.add(Container(
-        height: 80,
-      ));
-    }
-    return MasonryGridView(
+    return MasonryGridView.builder(
       controller: scrollController,
-      gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(crossAxisCount: axisCount),
-      children: children,
-    );
+      padding: fragmentPadding(context),
+        gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(crossAxisCount: axisCount),
+        itemCount: appStorage.albumIdList.length,
+        itemBuilder: (context, index) {
+              String id = appStorage.albumIdList[index];
+              var album = appStorage.albums.get(id);
+            return AlbumGridItem(
+                      album: album,
+                      onPressed: () {
+                        if(App.isDesktop() || App.isWideScreen(context)) {
+                          appState.setMainViewState(() {
+                            appState.fragmentTitleShowing = false;
+                            appState.showingAlbumId = album.id;
+                            appState.fragmentIndex = 7;
+                          });
+                        }
+                        else {
+                          Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (context) => AlbumView(album: album),
+                              ));
+                        }
+                      },
+                    onLongPressed: () {
+                        showConfirmationDialog("@", () {
+                          setState(() {
+                            album.delete();
+                            appStorage.albums.remove(id);
+                            appStorage.albumIdList.remove(id);
+                          });
+                        });
+                    },
+                  );
+    });
   }
 }

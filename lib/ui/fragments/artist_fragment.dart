@@ -10,6 +10,7 @@ import '../../models/app_storage.dart';
 import '../../models/fragment_index.dart';
 import '../components/image/album_cover.dart';
 import '../components/item/song_list_item.dart';
+import 'components/fragment_padding.dart';
 
 class ArtistFragment extends StatefulWidget {
   const ArtistFragment({super.key});
@@ -76,127 +77,131 @@ class _ArtistFragmentState extends State<ArtistFragment> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = [];
     final artist = appStorage.artists.get(appState.showingArtistId ?? "");
-    
-    children.add(
-      Padding(
-        padding: const EdgeInsets.only(top: 50.0, bottom: 15),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 250,
-              height: 250,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(200),
-                child: ArtistProfileImage(artist: artist),
-              ),
-            ),
-          ],
-        ),
-      )
-    );
-
-    children.add(
-      GestureDetector(
-        onLongPress: () {
-          showDialog(context: context, builder: (context) => EditArtistDialog(artist: artist, onSave: (artist) {
-            appState.setFragmentState(() {
-
-            });
-          }));
-        },
-        child: Text(artist.name.byContext(context), textAlign: TextAlign.center, style: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold
-        ),),
-      )
-    );
-
     final String playlistId = "!ARTIST,${artist.id}";
 
-    children.add(
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          FloatingButton(icon: Icons.play_arrow, onPressed: () {
-            var albumId = artist.albums.firstOrNull;
-            if(albumId != null) {
-              var songId = appStorage.albums.get(albumId).songs.firstOrNull;
-              if(songId != null) {
-                appState.setState(() {
-                  playerService.isPlaying = true;
-                  playerService.shuffled = false;
-                  playerService.startPlay(song: appStorage.songs.get(songId), playlistId: playlistId);
-                });
-              }
-            }
-          }),
-          Padding(
-            padding: const EdgeInsets.only(left: 15.0),
-            child: FloatingButton(icon: Icons.shuffle, onPressed: () {
-              var albumId = artist.albums.firstOrNull;
-              if(albumId != null) {
-                var songId = appStorage.albums.get(albumId).songs.firstOrNull;
-                if(songId != null) {
-                  appState.setState(() {
-                    playerService.isPlaying = true;
-                    playerService.startPlay(song: appStorage.songs.get(songId), playlistId: playlistId, shuffle: true);
-                  });
-                }
-              }
-            }),
-          ),
-        ],
-      )
-    );
-    
-    for(var albumId in artist.albums) {
-      final album = appStorage.albums.get(albumId);
-      children.add(
-          Padding(
-            padding: const EdgeInsets.only(left: 20.0, top: 30),
+    return ListView.builder(
+      padding: fragmentPadding(context),
+      controller: scrollController,
+      itemCount: artist.albums.length + 3,
+      itemBuilder: (context, index) {
+        if(index == 0) {
+          return  Padding(
+            padding: const EdgeInsets.only(top: 50.0, bottom: 15),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
-                  width: 150,
-                  height: 150,
+                  width: 250,
+                  height: 250,
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: AlbumCover(album: album),
+                    borderRadius: BorderRadius.circular(200),
+                    child: ArtistProfileImage(artist: artist),
                   ),
                 ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 15.0),
-                    child: Text(album.title.byContext(context), style: TextStyle(
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold
-                    )),
-                  ),
-                )
               ],
             ),
-          )
-      );
-      for(var songId in album.songs) {
-        var trackNumberWidget = Padding(
-          padding: const EdgeInsets.only(left: 30, right: 20),
-          child: Text(appStorage.songs.get(songId).trackNumber.toString()),
-        );
-        children.add(SongListItem(song: appStorage.songs.get(songId), playlistId: playlistId, albumCover: trackNumberWidget));
-      }
-    }
-    children.add(
-        SizedBox(height: 80,)
-    );
+          );
+        }
+        else if(index == 1) {
+          return GestureDetector(
+            onLongPress: () {
+              showDialog(context: context, builder: (context) => EditArtistDialog(artist: artist, onSave: (artist) {
+                appState.setFragmentState(() {
 
-    return ListView(
-      controller: scrollController,
-      children: children,
+                });
+              }));
+            },
+            child: Text(artist.name.byContext(context), textAlign: TextAlign.center, style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold
+            ),),
+          );
+        }
+        else if(index == 2) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              FloatingButton(icon: Icons.play_arrow, onPressed: () {
+                var albumId = artist.albums.firstOrNull;
+                if(albumId != null) {
+                  var songId = appStorage.albums.get(albumId).songs.firstOrNull;
+                  if(songId != null) {
+                    appState.setState(() {
+                      playerService.isPlaying = true;
+                      playerService.shuffled = false;
+                      playerService.startPlay(song: appStorage.songs.get(songId), playlistId: playlistId);
+                    });
+                  }
+                }
+              }),
+              Padding(
+                padding: const EdgeInsets.only(left: 15.0),
+                child: FloatingButton(icon: Icons.shuffle, onPressed: () {
+                  var albumId = artist.albums.firstOrNull;
+                  if(albumId != null) {
+                    var songId = appStorage.albums.get(albumId).songs.firstOrNull;
+                    if(songId != null) {
+                      appState.setState(() {
+                        playerService.isPlaying = true;
+                        playerService.startPlay(song: appStorage.songs.get(songId), playlistId: playlistId, shuffle: true);
+                      });
+                    }
+                  }
+                }),
+              ),
+            ],
+          );
+        }
+        else {
+          final albumId = artist.albums[index - 3];
+          final album = appStorage.albums.get(albumId);
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 20.0, top: 30),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 150,
+                      height: 150,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: AlbumCover(album: album),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 15.0),
+                        child: Text(
+                          album.title.byContext(context),
+                          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ...album.songs.map((songId) {
+                final song = appStorage.songs.get(songId);
+                final trackNumberWidget = Padding(
+                  padding: const EdgeInsets.only(left: 30, right: 20),
+                  child: Text(song.trackNumber.toString()),
+                );
+                return SongListItem(
+                  song: song,
+                  playlistId: playlistId,
+                  albumCover: trackNumberWidget,
+                );
+              }).toList(),
+            ],
+          );
+        }
+      },
     );
   }
 }

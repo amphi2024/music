@@ -7,6 +7,7 @@ import 'package:music/ui/components/item/artist_linear_item.dart';
 import 'package:music/ui/views/artist_view.dart';
 
 import '../../models/app_state.dart';
+import 'components/fragment_padding.dart';
 
 class ArtistsFragment extends StatefulWidget {
   const ArtistsFragment({super.key});
@@ -47,46 +48,37 @@ class _ArtistsFragmentState extends State<ArtistsFragment> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = [];
-
-    children.add(Container(
-      height: 60,
-    ));
-    for (int i = 0; i < appStorage.artistIdList.length; i++) {
-      var id = appStorage.artistIdList[i];
-      var artist = appStorage.artists.get(id);
-      var artistWidget = ArtistLinearItem(
-          artist: artist,
-          onPressed: () {
-            if(App.isWideScreen(context) || App.isDesktop()) {
-              appState.setMainViewState(() {
-                appState.fragmentIndex = FragmentIndex.artist;
-                appState.fragmentTitleShowing = false;
-                appState.showingArtistId = artist.id;
-              });
-            }
-            else {
-              Navigator.push(context, CupertinoPageRoute(builder: (context) => ArtistView(artist: artist)));
-            }
-          },
-          onLongPressed: () {
-              showConfirmationDialog("@", () {
-                artist.delete();
-                setState(() {
-                  appStorage.artists.remove(artist.id);
-                  appStorage.artistIdList.removeAt(i);
-                });
-              });
-          });
-      children.add(artistWidget);
-    }
-
-    children.add(Container(
-      height: 80,
-    ));
-    return ListView(
+    return ListView.builder(
+      padding: fragmentPadding(context),
       controller: scrollController,
-      children: children,
+      itemCount: appStorage.artistIdList.length,
+      itemBuilder: (context, index) {
+            var id = appStorage.artistIdList[index];
+            var artist = appStorage.artists.get(id);
+            return ArtistLinearItem(
+                artist: artist,
+                onPressed: () {
+                  if(App.isWideScreen(context) || App.isDesktop()) {
+                    appState.setMainViewState(() {
+                      appState.fragmentIndex = FragmentIndex.artist;
+                      appState.fragmentTitleShowing = false;
+                      appState.showingArtistId = artist.id;
+                    });
+                  }
+                  else {
+                    Navigator.push(context, CupertinoPageRoute(builder: (context) => ArtistView(artist: artist)));
+                  }
+                },
+                onLongPressed: () {
+                    showConfirmationDialog("@", () {
+                      artist.delete();
+                      setState(() {
+                        appStorage.artists.remove(artist.id);
+                        appStorage.artistIdList.remove(artist.id);
+                      });
+                    });
+                });
+      },
     );
   }
 }

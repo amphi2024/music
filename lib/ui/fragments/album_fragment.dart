@@ -5,6 +5,7 @@ import 'package:music/models/fragment_index.dart';
 import 'package:music/ui/components/item/song_list_item.dart';
 import 'package:music/ui/components/track_number.dart';
 import 'package:music/ui/fragments/components/album_fragment_title.dart';
+import 'package:music/ui/fragments/components/fragment_padding.dart';
 
 class AlbumFragment extends StatefulWidget {
   const AlbumFragment({super.key});
@@ -88,9 +89,23 @@ class _AlbumFragmentState extends State<AlbumFragment> {
       SizedBox(height: 80,)
     );
 
-    return ListView(
+    return ListView.builder(
+      padding: fragmentPadding(context),
       controller: scrollController,
-      children: children,
+      itemCount: album.songs.length + 1,
+      itemBuilder: (context, index) {
+        if(index == 0) {
+          return Padding(
+            padding: const EdgeInsets.only(left: 15.0, right: 5, top: 50),
+            child: AlbumFragmentTitle(album: album),
+          );
+        }
+        else {
+          final songId = album.songs[index - 1];
+          var trackNumberWidget = TrackNumber(trackNumber: appStorage.songs.get(songId).trackNumber);
+          return SongListItem(song: appStorage.songs.get(songId), playlistId: "!ALBUM,${album.id}", albumCover: trackNumberWidget);
+        }
+      },
     );
   }
 }
