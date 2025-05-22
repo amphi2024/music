@@ -21,6 +21,8 @@ class Playlist {
   List<dynamic> get songs => data["songs"];
   set songs(value) => data["songs"] = value;
 
+  List<int> thumbnailData = [];
+
   static Playlist created() {
     var playlist = Playlist();
     var filename = FilenameUtils.generatedFileName(".playlist", appStorage.playlistsPath);
@@ -35,6 +37,18 @@ class Playlist {
       playlist.id = FilenameUtils.nameOnly(PathUtils.basename(file.path));
       playlist.path = file.path;
       playlist.data = jsonDecode(file.readAsStringSync());
+
+      if(playlist.songs.length > 3) {
+        for (int i = 0; i < 4; i++) {
+          int index = Random().nextInt(playlist.songs.length);
+          if (playlist.thumbnailData.contains(index)) {
+            i--;
+          }
+          else {
+            playlist.thumbnailData.add(index);
+          }
+        }
+      }
       return playlist;
     }
     catch(e) {
