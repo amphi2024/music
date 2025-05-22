@@ -216,7 +216,7 @@ class _PlayingBarState extends State<PlayingBar> {
                                       );
                                       overlay.insert(overlayEntry);
                                     });
-                                  }, icon: Icon(Icons.lyrics, size: 30)),
+                                  }, icon: Icon(Icons.lyrics, size: 30, color: appState.autoScrollLyrics ? null : Theme.of(context).disabledColor)),
                                   IconButton(onPressed: () {
 
                                   }, icon: Icon(Icons.devices, size: 30)),
