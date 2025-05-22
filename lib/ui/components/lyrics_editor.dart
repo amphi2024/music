@@ -1,3 +1,4 @@
+import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/lyrics_editing_controller.dart';
 import 'package:music/models/music/lyrics.dart';
@@ -21,6 +22,9 @@ class _LyricsEditorState extends State<LyricsEditor> {
 
   @override
   void initState() {
+    if(widget.lyricsEditingController.lyrics.data.get("default").isEmpty && !widget.lyricsEditingController.readOnly) {
+      widget.lyricsEditingController.lyrics.data.get("default").add(LyricLine());
+    }
     super.initState();
   }
 
@@ -79,9 +83,18 @@ class _LyricsEditorState extends State<LyricsEditor> {
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: const Icon(Icons.drag_handle),
+                    GestureDetector(
+                      onLongPress: () {
+                        showDialog(context: context, builder: (context) => ConfirmationDialog(title: "", onConfirmed: () {
+                          setState(() {
+                            widget.lyricsEditingController.lyrics.data.get("default").removeAt(index);
+                          });
+                        }));
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: const Icon(Icons.drag_handle),
+                      ),
                     ),
                   ],
                 ),
