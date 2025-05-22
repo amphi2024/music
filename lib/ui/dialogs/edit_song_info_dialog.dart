@@ -41,7 +41,6 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
   Widget build(BuildContext context) {
     final langCode = Localizations.localeOf(context).languageCode;
     var songFile = song.files.entries.firstOrNull?.value ?? SongFile();
-    print(songFile.mediaFilepath);
     var lyricsEditingController = LyricsEditingController(
         lyrics: songFile.lyrics,
         readOnly: true,
