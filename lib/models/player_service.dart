@@ -42,7 +42,7 @@ class PlayerService {
   void toggleShuffle() {
     if(shuffled) {
       shuffled = false;
-      playlist.songs.sortSongList();
+      playlist.songs.sortSongList(appCacheData.sortOption(playlistId));
     }
     else {
       shuffled = true;
@@ -83,7 +83,7 @@ class PlayerService {
       playlist.songs.shuffle();
     }
     else {
-      playlist.songs.sortSongList();
+      playlist.songs.sortSongList(appCacheData.sortOption(playlistId));
     }
 
       index = 0;

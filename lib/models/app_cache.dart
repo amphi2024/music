@@ -1,4 +1,5 @@
 import 'package:amphi/models/app_cache_data_core.dart';
+import 'package:music/models/sort_option.dart';
 
 final appCacheData = AppCacheData.getInstance();
 
@@ -23,5 +24,31 @@ class AppCacheData extends AppCacheDataCore {
 
     set volume(value) => data["volume"] = value;
     double get volume => data["volume"] ?? 0.5;
+
+    String sortOption(String playlistId) {
+        if(data["sortOption"][selectedDirectory] is Map && selectedDirectory!.isNotEmpty) {
+            var option = data["sortOption"][selectedDirectory][playlistId];
+            if(option is String) {
+                return option;
+            }
+            else {
+                return SortOption.title;
+            }
+        }
+        else {
+            data["sortOption"] = <String, dynamic>{};
+            return SortOption.title;
+        }
+    }
+
+    void setSortOption({required String sortOption, required String playlistId}) {
+        if(data["sortOption"] is! Map) {
+            data["sortOption"] = {};
+        }
+        if(data["sortOption"][selectedDirectory] is! Map) {
+            data["sortOption"][selectedDirectory] = {};
+        }
+        data["sortOption"][selectedDirectory][playlistId] = sortOption;
+    }
 
 }

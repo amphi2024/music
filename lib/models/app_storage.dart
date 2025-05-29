@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:amphi/models/app_storage_core.dart';
 import 'package:amphi/models/update_event.dart';
@@ -8,9 +7,10 @@ import 'package:amphi/utils/path_utils.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:music/channels/app_method_channel.dart';
 import 'package:music/channels/app_web_channel.dart';
-import 'package:music/models/app_settings.dart';
+import 'package:music/models/app_cache.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/music/playlist.dart';
+import 'package:music/models/sort_option.dart';
 
 import 'app_state.dart';
 import 'app_theme.dart';
@@ -157,9 +157,9 @@ class AppStorage extends AppStorageCore {
     });
     playlists.get("").songs.add(song.id);
     appState.setFragmentState(() {
-      songIdList.sortSongList();
-      artistIdList.sortArtistList();
-      albumIdList.sortAlbumList();
+      songIdList.sortSongList(appCacheData.sortOption("!SONGS"));
+      artistIdList.sortArtistList(SortOption.title);
+      albumIdList.sortAlbumList(appCacheData.sortOption("!ALBUMS"));
     });
   }
 
@@ -182,7 +182,6 @@ class AppStorage extends AppStorageCore {
         }
       }
     }
-    artistIdList.sortArtistList();
   }
 
   void initAlbums() {
@@ -201,7 +200,6 @@ class AppStorage extends AppStorageCore {
         }
       }
     }
-    albumIdList.sortAlbumList();
   }
 
   void initPlaylists() {
@@ -213,7 +211,6 @@ class AppStorage extends AppStorageCore {
         playlistIdList.add(playlist.id);
       }
     }
-    playlistIdList.sortPlaylistList();
   }
 
   void updateGenres(Map<String, dynamic> genre) {
@@ -262,11 +259,21 @@ class AppStorage extends AppStorageCore {
         }
       }
     }
-    playlists[""]!.songs.sortSongList();
-    songIdList.sortSongList();
+
     initAlbums();
     initArtists();
     initPlaylists();
+
+    playlistIdList.sortPlaylistList();
+    albumIdList.sortAlbumList(appCacheData.sortOption("!ALBUMS"));
+    artistIdList.sortArtistList(appCacheData.sortOption("!ARTISTS"));
+    playlists[""]!.songs.sortSongList(appCacheData.sortOption("!SONGS"));
+    songIdList.sortSongList(appCacheData.sortOption("!SONGS"));
+    playlists["!ARCHIVE"]!.songs.sortSongList(appCacheData.sortOption("!ARCHIVE"));
+    archiveIdList.sortSongList(appCacheData.sortOption("!ARCHIVE"));
+    playlists.forEach((key, value) {
+      value.songs.sortSongList(appCacheData.sortOption(value.id));
+    });
   }
 
   List<AppTheme> getAllThemes() {
@@ -502,7 +509,7 @@ class AppStorage extends AppStorageCore {
               songIdList.add(song.id);
             }
             appState.setFragmentState(() {
-              songIdList.sortSongList();
+              songIdList.sortSongList(appCacheData.sortOption("!SONGS"));
             });
           }
         });
@@ -725,26 +732,54 @@ extension PlaylistsEx on Map<String, Playlist> {
 }
 
 extension SortEx on List<String> {
-  void sortSongList() {
+  void sortAlbumList(String sortOption) {
+    switch(sortOption) {
+      case SortOption.artist:
+        sort((a, b) {
+          var aTitle = appStorage.albums[a]!.artist.name.byLocaleCode(appMethodChannel.localeCode);
+          var bTitle = appStorage.albums[b]!.artist.name.byLocaleCode(appMethodChannel.localeCode);
+          return aTitle.compareTo(bTitle);
+        });
+        break;
+      case SortOption.artistDescending:
+        sort((a, b) {
+          var aTitle = appStorage.albums[a]!.artist.name.byLocaleCode(appMethodChannel.localeCode);
+          var bTitle = appStorage.albums[b]!.artist.name.byLocaleCode(appMethodChannel.localeCode);
+          return bTitle.compareTo(aTitle);
+        });
+        break;
+    case SortOption.titleDescending:
     sort((a, b) {
-      var aTitle = appStorage.songs[a]!.title.byLocaleCode(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
-      var bTitle = appStorage.songs[b]!.title.byLocaleCode(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
-      return aTitle.compareTo(bTitle);
+    var aTitle = appStorage.albums[a]!.title.byLocaleCode(appMethodChannel.localeCode);
+    var bTitle = appStorage.albums[b]!.title.byLocaleCode(appMethodChannel.localeCode);
+    return bTitle.compareTo(aTitle);
     });
+      default:
+        sort((a, b) {
+          var aTitle = appStorage.albums[a]!.title.byLocaleCode(appMethodChannel.localeCode);
+          var bTitle = appStorage.albums[b]!.title.byLocaleCode(appMethodChannel.localeCode);
+          return aTitle.compareTo(bTitle);
+        });
+        break;
+    }
   }
-  void sortAlbumList() {
-    sort((a, b) {
-      var aTitle = appStorage.albums[a]!.title.byLocaleCode(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
-      var bTitle = appStorage.albums[b]!.title.byLocaleCode(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
-      return aTitle.compareTo(bTitle);
-    });
-  }
-  void sortArtistList() {
-    sort((a, b) {
-      var aTitle = appStorage.artists[a]!.name.byLocaleCode(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
-      var bTitle = appStorage.artists[b]!.name.byLocaleCode(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
-      return aTitle.compareTo(bTitle);
-    });
+  void sortArtistList(String sortOption) {
+    switch(sortOption) {
+      case SortOption.title:
+        sort((a, b) {
+          var aTitle = appStorage.artists[a]!.name.byLocaleCode(appMethodChannel.localeCode);
+          var bTitle = appStorage.artists[b]!.name.byLocaleCode(appMethodChannel.localeCode);
+          return aTitle.compareTo(bTitle);
+        });
+        break;
+      case SortOption.titleDescending:
+        sort((a, b) {
+          var aTitle = appStorage.artists[a]!.name.byLocaleCode(appMethodChannel.localeCode);
+          var bTitle = appStorage.artists[b]!.name.byLocaleCode(appMethodChannel.localeCode);
+          return bTitle.compareTo(aTitle);
+        });
+        break;
+    }
   }
   void sortPlaylistList() {
     sort((a, b) {
@@ -756,13 +791,51 @@ extension SortEx on List<String> {
 }
 
 extension SortExDynamic on List {
-  void sortSongList() {
-    sort((a, b) {
-      var aTitle = appStorage.songs[a]!.title.byLocaleCode(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
-      var bTitle = appStorage.songs[b]!.title.byLocaleCode(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
-      return aTitle.compareTo(bTitle);
-    });
+  void sortSongList(String sortOption) {
+    print(sortOption);
+    switch(sortOption) {
+      case SortOption.artist:
+        sort((a, b) {
+          var aTitle = appStorage.songs[a]!.artist.name.byLocaleCode(appMethodChannel.localeCode);
+          var bTitle = appStorage.songs[b]!.artist.name.byLocaleCode(appMethodChannel.localeCode);
+          return aTitle.compareTo(bTitle);
+        });
+        break;
+      case SortOption.album:
+        sort((a, b) {
+          var aTitle = appStorage.songs[a]!.album.title.byLocaleCode(appMethodChannel.localeCode);
+          var bTitle = appStorage.songs[b]!.album.title.byLocaleCode(appMethodChannel.localeCode);
+          return aTitle.compareTo(bTitle);
+        });
+        break;
+      case SortOption.albumDescending:
+        sort((a, b) {
+          var aTitle = appStorage.songs[a]!.album.title.byLocaleCode(appMethodChannel.localeCode);
+          var bTitle = appStorage.songs[b]!.album.title.byLocaleCode(appMethodChannel.localeCode);
+          return bTitle.compareTo(aTitle);
+        });
+        break;
+      case SortOption.artistDescending:
+        sort((a, b) {
+          var aTitle = appStorage.songs[a]!.artist.name.byLocaleCode(appMethodChannel.localeCode);
+          var bTitle = appStorage.songs[b]!.artist.name.byLocaleCode(appMethodChannel.localeCode);
+          return bTitle.compareTo(aTitle);
+        });
+        break;
+      case SortOption.titleDescending:
+      sort((a, b) {
+        var aTitle = appStorage.songs[a]!.title.byLocaleCode(appMethodChannel.localeCode);
+        var bTitle = appStorage.songs[b]!.title.byLocaleCode(appMethodChannel.localeCode);
+        return bTitle.compareTo(aTitle);
+      });
+        break;
+      case SortOption.title:
+        sort((a, b) {
+          var aTitle = appStorage.songs[a]!.title.byLocaleCode(appMethodChannel.localeCode);
+          var bTitle = appStorage.songs[b]!.title.byLocaleCode(appMethodChannel.localeCode);
+          return aTitle.compareTo(bTitle);
+        });
+        break;
+    }
   }
 }
-
-const sortByTitle = 0;

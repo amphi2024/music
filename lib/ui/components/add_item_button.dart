@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:music/models/app_cache.dart';
 import 'package:music/models/music/playlist.dart';
+import 'package:music/models/sort_option.dart';
 
 import '../../models/app_state.dart';
 import '../../models/app_storage.dart';
@@ -37,7 +39,7 @@ class AddItemButton extends StatelessWidget {
                   appState.setFragmentState(() {
                     appStorage.albums[album.id] = album;
                     appStorage.albumIdList.add(album.id);
-                    appStorage.albumIdList.sortAlbumList();
+                    appStorage.albumIdList.sortAlbumList(appCacheData.sortOption("!ALBUMS"));
                   });
                 });
               });
@@ -49,7 +51,7 @@ class AddItemButton extends StatelessWidget {
                   appState.setFragmentState(() {
                     appStorage.artists[artist.id] = artist;
                     appStorage.artistIdList.add(artist.id);
-                    appStorage.artistIdList.sortArtistList();
+                    appStorage.artistIdList.sortArtistList(SortOption.title);
                   });
                 });
               });
