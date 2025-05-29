@@ -63,8 +63,8 @@ class _ArtistFragmentState extends State<ArtistFragment> {
                 top: 5,
                 child: IconButton(onPressed: () {
                   appState.setMainViewState(() {
-                    appState.fragmentIndex = FragmentIndex.albums;
-                    appState.showingAlbumId = null;
+                    appState.fragmentIndex = FragmentIndex.artists;
+                    appState.showingArtistId = null;
                     appState.fragmentTitleShowing = true;
                   });
                 }, icon: Icon(Icons.arrow_back_ios_new, size: 15,))),
