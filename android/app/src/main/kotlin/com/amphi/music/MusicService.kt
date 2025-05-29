@@ -6,9 +6,12 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.media.MediaMetadata
 import android.net.Uri
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
+import android.support.v4.media.MediaMetadataCompat
 import androidx.annotation.OptIn
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -23,6 +26,7 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaStyleNotificationHelper
 import io.flutter.plugin.common.MethodChannel
 import java.io.File
+import androidx.core.net.toUri
 
 class MusicService : Service() {
     private lateinit var notificationManager: NotificationManagerCompat
@@ -144,12 +148,30 @@ class MusicService : Service() {
     fun setSource(url: String, filePath: String, playNow: Boolean = true) {
         val file = File(filePath)
         if(file.exists()) {
+            val mediaMetadata = androidx.media3.common.MediaMetadata.Builder()
+                .setTitle(title)
+                .setArtist(artist)
+                .build()
+
+
             val uri = Uri.fromFile(file)
-            val mediaItem = MediaItem.fromUri(uri)
+            val mediaItem = MediaItem.Builder()
+                .setUri(uri)
+                .setMediaMetadata(mediaMetadata)
+                .build()
             player.setMediaItem(mediaItem)
         }
         else {
-            val mediaItem = MediaItem.fromUri(Uri.parse(url))
+
+            val mediaMetadata = androidx.media3.common.MediaMetadata.Builder()
+                .setTitle(title)
+                .setArtist(artist)
+                .build()
+
+            val mediaItem = MediaItem.Builder()
+                .setUri(url.toUri())
+                .setMediaMetadata(mediaMetadata)
+                .build()
 
             val dataSourceFactory = DefaultHttpDataSource.Factory()
                 .setDefaultRequestProperties(
@@ -243,18 +265,8 @@ class MusicService : Service() {
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
+            ) == PackageManager.PERMISSION_GRANTED
         ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return
-        }
-        else {
             notificationManager.notify(1, notificationBuilder.build())
         }
 
