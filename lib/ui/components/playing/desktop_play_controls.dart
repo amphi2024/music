@@ -43,6 +43,37 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
 
   @override
   Widget build(BuildContext context) {
+
+    final resumeButton =  IconButton(
+        icon: Icon(
+            playerService.isPlaying
+                ? Icons.pause
+                : Icons.play_arrow,
+            size: 25),
+        onPressed: () {
+          if(playerService.isPlaying) {
+            appMethodChannel.pauseMusic();
+            if(mounted) {
+              setState(() {
+                playerService.isPlaying = false;
+              });
+            }
+          }
+          else {
+            appMethodChannel.resumeMusic();
+            if(mounted) {
+              setState(() {
+                playerService.isPlaying = true;
+              });
+            }
+          }
+        });
+
+    final screenWidth = MediaQuery.of(context).size.width;
+    if(screenWidth < 800) {
+      return resumeButton;
+    }
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -65,30 +96,7 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
                 onPressed: () {
                   playerService.playPrevious(Localizations.localeOf(context).languageCode);
                 }),
-            IconButton(
-                icon: Icon(
-                    playerService.isPlaying
-                        ? Icons.pause
-                        : Icons.play_arrow,
-                    size: 25),
-                onPressed: () {
-                  if(playerService.isPlaying) {
-                    appMethodChannel.pauseMusic();
-                    if(mounted) {
-                      setState(() {
-                        playerService.isPlaying = false;
-                      });
-                    }
-                  }
-                  else {
-                    appMethodChannel.resumeMusic();
-                    if(mounted) {
-                      setState(() {
-                        playerService.isPlaying = true;
-                      });
-                    }
-                  }
-                }),
+            resumeButton,
             IconButton(
                 icon: Icon(
                   Icons.fast_forward,

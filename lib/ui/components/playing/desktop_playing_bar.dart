@@ -24,8 +24,13 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
     final song = widget.song;
     final screenWidth = MediaQuery.of(context).size.width;
     double controlsPanelWidth = 750;
+    double titleWidth = 250;
     if(screenWidth <= 1450) {
       controlsPanelWidth = 350;
+    }
+    if(screenWidth < 900) {
+      titleWidth = 150;
+      controlsPanelWidth = 250;
     }
 
     return AnimatedPositioned(
@@ -54,7 +59,7 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               SizedBox(
-                width: 250,
+                width: titleWidth,
                 child: Row(
                   children: [
                     Padding(
@@ -91,30 +96,33 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
                   setState: setState,
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Icon( playerService.volume > 0.5 ? Icons.volume_up : playerService.volume > 0.1 ? Icons.volume_down : Icons.volume_mute ),
-                  SizedBox(
-                    width: 80,
-                    child: Slider(
-                        max: 1,
-                        value: playerService.volume,
-                        onChanged: (value) {
-                          appCacheData.volume = value;
-                          appCacheData.save();
-                          appMethodChannel.setVolume(value);
-                          setState(() {
-                            playerService.volume = value;
-                          });
-                        }),
-                  ),
-                  IconButton(onPressed: () {
-                    appState.setMainViewState(() {
-                      appState.floatingMenuShowing = !appState.floatingMenuShowing;
-                    });
-                  }, icon: Icon(Icons.menu)),
-                ],
+              Visibility(
+                visible: screenWidth > 1000,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Icon( playerService.volume > 0.5 ? Icons.volume_up : playerService.volume > 0.1 ? Icons.volume_down : Icons.volume_mute ),
+                    SizedBox(
+                      width: 80,
+                      child: Slider(
+                          max: 1,
+                          value: playerService.volume,
+                          onChanged: (value) {
+                            appCacheData.volume = value;
+                            appCacheData.save();
+                            appMethodChannel.setVolume(value);
+                            setState(() {
+                              playerService.volume = value;
+                            });
+                          }),
+                    ),
+                    IconButton(onPressed: () {
+                      appState.setMainViewState(() {
+                        appState.floatingMenuShowing = !appState.floatingMenuShowing;
+                      });
+                    }, icon: Icon(Icons.menu)),
+                  ],
+                ),
               ),
             ],
           ),
