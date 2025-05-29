@@ -26,7 +26,7 @@ class AppCacheData extends AppCacheDataCore {
     double get volume => data["volume"] ?? 0.5;
 
     String sortOption(String playlistId) {
-        if(data["sortOption"][selectedDirectory] is Map && selectedDirectory!.isNotEmpty) {
+        if(data["sortOption"]?[selectedDirectory] is Map && selectedDirectory!.isNotEmpty) {
             var option = data["sortOption"][selectedDirectory][playlistId];
             if(option is String) {
                 return option;
