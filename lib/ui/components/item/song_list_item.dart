@@ -27,9 +27,9 @@ class SongListItem extends StatelessWidget {
 
     return GestureDetector(
       onLongPress: () {
-        appState.setState(() {
-          appState.selectedSongs = [];
-        });
+        // appState.setState(() {
+        //   appState.selectedSongs = [];
+        // });
       },
       onTap: () {
         appState.setState(() {
@@ -158,7 +158,7 @@ class SongListItem extends StatelessWidget {
                                           Navigator.pop(context);
                                         }, icon: Icon(Icons.cancel_outlined))
                                       ],),
-                                      Expanded(child: SelectPlaylist(songId: song.id)),
+                                      Expanded(child: SelectPlaylist(songIdList: [song.id])),
                                     ],
                                   ),
                                 ),
@@ -179,7 +179,7 @@ class SongListItem extends StatelessWidget {
                                 child: Column(
                                   children: [
                                     BottomSheetDragHandle(),
-                                    Expanded(child: SelectPlaylist(songId: song.id))
+                                    Expanded(child: SelectPlaylist(songIdList: [song.id]))
                                   ]
                                 ),
                               )).then((value) {

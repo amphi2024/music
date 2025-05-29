@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:music/models/app_cache.dart';
 import 'package:music/models/app_storage.dart';
 
 class SelectPlaylist extends StatefulWidget {
 
-  final String songId;
-  const SelectPlaylist({super.key, required this.songId});
+  final List<String> songIdList;
+  const SelectPlaylist({super.key, required this.songIdList});
 
   @override
   State<SelectPlaylist> createState() => _SelectPlaylistState();
@@ -18,8 +19,10 @@ class _SelectPlaylistState extends State<SelectPlaylist> {
   void dispose() {
     for(var id in selectedPlaylists) {
       var playlist = appStorage.playlists.get(id);
-      playlist.songs.add(widget.songId);
-      playlist.songs.sortSongList();
+      for(var songId in widget.songIdList) {
+        playlist.songs.add(songId);
+      }
+      playlist.songs.sortSongList(appCacheData.sortOption(id));
       playlist.save();
     }
     super.dispose();
