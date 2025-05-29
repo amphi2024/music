@@ -1,5 +1,4 @@
 import 'package:amphi/models/app.dart';
-import 'package:amphi/widgets/menu/popup/show_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_cache.dart';
 import 'package:music/models/app_state.dart';
@@ -67,8 +66,8 @@ class FragmentTitle extends StatelessWidget {
                         },
                         icon: Icon(Icons.settings)),
                   ),
-                  IconButton(
-                      onPressed: () {
+                  PopupMenuButton(
+                      itemBuilder: (context) {
                         var playlistId = appState.showingPlaylistId ?? "";
                         final fragmentIndex = appState.fragmentIndex;
                         switch (fragmentIndex) {
@@ -153,7 +152,7 @@ class FragmentTitle extends StatelessWidget {
                           items.add(PopupMenuItem(child: Text("Add to Playlist"), onTap: () {}));
                           items.add(PopupMenuItem(child: Text("Move to Archive"), onTap: () {}));
                         }
-                        showMenuByRelative(context: context, items: items);
+                        return items;
                       },
                       icon: Icon(Icons.more_horiz_outlined)),
                 ],
