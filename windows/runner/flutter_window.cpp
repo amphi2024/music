@@ -85,7 +85,10 @@ bool FlutterWindow::OnCreate()
           auto token_iter = map_arg->find(flutter::EncodableValue("token"));
           std::string token = std::get<std::string>(token_iter->second);
 
-          AudioPlayer::GetInstance().Play(path, url, token);
+          auto playNow_iter = map_arg->find(flutter::EncodableValue("play_now"));
+          bool playNow = std::get<bool>(playNow_iter->second);
+
+          AudioPlayer::GetInstance().SetMediaSource(path, url, token, playNow);
           result->Success();
         }
         else if (call.method_name() == "apply_playback_position")

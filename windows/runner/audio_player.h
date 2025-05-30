@@ -12,7 +12,7 @@ public:
     static AudioPlayer& GetInstance();
 
     bool Init();
-    void Play(const std::string& path, const string& url, const string& token);
+    void SetMediaSource(const std::string& path, const string& url, const string& token, bool playNow);
     void Pause();
     void Resume();
     void Stop();

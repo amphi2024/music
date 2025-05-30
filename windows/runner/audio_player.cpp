@@ -34,7 +34,7 @@ bool AudioPlayer::Init()
     return true;
 }
 
-void AudioPlayer::Play(const string &path, const string &url, const string &token)
+void AudioPlayer::SetMediaSource(const string &path, const string &url, const string &token, bool playNow)
 {
 
     Stop();
@@ -47,9 +47,11 @@ void AudioPlayer::Play(const string &path, const string &url, const string &toke
         stream = BASS_StreamCreateFile(FALSE, path.c_str(), 0, 0, 0);
         if (stream != NULL)
         {
-            BASS_ChannelPlay(stream, FALSE);
             BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, volume_);
             sound_loaded_ = true;
+            if(playNow) {
+              BASS_ChannelPlay(stream, FALSE);
+            }
         }
     }
     else
@@ -61,12 +63,11 @@ void AudioPlayer::Play(const string &path, const string &url, const string &toke
         stream = BASS_StreamCreateURL(combined.c_str(), 0, 0, NULL, 0);
         if (stream != NULL)
         {
-            BASS_ChannelPlay(stream, FALSE);
             BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, volume_);
             sound_loaded_ = true;
-        }
-        else {
-            std::cout << "Hey" << std::endl;
+            if(playNow) {
+              BASS_ChannelPlay(stream, FALSE);
+            }
         }
     }
 }
