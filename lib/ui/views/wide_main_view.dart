@@ -6,6 +6,7 @@ import 'package:music/models/app_storage.dart';
 import 'package:music/models/fragment_index.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
+import 'package:music/ui/components/custom_window_button.dart';
 import 'package:music/ui/components/fragment_title.dart';
 import 'package:music/ui/components/menu/desktop_floating_menu.dart';
 import 'package:music/ui/components/navigation_menu.dart';
@@ -82,6 +83,14 @@ class _WideMainViewState extends State<WideMainView> {
   Widget build(BuildContext context) {
     appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor);
 
+    var colors = CustomWindowButtonColors(
+      iconMouseOver: Theme.of(context).textTheme.bodyMedium?.color,
+      mouseOver: Color.fromRGBO(125, 125, 125, 0.1),
+      iconNormal: Theme.of(context).textTheme.bodyMedium?.color,
+      mouseDown: Color.fromRGBO(125, 125, 125, 0.1),
+      iconMouseDown: Theme.of(context).textTheme.bodyMedium?.color,
+    );
+
     return PopScope(
       canPop: !appState.floatingMenuShowing,
       onPopInvokedWithResult: (didPop, result) {
@@ -122,15 +131,27 @@ class _WideMainViewState extends State<WideMainView> {
                   child: Row(
                     children: [
                       Expanded(child: MoveWindow(child: FragmentTitle(title: fragmentTitle()))),
-                      MinimizeWindowButton(),
+                      MinimizeCustomWindowButton(
+                        colors: colors
+                      ),
                       appWindow.isMaximized
-                          ? RestoreWindowButton(
+                          ? RestoreCustomWindowButton(
+                        colors: colors,
                         onPressed: maximizeOrRestore,
                       )
-                          : MaximizeWindowButton(
+                          : MaximizeCustomWindowButton(
+                        colors: colors,
                         onPressed: maximizeOrRestore,
                       ),
-                      CloseWindowButton()
+                      CloseCustomWindowButton(
+                        colors: CustomWindowButtonColors(
+                          mouseOver: Color(0xFFD32F2F),
+                          mouseDown: Color(0xFFB71C1C),
+                          iconNormal: Color(0xFF805306),
+                          iconMouseOver: Color(0xFFFFFFFF),
+                          normal: Theme.of(context).scaffoldBackgroundColor
+                        )
+                      )
                     ],
                   ),
                 ),
