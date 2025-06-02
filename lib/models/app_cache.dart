@@ -1,4 +1,6 @@
 import 'package:amphi/models/app_cache_data_core.dart';
+import 'package:amphi/utils/path_utils.dart';
+import 'package:music/models/app_storage.dart';
 import 'package:music/models/sort_option.dart';
 
 final appCacheData = AppCacheData.getInstance();
@@ -26,8 +28,9 @@ class AppCacheData extends AppCacheDataCore {
     double get volume => data["volume"] ?? 0.5;
 
     String sortOption(String playlistId) {
-        if(data["sortOption"]?[selectedDirectory] is Map && selectedDirectory!.isNotEmpty) {
-            var option = data["sortOption"][selectedDirectory][playlistId];
+        var dirName = PathUtils.basename(appStorage.selectedUser.storagePath);
+        if(data["sortOption"]?[dirName] is Map) {
+            var option = data["sortOption"][dirName][playlistId];
             if(option is String) {
                 return option;
             }
@@ -42,13 +45,12 @@ class AppCacheData extends AppCacheDataCore {
     }
 
     void setSortOption({required String sortOption, required String playlistId}) {
-        if(data["sortOption"] is! Map) {
-            data["sortOption"] = {};
+        var dirName = PathUtils.basename(appStorage.selectedUser.storagePath);
+        if(data["sortOption"]?[dirName] is! Map) {
+            data["sortOption"] = <String, dynamic>{};
+            data["sortOption"][dirName] = <String, dynamic>{};
         }
-        if(data["sortOption"][selectedDirectory] is! Map) {
-            data["sortOption"][selectedDirectory] = {};
-        }
-        data["sortOption"][selectedDirectory][playlistId] = sortOption;
+        data["sortOption"][dirName][playlistId] = sortOption;
     }
 
 }
