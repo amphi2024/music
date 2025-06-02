@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:amphi/models/app.dart';
 import 'package:amphi/models/app_localizations.dart';
@@ -58,6 +59,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     appCacheData.getData();
     appStorage.initialize(() {
       appSettings.getData();
+      appMethodChannel.localeCode = appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode;
       appStorage.initMusic();
       setState(() {
         initialized = true;
