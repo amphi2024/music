@@ -792,7 +792,6 @@ extension SortEx on List<String> {
 
 extension SortExDynamic on List {
   void sortSongList(String sortOption) {
-    print(sortOption);
     switch(sortOption) {
       case SortOption.artist:
         sort((a, b) {
