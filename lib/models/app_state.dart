@@ -1,4 +1,6 @@
 
+import 'package:music/models/connected_device.dart';
+
 final appState = AppState.getInstance();
 
 class AppState {
@@ -20,10 +22,13 @@ class AppState {
   String? showingAlbumId;
   String? showingGenre;
 
+  Map<String, ConnectedDevice> connectedDevices = {};
+
   late void Function(void Function()) setState;
 
   late void Function(void Function()) setMainViewState;
   late void Function(void Function()) setFragmentState;
   void Function() requestScrollToTop = () {};
+  void Function(void Function())? onConnectedDeviceUpdated;
 
 }

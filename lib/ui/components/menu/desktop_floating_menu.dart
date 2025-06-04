@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
+import 'package:music/ui/components/playing/connected_devices.dart';
 import 'package:music/ui/components/playing/desktop_playing_lyrics.dart';
 import 'package:music/ui/components/playing/playing_queue.dart';
 
@@ -52,7 +53,7 @@ class _DesktopFloatingMenuState extends State<DesktopFloatingMenu> {
                   index: index,
                   children: [
                     DesktopPlayingLyrics(),
-                    DesktopPlayingLyrics(),
+                    ConnectedDevices(),
                     Padding(
                       padding: const EdgeInsets.all(15.0),
                       child: PlayingQueue(),

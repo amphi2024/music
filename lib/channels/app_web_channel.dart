@@ -6,6 +6,8 @@ import 'package:amphi/models/update_event.dart';
 import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
 import 'package:http/http.dart';
+import 'package:music/models/app_state.dart';
+import 'package:music/models/connected_device.dart';
 import 'package:music/models/music/lyrics.dart';
 import 'package:music/models/music/playlist.dart';
 import 'package:web_socket_channel/io.dart';
@@ -19,6 +21,8 @@ import '../models/music/song.dart';
 import '../models/music/song_file.dart';
 
 final appWebChannel = AppWebChannel.getInstance();
+
+const playbackStatusUpdate = "playback_status_update";
 
 class AppWebChannel extends AppWebChannelCore {
   static final AppWebChannel _instance = AppWebChannel._internal();
@@ -44,8 +48,20 @@ class AppWebChannel extends AppWebChannelCore {
 
     webSocketChannel?.stream.listen((message) async {
       Map<String, dynamic> jsonData = jsonDecode(message);
-      UpdateEvent updateEvent = UpdateEvent.fromJson(jsonData);
-      appStorage.syncData(updateEvent);
+      switch(jsonData["action"]) {
+        case playbackStatusUpdate:
+          var connectedDevice = ConnectedDevice.fromJson(jsonData);
+          if(appState.onConnectedDeviceUpdated != null) {
+            appState.onConnectedDeviceUpdated!(() {
+              appState.connectedDevices[connectedDevice.name] = connectedDevice;
+            });
+          }
+          break;
+        default:
+          UpdateEvent updateEvent = UpdateEvent.fromJson(jsonData);
+          appStorage.syncData(updateEvent);
+          break;
+      }
     }, onDone: () {
       connected = false;
     }, onError: (d) {

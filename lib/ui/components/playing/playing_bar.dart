@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
 import 'package:music/ui/components/image/album_cover.dart';
+import 'package:music/ui/components/playing/mobile_connected_devices.dart';
 import 'package:music/ui/components/playing/mobile_playing_queue.dart';
 import 'package:music/ui/components/playing/play_controls.dart';
 import 'package:music/ui/components/playing/playing_lyrics.dart';
@@ -218,7 +219,18 @@ class _PlayingBarState extends State<PlayingBar> {
                                     });
                                   }, icon: Icon(Icons.lyrics, size: 30, color: appState.autoScrollLyrics ? null : Theme.of(context).disabledColor)),
                                   IconButton(onPressed: () {
-
+                                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                                      final overlay = Overlay.of(context);
+                                      overlayEntry = OverlayEntry(
+                                        builder: (context) => MobileConnectedDevices(
+                                          onRemove: () async {
+                                            await Future.delayed(const Duration(milliseconds: 500));
+                                            overlayEntry.remove();
+                                          },
+                                        ),
+                                      );
+                                      overlay.insert(overlayEntry);
+                                    });
                                   }, icon: Icon(Icons.devices, size: 30)),
                                   IconButton(onPressed: () {
                                     WidgetsBinding.instance.addPostFrameCallback((_) {
