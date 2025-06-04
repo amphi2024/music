@@ -1,8 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/app_settings.dart';
+import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
+import 'package:music/models/connected_device.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/player_service.dart';
 
@@ -18,7 +22,7 @@ class AppMethodChannel extends MethodChannel {
         if (playerService.isPlaying) {
           await onPlaybackChanged(position);
           if (position + 50 >= playerService.musicDuration) {
-            playerService.playNext(localeCode);
+            onPlaybackFinished();
           }
         }
       });
@@ -33,7 +37,7 @@ class AppMethodChannel extends MethodChannel {
           playerService.playPrevious(localeCode);
           break;
         case "play_next":
-          playerService.playNext(localeCode);
+          onPlaybackFinished();
           break;
         case "on_pause":
           for (var fun in playbackListeners) {
@@ -52,6 +56,27 @@ class AppMethodChannel extends MethodChannel {
     });
   }
 
+  void onPlaybackFinished() {
+    if (playerService.playMode == playOnce) {
+      if(playerService.index == playerService.playlist.songs.length - 1) {
+        appState.setState(() {
+          playerService.playbackPosition = playerService.musicDuration;
+          playerService.isPlaying = false;
+        });
+      }
+      else {
+        playerService.playNext(localeCode);
+      }
+    }
+    else if(playerService.playMode == repeatOne) {
+      applyPlaybackPosition(0);
+      resumeMusic();
+    }
+    else {
+      playerService.playNext(localeCode);
+    }
+  }
+
   Future<void> onPlaybackChanged(int position) async {
     if (position <= playerService.musicDuration) {
       playerService.playbackPosition = position;
@@ -64,6 +89,12 @@ class AppMethodChannel extends MethodChannel {
     } else {
       playerService.musicDuration = await appMethodChannel.getMusicDuration();
     }
+
+    var deviceType = Platform.operatingSystem;
+    var connectedDevice = ConnectedDevice(
+        position: position, duration: playerService.musicDuration, songId: playerService.playingSongId, name: appWebChannel.deviceName, deviceType: deviceType, playlistId: playerService.playlistId);
+    var message = jsonEncode(connectedDevice.toMap());
+    appWebChannel.postWebSocketMessage(message);
   }
 
   static AppMethodChannel getInstance() => _instance;
