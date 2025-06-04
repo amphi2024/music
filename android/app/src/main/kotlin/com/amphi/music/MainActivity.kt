@@ -56,7 +56,6 @@ class MainActivity : FlutterActivity() {
 
     override fun onStop() {
         super.onStop()
-
         unbindService(connection)
     }
 
@@ -138,13 +137,16 @@ class MainActivity : FlutterActivity() {
 
                 "set_media_source" -> {
                     val filePath = call.argument<String>("path")!!
-                    val title =  call.argument<String>("title")!!
+                    val title = call.argument<String>("title")!!
                     val artist = call.argument<String>("artist")!!
                     val url = call.argument<String>("url")!!
                     val token = call.argument<String>("token")!!
                     val albumCoverPath = call.argument<String>("album_cover")
                     val playNow = call.argument<Boolean>("play_now")!!
-                        musicService?.let { service ->
+
+                    musicService?.let { service ->
+
+                        if(service.title != title || service.artist != artist) {
                             service.title = title
                             service.artist = artist
                             service.albumCoverFilePath = albumCoverPath
@@ -155,6 +157,7 @@ class MainActivity : FlutterActivity() {
                                 filePath = filePath
                             )
                             service.updateNotification()
+                        }
                     }
                     result.success(true)
                 }
