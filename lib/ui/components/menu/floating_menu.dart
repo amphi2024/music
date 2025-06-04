@@ -144,7 +144,7 @@ class _Buttons extends StatelessWidget {
               });
             }),
         FloatingMenuButton(
-            icon: Icons.music_note,
+            icon: Icons.piano,
             label: "Genres",
             onPressed: () {
               appState.setMainViewState(() {

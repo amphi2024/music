@@ -60,7 +60,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
           saveWindowSize();
         }
       }),
-      _MenuItem(title: "Genres", icon: Icons.music_note, onPressed: () {
+      _MenuItem(title: "Genres", icon: Icons.piano, onPressed: () {
         appState.setMainViewState(() {
           appState.fragmentTitleMinimized = false;
           appState.fragmentTitleShowing = true;
