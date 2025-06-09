@@ -1,4 +1,6 @@
+import 'dart:io';
 
+import 'package:amphi/models/app.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
@@ -31,23 +33,22 @@ class WideMainView extends StatefulWidget {
 }
 
 class _WideMainViewState extends State<WideMainView> {
-
   void maximizeOrRestore() {
     setState(() {
       appWindow.maximizeOrRestore();
     });
   }
 
-   final List<Widget> fragments = [
+  final List<Widget> fragments = [
     SongsFragment(),
     ArtistsFragment(),
     AlbumsFragment(),
-     GenresFragment(),
-     ArchiveFragment(),
-     PlaylistFragment(),
-     ArtistFragment(),
-     AlbumFragment(),
-     GenreFragment()
+    GenresFragment(),
+    ArchiveFragment(),
+    PlaylistFragment(),
+    ArtistFragment(),
+    AlbumFragment(),
+    GenreFragment()
   ];
 
   @override
@@ -55,9 +56,9 @@ class _WideMainViewState extends State<WideMainView> {
     appState.setMainViewState = setState;
     super.initState();
   }
-  
+
   String fragmentTitle() {
-    switch(appState.fragmentIndex) {
+    switch (appState.fragmentIndex) {
       case FragmentIndex.songs:
         return "Songs";
       case FragmentIndex.artists:
@@ -91,10 +92,40 @@ class _WideMainViewState extends State<WideMainView> {
       iconMouseDown: Theme.of(context).textTheme.bodyMedium?.color,
     );
 
+    List<Widget> children = [
+      Expanded(child: FragmentTitle(title: fragmentTitle())),
+    ];
+
+    if (Platform.isWindows || Platform.isLinux) {
+      children = [
+        Expanded(child: MoveWindow(child: FragmentTitle(title: fragmentTitle()))),
+        Visibility(
+          visible: App.isDesktop(),
+          child: MinimizeCustomWindowButton(colors: colors),
+        ),
+        appWindow.isMaximized
+            ? RestoreCustomWindowButton(
+                colors: colors,
+                onPressed: maximizeOrRestore,
+              )
+            : MaximizeCustomWindowButton(
+                colors: colors,
+                onPressed: maximizeOrRestore,
+              ),
+        CloseCustomWindowButton(
+            colors: CustomWindowButtonColors(
+                mouseOver: Color(0xFFD32F2F),
+                mouseDown: Color(0xFFB71C1C),
+                iconNormal: Color(0xFF805306),
+                iconMouseOver: Color(0xFFFFFFFF),
+                normal: Theme.of(context).scaffoldBackgroundColor))
+      ];
+    }
+
     return PopScope(
       canPop: !appState.floatingMenuShowing,
       onPopInvokedWithResult: (didPop, result) {
-        if(appState.floatingMenuShowing) {
+        if (appState.floatingMenuShowing) {
           setState(() {
             appState.floatingMenuShowing = false;
           });
@@ -102,7 +133,7 @@ class _WideMainViewState extends State<WideMainView> {
       },
       child: GestureDetector(
         onTap: () {
-          if(appState.floatingMenuShowing) {
+          if (appState.floatingMenuShowing) {
             setState(() {
               appState.floatingMenuShowing = false;
             });
@@ -111,9 +142,8 @@ class _WideMainViewState extends State<WideMainView> {
         child: Scaffold(
           extendBodyBehindAppBar: true,
           extendBody: true,
-          appBar: AppBar(
-              toolbarHeight: 0 // This is needed to change the status bar text (icon) color on Android
-          ),
+          appBar: AppBar(toolbarHeight: 0 // This is needed to change the status bar text (icon) color on Android
+              ),
           body: Stack(
             children: [
               AnimatedPositioned(
@@ -121,43 +151,24 @@ class _WideMainViewState extends State<WideMainView> {
                   top: 0,
                   bottom: 0,
                   right: 0,
-                  duration: Duration(milliseconds: 1000), curve: Curves.easeOutQuint, child: fragments[appState.fragmentIndex]),
+                  duration: Duration(milliseconds: 1000),
+                  curve: Curves.easeOutQuint,
+                  child: fragments[appState.fragmentIndex]),
               Positioned(
                 top: 0,
                 left: 200,
                 right: 0,
                 child: SizedBox(
-                  height: 50,
+                  height: 55 +  MediaQuery.of(context).padding.top,
                   child: Row(
-                    children: [
-                      Expanded(child: MoveWindow(child: FragmentTitle(title: fragmentTitle()))),
-                      MinimizeCustomWindowButton(
-                        colors: colors
-                      ),
-                      appWindow.isMaximized
-                          ? RestoreCustomWindowButton(
-                        colors: colors,
-                        onPressed: maximizeOrRestore,
-                      )
-                          : MaximizeCustomWindowButton(
-                        colors: colors,
-                        onPressed: maximizeOrRestore,
-                      ),
-                      CloseCustomWindowButton(
-                        colors: CustomWindowButtonColors(
-                          mouseOver: Color(0xFFD32F2F),
-                          mouseDown: Color(0xFFB71C1C),
-                          iconNormal: Color(0xFF805306),
-                          iconMouseOver: Color(0xFFFFFFFF),
-                          normal: Theme.of(context).scaffoldBackgroundColor
-                        )
-                      )
-                    ],
+                    children: children,
                   ),
                 ),
               ),
               NavigationMenu(),
-              DesktopPlayingBar(song: playerService.nowPlaying(),),
+              DesktopPlayingBar(
+                song: playerService.nowPlaying(),
+              ),
               DesktopFloatingMenu()
             ],
           ),
