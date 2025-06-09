@@ -52,7 +52,9 @@ class _MobileConnectedDevicesState extends State<MobileConnectedDevices> {
                     .of(context)
                     .padding
                     .top, bottom: 0),
-                child: ConnectedDevices(),
+                child: ConnectedDevices(
+                  titleColor: Colors.white,
+                ),
               ),
             ),
           ),

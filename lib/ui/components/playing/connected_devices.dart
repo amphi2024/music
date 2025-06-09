@@ -8,7 +8,9 @@ import 'package:music/models/player_service.dart';
 import 'package:music/utils/duration_converter.dart';
 
 class ConnectedDevices extends StatefulWidget {
-  const ConnectedDevices({super.key});
+
+  final Color? titleColor;
+  const ConnectedDevices({super.key, this.titleColor});
 
   @override
   State<ConnectedDevices> createState() => _ConnectedDevicesState();
@@ -27,6 +29,14 @@ class _ConnectedDevicesState extends State<ConnectedDevices> {
 
   @override
   void initState() {
+    timer = Timer(
+      const Duration(seconds: 5),
+          () {
+        setState(() {
+          appState.connectedDevices.clear();
+        });
+      },
+    );
     appState.onConnectedDeviceUpdated = (function) {
      setState(function);
      timer?.cancel();
@@ -46,6 +56,12 @@ class _ConnectedDevicesState extends State<ConnectedDevices> {
   Widget build(BuildContext context) {
 
     final connectedDevices = appState.connectedDevices.values.toList();
+
+    if(connectedDevices.isEmpty) {
+      return Center(
+          child: Text("There are no other connected devices", style: TextStyle(
+            color: widget.titleColor, fontSize: 25, ), maxLines: 3, textAlign: TextAlign.center,));
+    }
 
     return ListView.builder(
         itemCount: connectedDevices.length,
