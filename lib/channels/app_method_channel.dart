@@ -29,6 +29,15 @@ class AppMethodChannel extends MethodChannel {
     }
     setMethodCallHandler((call) async {
       switch (call.method) {
+        case "sync_media_source_to_flutter":
+          final index = call.arguments["index"];
+          final isPlaying = call.arguments["is_playing"];
+          appState.setState(() {
+            playerService.index = index;
+            playerService.isPlaying = isPlaying;
+            playerService.playingSongId = playerService.playlist.songs[index];
+          });
+          break;
         case "on_playback_changed":
           final position = call.arguments["position"];
           await onPlaybackChanged(position);

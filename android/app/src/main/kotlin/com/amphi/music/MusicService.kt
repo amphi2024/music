@@ -63,7 +63,11 @@ class MusicService : Service() {
         player.addListener(object : Player.Listener{
             override fun onPlaybackStateChanged(playbackState: Int) {
                 if (playbackState == Player.STATE_ENDED) {
-                    methodChannel?.invokeMethod("play_next", null)
+                    playNext()
+                    methodChannel?.invokeMethod("sync_media_source_to_flutter", mapOf(
+                        "index" to index,
+                        "is_playing" to isPlaying
+                    ))
                 }
             }
         })
@@ -119,10 +123,18 @@ class MusicService : Service() {
                     else {
                         //methodChannel?.invokeMethod("play_previous", null)
                         playPrevious()
+                        methodChannel?.invokeMethod("sync_media_source_to_flutter", mapOf(
+                            "index" to index,
+                            "is_playing" to isPlaying
+                        ))
                     }
                 }
                 "PLAY_NEXT" -> {
                     playNext()
+                    methodChannel?.invokeMethod("sync_media_source_to_flutter", mapOf(
+                        "index" to index,
+                        "is_playing" to isPlaying
+                    ))
                     //methodChannel?.invokeMethod("play_next", null)
                 }
                 "PAUSE" -> {

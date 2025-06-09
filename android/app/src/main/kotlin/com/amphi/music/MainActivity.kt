@@ -61,6 +61,10 @@ class MainActivity : FlutterActivity() {
 
     override fun onResume() {
         super.onResume()
+        methodChannel?.invokeMethod("sync_media_source_to_flutter", mapOf(
+            "index" to (musicService?.index ?: 0),
+            "is_playing" to (musicService?.isPlaying ?: false)
+        ))
         setNavigationBarColor(
             window = window,
             navigationBarColor = navigationBarColor,
