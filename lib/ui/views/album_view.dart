@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/album.dart';
@@ -6,6 +8,10 @@ import 'package:music/ui/components/image/album_cover.dart';
 import 'package:music/ui/components/item/song_list_item.dart';
 import 'package:music/ui/components/track_number.dart';
 import 'package:music/ui/dialogs/edit_album_dialog.dart';
+import 'package:music/ui/fragments/components/floating_button.dart';
+
+import '../../models/app_state.dart';
+import '../../models/player_service.dart';
 
 class AlbumView extends StatefulWidget {
   final Album album;
@@ -71,21 +77,59 @@ class _AlbumViewState extends State<AlbumView> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(bottom: 15),
-              child: Text(
-                widget.album.artist.name.byContext(context),
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18),
+              child: Column(
+                children: [
+                  Text(
+                    widget.album.artist.name.byContext(context),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Padding(padding: EdgeInsets.only(right: 15), child: FloatingButton(icon: Icons.play_arrow, onPressed: () {
+                          if(widget.album.songs.isNotEmpty) {
+                            appState.setState(() {
+                              var id = widget.album.songs[0];
+                              var song = appStorage.songs.get(id);
+                              playerService.isPlaying = true;
+                              playerService.startPlay(song: song, playlistId: "!ALBUM,${widget.album.id}");
+                              playerService.shuffled = false;
+                            });
+                          }
+                        })),
+                        FloatingButton(icon: Icons.shuffle, onPressed: () {
+                          if(widget.album.songs.isNotEmpty) {
+                            int index = Random().nextInt(widget.album.songs.length);
+                            var id = widget.album.songs[index];
+                            var song = appStorage.songs.get(id);
+                            appState.setState(() {
+                              playerService.isPlaying = true;
+                              playerService.startPlay(song: song, playlistId: "!ALBUM,${widget.album.id}", shuffle: true);
+                            });
+                          }
+                        })
+                      ],
+                    ),
+                  )
+                ],
               ),
             ),
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                var song = songList[index];
-                var textWidget = TrackNumber(trackNumber: song.trackNumber);
-                return SongListItem(song: song, playlistId: "!ALBUM,${widget.album.id}", albumCover: textWidget);
-              },
-              childCount: songList.length,
+          SliverPadding(
+            padding: EdgeInsets.only(bottom: 80 + MediaQuery.of(context).padding.bottom),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  var song = songList[index];
+                  var textWidget = TrackNumber(trackNumber: song.trackNumber);
+                  return SongListItem(song: song, playlistId: "!ALBUM,${widget.album.id}", albumCover: textWidget);
+                },
+                childCount: songList.length,
+              ),
             ),
           ),
         ],

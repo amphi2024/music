@@ -9,6 +9,8 @@ import 'package:music/ui/components/image/artist_profile_image.dart';
 import 'package:music/ui/dialogs/edit_artist_dialog.dart';
 
 import '../../models/app_storage.dart';
+import '../../models/player_service.dart';
+import '../fragments/components/floating_button.dart';
 import 'album_view.dart';
 
 class ArtistView extends StatelessWidget {
@@ -27,7 +29,7 @@ class ArtistView extends StatelessWidget {
     }
 
     var imageSize = MediaQuery.of(context).size.width - 100;
-
+    final String playlistId = "!ARTIST,${artist.id}";
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -65,17 +67,56 @@ class ArtistView extends StatelessWidget {
               ),
             ),
           ),
-          SliverGrid.builder(
-              itemCount: albumList.length,
-              itemBuilder: (context, index) => AlbumGridItem(showArtistName: false, album: albumList[index], onPressed: () {
-                Navigator.push(
-                    context,
-                    CupertinoPageRoute(
-                      builder: (context) => AlbumView(album: albumList[index]),
-                    ));
-              }),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-                childAspectRatio: 0.65))
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(padding: EdgeInsets.only(right: 15), child: FloatingButton(icon: Icons.play_arrow, onPressed: () {
+                    var albumId = artist.albums.firstOrNull;
+                    if(albumId != null) {
+                      var songId = appStorage.albums.get(albumId).songs.firstOrNull;
+                      if(songId != null) {
+                        appState.setState(() {
+                          playerService.isPlaying = true;
+                          playerService.shuffled = false;
+                          playerService.startPlay(song: appStorage.songs.get(songId), playlistId: playlistId);
+                        });
+                      }
+                    }
+                  })),
+                  FloatingButton(icon: Icons.shuffle, onPressed: () {
+                    var albumId = artist.albums.firstOrNull;
+                    if(albumId != null) {
+                      var songId = appStorage.albums.get(albumId).songs.firstOrNull;
+                      if(songId != null) {
+                        appState.setState(() {
+                          playerService.isPlaying = true;
+                          playerService.startPlay(song: appStorage.songs.get(songId), playlistId: playlistId, shuffle: true);
+                        });
+                      }
+                    }
+                  })
+                ],
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: EdgeInsets.only(bottom: 80 + MediaQuery.of(context).padding.bottom),
+            sliver: SliverGrid.builder(
+                itemCount: albumList.length,
+                itemBuilder: (context, index) => AlbumGridItem(showArtistName: false, album: albumList[index], onPressed: () {
+                  Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => AlbumView(album: albumList[index]),
+                      ));
+                }),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
+                  childAspectRatio: 0.65)),
+          )
         ]
       ),
     );
