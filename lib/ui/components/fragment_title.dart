@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:amphi/models/app.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_cache.dart';
@@ -21,11 +23,19 @@ class FragmentTitle extends StatelessWidget {
     var textTheme = themeData.textTheme;
     double scaleValue = (textTheme.bodyMedium?.fontSize ?? 15) / (textTheme.headlineMedium?.fontSize ?? 20);
 
+    var padding = EdgeInsets.only(left: 15.0, right: 5);
+    double height = 55;
+    if(Platform.isAndroid && App.isWideScreen(context)) {
+      padding = EdgeInsets.only(left: 15.0, right: 5, top: MediaQuery.of(context).padding.top);
+      height += MediaQuery.of(context).padding.top;
+    }
+
+
     return Container(
-      height: 55,
+      height: height,
       decoration: BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor.withAlpha(125)),
       child: Padding(
-        padding: const EdgeInsets.only(left: 15.0, right: 5),
+        padding: padding,
         child: Stack(
           children: [
             AnimatedOpacity(
