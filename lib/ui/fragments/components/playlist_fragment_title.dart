@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
@@ -69,7 +71,8 @@ class PlaylistFragmentTitle extends StatelessWidget {
                             padding: const EdgeInsets.only(left: 15.0),
                             child: FloatingButton(icon: Icons.shuffle, onPressed: () {
                               if(playlist.songs.isNotEmpty) {
-                                var id = playlist.songs[0];
+                                var index = Random().nextInt(playlist.songs.length);
+                                var id = playlist.songs[index];
                                 var song = appStorage.songs.get(id);
                                 appState.setState(() {
                                   playerService.isPlaying = true;
