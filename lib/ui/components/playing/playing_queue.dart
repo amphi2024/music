@@ -10,7 +10,7 @@ class PlayingQueue extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var playingQueue = playerService.playlist.songs;
+    var playingQueue = playerService.songs;
 
     return ListView.builder(
       padding: EdgeInsets.zero,

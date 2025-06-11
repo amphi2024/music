@@ -35,7 +35,7 @@ class AppMethodChannel extends MethodChannel {
           appState.setState(() {
             playerService.index = index;
             playerService.isPlaying = isPlaying;
-            playerService.playingSongId = playerService.playlist.songs[index];
+            playerService.playingSongId = playerService.songs[index];
           });
           break;
         case "on_playback_changed":
@@ -67,7 +67,7 @@ class AppMethodChannel extends MethodChannel {
 
   void onPlaybackFinished() {
     if (playerService.playMode == playOnce) {
-      if(playerService.index == playerService.playlist.songs.length - 1) {
+      if(playerService.index == playerService.songs.length - 1) {
         appState.setState(() {
           playerService.playbackPosition = playerService.musicDuration;
           playerService.isPlaying = false;
@@ -186,7 +186,7 @@ class AppMethodChannel extends MethodChannel {
 
   Future<void> syncPlaylistState() async {
     List<Map<String, dynamic>> list = [];
-    for (String songId in playerService.playlist.songs) {
+    for (String songId in playerService.songs) {
       var song = appStorage.songs.get(songId);
       var songFile = song.playingFile();
       list.add({

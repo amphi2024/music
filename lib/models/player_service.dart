@@ -1,9 +1,9 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:music/channels/app_method_channel.dart';
 import 'package:music/models/app_cache.dart';
 import 'package:music/models/app_storage.dart';
-import 'package:music/models/music/playlist.dart';
 
 import 'app_state.dart';
 import 'music/song.dart';
@@ -18,9 +18,9 @@ class PlayerService {
   static final PlayerService _instance = PlayerService();
   static PlayerService getInstance() => _instance;
 
-  String playlistId = "";
-  Playlist get playlist => appStorage.playlists[playlistId] ?? Playlist();
+  List<String> songs = [];
   int index = 0;
+  String playlistId = "";
   String playingSongId = "";
   int musicDuration = 0;
   int playbackPosition = 0;
@@ -42,18 +42,19 @@ class PlayerService {
   void toggleShuffle() {
     if(shuffled) {
       shuffled = false;
-      playlist.songs.sortSongList(appCacheData.sortOption(playlistId));
+      songs.sortSongList(appCacheData.sortOption(playlistId));
     }
     else {
       shuffled = true;
-      playlist.shuffle();
+      Random random = Random();
+      songs.shuffle(random);
     }
     syncPlaylistState();
   }
 
   void syncPlaylistState() {
-    for(int i = 0 ; i < playlist.songs.length; i++) {
-      if(playlist.songs[i] == playingSongId) {
+    for(int i = 0 ; i < songs.length; i++) {
+      if(songs[i] == playingSongId) {
         index = i; // Sync index of playing song
       }
     }
@@ -63,7 +64,7 @@ class PlayerService {
   }
 
   Song nowPlaying() {
-    if(playlist.songs.isEmpty || playlist.songs.length <= index) {
+    if(songs.isEmpty || songs.length <= index) {
       return Song();
     }
     else {
@@ -77,24 +78,27 @@ class PlayerService {
     appCacheData.save();
 
     this.playlistId = playlistId;
+    songs.clear();
+    songs.addAll(appStorage.playlists.get(playlistId).songs.map((e) => e as String));
 
     if(shuffle) {
       shuffled = true;
-      playlist.songs.shuffle();
+      Random random = Random();
+      songs.shuffle(random);
     }
     else {
-      playlist.songs.sortSongList(appCacheData.sortOption(playlistId));
+      songs.sortSongList(appCacheData.sortOption(playlistId));
     }
 
       index = 0;
-      for(int i = 0; i < playlist.songs.length; i++) {
-        var id = playlist.songs[i];
+      for(int i = 0; i < songs.length; i++) {
+        var id = songs[i];
         if(id == song.id) {
           index = i;
           break;
         }
       }
-      playingSongId = playlist.songs[index];
+      playingSongId = songs[index];
       if(localeCode != null) {
         appMethodChannel.localeCode = localeCode;
       }
@@ -109,9 +113,9 @@ class PlayerService {
   Future<void> playPrevious(String? localeCode) async {
     playerService.index--;
     if(index < 0) {
-      index = playlist.songs.length - 1;
+      index = songs.length - 1;
     }
-    playingSongId = playlist.songs[index];
+    playingSongId = songs[index];
 
       if(localeCode != null) {
         appMethodChannel.localeCode = localeCode;
@@ -127,10 +131,10 @@ class PlayerService {
   Future<void> playNext(String? localeCode) async {
 
     index++;
-    if(index >= playlist.songs.length) {
+    if(index >= songs.length) {
       index = 0;
     }
-    playingSongId = playlist.songs[index];
+    playingSongId = songs[index];
 
       if(localeCode != null) {
         appMethodChannel.localeCode = localeCode;
@@ -154,7 +158,7 @@ class PlayerService {
       await appMethodChannel.pauseMusic();
     }
     index = i;
-    playingSongId = playlist.songs[i];
+    playingSongId = songs[i];
       await appMethodChannel.setMediaSource(song: nowPlaying(), playNow: isPlaying);
       await appMethodChannel.resumeMusic();
       musicDuration = await appMethodChannel.getMusicDuration();
