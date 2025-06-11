@@ -6,18 +6,35 @@ import 'package:music/models/music/playlist.dart';
 import 'package:music/ui/components/item/song_list_item.dart';
 import 'package:music/ui/components/playlist_thumbnail.dart';
 
+import '../../models/app_cache.dart';
 import '../../models/app_state.dart';
 import '../../models/player_service.dart';
+import '../../models/sort_option.dart';
 import '../components/image/album_cover.dart';
 import '../fragments/components/floating_button.dart';
 
-class PlaylistView extends StatelessWidget {
+class PlaylistView extends StatefulWidget {
 
   final Playlist playlist;
   const PlaylistView({super.key, required this.playlist});
 
   @override
+  State<PlaylistView> createState() => _PlaylistViewState();
+}
+
+class _PlaylistViewState extends State<PlaylistView> {
+
+  void sortListByOption(String sortOption) {
+       setState(() {
+          appStorage.playlists.get(widget.playlist.id).songs.sortSongList(sortOption);
+        });
+        appCacheData.setSortOption(sortOption: sortOption, playlistId: widget.playlist.id);
+    appCacheData.save();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final playlist = widget.playlist;
 
     var imageSize = MediaQuery.of(context).size.width - 100;
 
@@ -27,6 +44,71 @@ class PlaylistView extends StatelessWidget {
             SliverAppBar(
               expandedHeight: MediaQuery.of(context).size.width + 80,
               pinned: true,
+              actions: [
+                PopupMenuButton(
+                    itemBuilder: (context) {
+                      var playlistId = playlist.id;
+                      final sortOption = appCacheData.sortOption(playlistId);
+                      final items = [
+                        PopupMenuItem(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Sort by Title"),
+                                Visibility(
+                                    visible: sortOption == SortOption.title || sortOption == SortOption.titleDescending,
+                                    child: Icon(sortOption == SortOption.title ? Icons.arrow_upward : Icons.arrow_downward))
+                              ],
+                            ),
+                            onTap: () {
+                              if(sortOption == SortOption.title) {
+                                sortListByOption(SortOption.titleDescending);
+                              }
+                              else {
+                                sortListByOption(SortOption.title);
+                              }
+                            }),
+                        PopupMenuItem(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Sort by Artist"),
+                                Visibility(
+                                    visible: sortOption == SortOption.artist || sortOption == SortOption.artistDescending,
+                                    child: Icon(sortOption == SortOption.artist ? Icons.arrow_upward : Icons.arrow_downward))
+                              ],
+                            ),
+                            onTap: () {
+                              if(sortOption == SortOption.artist) {
+                                sortListByOption(SortOption.artistDescending);
+                              }
+                              else {
+                                sortListByOption(SortOption.artist);
+                              }
+                            }),
+                        PopupMenuItem(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text("Sort by Album"),
+                                Visibility(
+                                    visible: sortOption == SortOption.album || sortOption == SortOption.albumDescending,
+                                    child: Icon(sortOption == SortOption.album ? Icons.arrow_upward : Icons.arrow_downward))
+                              ],
+                            ),
+                            onTap: () {
+                              if(sortOption == SortOption.album) {
+                                sortListByOption(SortOption.albumDescending);
+                              }
+                              else {
+                                sortListByOption(SortOption.album);
+                              }
+                            })
+                      ];
+                      return items;
+                    },
+                    icon: Icon(Icons.more_horiz_outlined))
+              ],
               flexibleSpace: FlexibleSpaceBar(
                 title: GestureDetector(
                   onLongPress: () {
