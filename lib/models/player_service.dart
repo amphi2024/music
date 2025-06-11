@@ -126,6 +126,10 @@ class PlayerService {
       await appMethodChannel.setMediaSource(song: nowPlaying(), playNow: isPlaying);
       appCacheData.lastPlayedSongId = playingSongId;
       appCacheData.save();
+
+    if(Platform.isAndroid || Platform.isIOS) {
+      await appMethodChannel.syncMediaSourceToNative();
+    }
   }
 
   Future<void> playNext(String? localeCode) async {
@@ -146,6 +150,10 @@ class PlayerService {
       await appMethodChannel.setMediaSource(song: nowPlaying(), playNow: isPlaying);
     appCacheData.lastPlayedSongId = playingSongId;
     appCacheData.save();
+
+    if(Platform.isAndroid || Platform.isIOS) {
+      await appMethodChannel.syncMediaSourceToNative();
+    }
   }
 
   Future<void> pauseMusicIfPlaying() async {
@@ -163,6 +171,10 @@ class PlayerService {
       await appMethodChannel.resumeMusic();
       musicDuration = await appMethodChannel.getMusicDuration();
      appState.setState(() {});
+
+    if(Platform.isAndroid || Platform.isIOS) {
+      await appMethodChannel.syncMediaSourceToNative();
+    }
   }
 
 }

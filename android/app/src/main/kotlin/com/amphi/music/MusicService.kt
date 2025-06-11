@@ -214,6 +214,11 @@ class MusicService : Service() {
 
         setSource(url = item.url, filePath = item.mediaFilePath, playNow = true)
 
+        methodChannel?.invokeMethod("sync_media_source_to_flutter", mapOf(
+            "index" to index,
+            "is_playing" to isPlaying
+        ))
+
         updateNotification()
     }
 
@@ -228,6 +233,10 @@ class MusicService : Service() {
         albumCoverFilePath = item.albumCoverFilePath
         setSource(url = item.url, filePath = item.mediaFilePath, playNow = true)
 
+        methodChannel?.invokeMethod("sync_media_source_to_flutter", mapOf(
+            "index" to index,
+            "is_playing" to isPlaying
+        ))
         updateNotification()
     }
 

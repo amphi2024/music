@@ -205,6 +205,13 @@ class AppMethodChannel extends MethodChannel {
     });
   }
 
+  Future<void> syncMediaSourceToNative() async {
+    await invokeMethod("sync_media_source_to_native", {
+      "index": playerService.index,
+      "is_playing": playerService.isPlaying
+    });
+  }
+
   Future<void> setMediaSource({required Song song, String? localeCode, bool playNow = true}) async {
     await invokeMethod("set_media_source", {
       "path": song.playingFile().mediaFilepath,

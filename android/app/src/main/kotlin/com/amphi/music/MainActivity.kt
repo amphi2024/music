@@ -220,6 +220,13 @@ class MainActivity : FlutterActivity() {
                     result.success(call.argument<String>("path")?.let { albumArt(filePath = it) })
                 }
 
+                "sync_media_source_to_native" -> {
+                    val index = call.argument<Int>("index")!!
+                    val isPlaying = call.argument<Boolean>("is_playing")!!
+                    musicService?.isPlaying = isPlaying
+                    musicService?.index = index
+                    result.success(true)
+                }
                 else -> result.notImplemented()
             }
         }
