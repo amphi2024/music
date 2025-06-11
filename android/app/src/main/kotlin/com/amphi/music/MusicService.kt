@@ -6,16 +6,18 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
-import android.media.MediaMetadata
 import android.net.Uri
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import androidx.annotation.OptIn
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
@@ -26,7 +28,6 @@ import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaStyleNotificationHelper
 import io.flutter.plugin.common.MethodChannel
 import java.io.File
-import androidx.core.net.toUri
 
 class MusicService : Service() {
     private lateinit var notificationManager: NotificationManagerCompat
@@ -42,6 +43,7 @@ class MusicService : Service() {
     var title = ""
     var artist = ""
     var albumCoverFilePath: String? = null
+    lateinit var mediaSessionCompat: MediaSessionCompat
     lateinit var mediaSession: MediaSession
     var methodChannel: MethodChannel? = null
     lateinit var notificationBuilder: NotificationCompat.Builder
@@ -59,8 +61,41 @@ class MusicService : Service() {
         player = ExoPlayer.Builder(this).build()
         mediaSession = MediaSession.Builder(this, player)
             .build()
+        mediaSessionCompat = MediaSessionCompat(this, "MusicService")
+
+        mediaSessionCompat.setCallback(object : MediaSessionCompat.Callback() {
+            override fun onSeekTo(pos: Long) {
+                player.seekTo(pos)
+                updatePlaybackState()
+            }
+            override fun onPlay() {
+                isPlaying = true
+                player.play()
+                updateNotification()
+            }
+
+            override fun onPause() {
+                isPlaying = false
+                player.pause()
+                updateNotification()
+            }
+
+            override fun onSkipToNext() {
+                playNext()
+            }
+
+            override fun onSkipToPrevious() {
+                playPrevious()
+            }
+        })
+        mediaSessionCompat.isActive = true
+
 
         player.addListener(object : Player.Listener{
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                this@MusicService.isPlaying = isPlaying
+                updatePlaybackState()
+            }
             override fun onPlaybackStateChanged(playbackState: Int) {
                 if (playbackState == Player.STATE_ENDED) {
                     playNext()
@@ -69,46 +104,11 @@ class MusicService : Service() {
                         "is_playing" to isPlaying
                     ))
                 }
+                updatePlaybackState()
             }
         })
 
-        val previousIntent = PendingIntent.getBroadcast(
-            this, 0, Intent(this, com.amphi.music.MediaButtonReceiver::class.java).apply {
-                action = "PLAY_PREVIOUS"
-            }, PendingIntent.FLAG_IMMUTABLE
-        )
-        val nextIntent = PendingIntent.getBroadcast(
-            this, 0, Intent(this, com.amphi.music.MediaButtonReceiver::class.java).apply {
-                action = "PLAY_NEXT"
-            }, PendingIntent.FLAG_IMMUTABLE
-        )
-        val playPauseIntent = PendingIntent.getBroadcast(
-            this, 0, Intent(this, com.amphi.music.MediaButtonReceiver::class.java).apply {
-                action = "PAUSE"
-            }, PendingIntent.FLAG_IMMUTABLE
-        )
-
-        notificationBuilder = NotificationCompat.Builder(this, MusicApplication.MUSIC_NOTIFICATION_CHANNEL_ID)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setContentTitle(title)
-            .setContentText(artist)
-            .setSmallIcon(R.drawable.logo)
-            .addAction(NotificationCompat.Action(R.drawable.previous, "Previous", previousIntent
-            ))
-            .addAction(NotificationCompat.Action( if(isPlaying) R.drawable.pause else R.drawable.play, "Pause", playPauseIntent
-            ))
-            .addAction(NotificationCompat.Action(R.drawable.next, "Pause", nextIntent
-            ))
-            .setStyle(MediaStyleNotificationHelper.MediaStyle(mediaSession).setShowActionsInCompactView(1))
-            .setOngoing(true)
-
-        albumCoverFilePath?.let {
-            val file = File(it)
-            if(file.exists() && it.isNotEmpty()) {
-                val bitmap = BitmapFactory.decodeFile(albumCoverFilePath)
-                notificationBuilder.setLargeIcon(bitmap)
-            }
-        }
+        updateNotification()
 
         startForeground(1, notificationBuilder.build())
     }
@@ -158,13 +158,15 @@ class MusicService : Service() {
 
     @OptIn(UnstableApi::class)
     fun setSource(url: String, filePath: String, playNow: Boolean = true) {
-        val file = File(filePath)
-        if(file.exists()) {
-            val mediaMetadata = androidx.media3.common.MediaMetadata.Builder()
-                .setTitle(title)
-                .setArtist(artist)
-                .build()
 
+        val file = File(filePath)
+
+        val mediaMetadata = androidx.media3.common.MediaMetadata.Builder()
+            .setTitle(title)
+            .setArtist(artist)
+            .build()
+
+        if(file.exists()) {
 
             val uri = Uri.fromFile(file)
             val mediaItem = MediaItem.Builder()
@@ -174,11 +176,6 @@ class MusicService : Service() {
             player.setMediaItem(mediaItem)
         }
         else {
-
-            val mediaMetadata = androidx.media3.common.MediaMetadata.Builder()
-                .setTitle(title)
-                .setArtist(artist)
-                .build()
 
             val mediaItem = MediaItem.Builder()
                 .setUri(url.toUri())
@@ -230,24 +227,26 @@ class MusicService : Service() {
         artist = item.artist
         albumCoverFilePath = item.albumCoverFilePath
         setSource(url = item.url, filePath = item.mediaFilePath, playNow = true)
+
         updateNotification()
     }
 
     @OptIn(UnstableApi::class)
     fun updateNotification() {
+        updatePlaybackState()
 
         val previousIntent = PendingIntent.getBroadcast(
-            this, 0, Intent(this, com.amphi.music.MediaButtonReceiver::class.java).apply {
+            this, 0, Intent(this, MediaButtonReceiver::class.java).apply {
                 action = "PLAY_PREVIOUS"
             }, PendingIntent.FLAG_IMMUTABLE
         )
         val nextIntent = PendingIntent.getBroadcast(
-            this, 0, Intent(this, com.amphi.music.MediaButtonReceiver::class.java).apply {
+            this, 0, Intent(this, MediaButtonReceiver::class.java).apply {
                 action = "PLAY_NEXT"
             }, PendingIntent.FLAG_IMMUTABLE
         )
         val playPauseIntent = PendingIntent.getBroadcast(
-            this, 0, Intent(this, com.amphi.music.MediaButtonReceiver::class.java).apply {
+            this, 0, Intent(this, MediaButtonReceiver::class.java).apply {
                 action = "PAUSE"
             }, PendingIntent.FLAG_IMMUTABLE
         )
@@ -261,10 +260,22 @@ class MusicService : Service() {
             ))
             .addAction(NotificationCompat.Action( if(isPlaying) R.drawable.pause else R.drawable.play, "Pause", playPauseIntent
             ))
-            .addAction(NotificationCompat.Action(R.drawable.next, "Pause", nextIntent
+            .addAction(NotificationCompat.Action(R.drawable.next, "Next", nextIntent
             ))
-            .setStyle(MediaStyleNotificationHelper.MediaStyle(mediaSession).setShowActionsInCompactView(1))
             .setOngoing(true)
+
+
+        if(Build.VERSION.SDK_INT >= 34) {
+            notificationBuilder.setStyle(
+                androidx.media.app.NotificationCompat.MediaStyle()
+                    .setMediaSession(mediaSessionCompat.sessionToken)
+                    .setShowActionsInCompactView(0, 1, 2)
+                    .setShowCancelButton(true)
+            )
+        }
+        else {
+            notificationBuilder.setStyle(MediaStyleNotificationHelper.MediaStyle(mediaSession).setShowActionsInCompactView(0, 1, 2))
+        }
 
         albumCoverFilePath?.let {
             val file = File(it)
@@ -287,10 +298,41 @@ class MusicService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         player.release()
-        mediaSession.release()
+        mediaSessionCompat.release()
     }
 
     override fun onBind(intent: Intent?): IBinder? {
         return binder
     }
+
+    private fun updatePlaybackState() {
+        val metadata = android.support.v4.media.MediaMetadataCompat.Builder()
+            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
+            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
+            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, player.duration)
+            .build()
+
+        mediaSessionCompat.setMetadata(metadata)
+
+        val state = if (isPlaying) PlaybackStateCompat.STATE_PLAYING else PlaybackStateCompat.STATE_PAUSED
+
+        val playbackState = PlaybackStateCompat.Builder()
+            .setActions(
+                PlaybackStateCompat.ACTION_PLAY or
+                        PlaybackStateCompat.ACTION_PAUSE or
+                        PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                        PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
+                        PlaybackStateCompat.ACTION_SEEK_TO
+            )
+            .setState(
+                state,
+                player.currentPosition,
+                if (isPlaying) 1.0f else 0f
+            )
+            .setBufferedPosition(player.bufferedPosition)
+            .build()
+
+        mediaSessionCompat.setPlaybackState(playbackState)
+    }
+
 }
