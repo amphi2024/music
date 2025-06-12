@@ -70,7 +70,7 @@ class _ArtistsFragmentState extends State<ArtistsFragment> {
                   }
                 },
                 onLongPressed: () {
-                    showConfirmationDialog("@", () {
+                    showConfirmationDialog("@dialog_title_delete_artist", () {
                       artist.delete();
                       setState(() {
                         appStorage.artists.remove(artist.id);

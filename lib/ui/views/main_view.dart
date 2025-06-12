@@ -1,4 +1,5 @@
 
+import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:music/channels/app_method_channel.dart';
 import 'package:music/models/app_state.dart';
@@ -59,15 +60,15 @@ class _MainViewState extends State<MainView> {
   String fragmentTitle() {
     switch(appState.fragmentIndex) {
       case FragmentIndex.songs:
-        return "Songs";
+        return AppLocalizations.of(context).get("@songs");
       case FragmentIndex.artists:
-        return "Artists";
+        return AppLocalizations.of(context).get("@artists");
       case FragmentIndex.albums:
-        return "Albums";
+        return AppLocalizations.of(context).get("@albums");
       case FragmentIndex.genres:
-        return "Genres";
+        return AppLocalizations.of(context).get("@genres");
       case FragmentIndex.archive:
-        return "Archive";
+        return AppLocalizations.of(context).get("@archive");
       case FragmentIndex.playlist:
         return appStorage.playlists.get(appState.showingPlaylistId ?? "").title;
       case FragmentIndex.artist:

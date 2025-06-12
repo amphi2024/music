@@ -1,4 +1,5 @@
 import 'package:amphi/models/app.dart';
+import 'package:amphi/models/app_localizations.dart';
 import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
@@ -134,12 +135,12 @@ class SongListItem extends StatelessWidget {
                       icon: Icon(Icons.more_vert),
                       itemBuilder: (context) {
                         List<PopupMenuItem> list = [
-                          PopupMenuItem(child: Text("Remove Download"), onTap: () {
+                          PopupMenuItem(child: Text(AppLocalizations.of(context).get("@remove_download")), onTap: () {
                             appState.setFragmentState(() {
                               song.removeDownload();
                             });
                           }),
-                          PopupMenuItem(child: Text("Add to Playlist"), onTap: () {
+                          PopupMenuItem(child: Text(AppLocalizations.of(context).get("@add_to_playlist")), onTap: () {
                             if(App.isDesktop() || App.isWideScreen(context)) {
                               showDialog(context: context, builder: (context) => Dialog(
                                 child: Container(
@@ -189,12 +190,12 @@ class SongListItem extends StatelessWidget {
                               });
                             }
                           }),
-                          PopupMenuItem(child: Text("Edit Info"), onTap: () {
+                          PopupMenuItem(child: Text(AppLocalizations.of(context).get("@edit_song_info")), onTap: () {
                             showDialog(context: context, builder: (context) {
                               return EditSongInfoDialog(song: song);
                             });
                           }),
-                          PopupMenuItem(child: Text("Upload"), onTap: () {
+                          PopupMenuItem(child: Text(AppLocalizations.of(context).get("@upload_again")), onTap: () {
                             appState.setFragmentState(() {
                               song.transferring = true;
                             });
@@ -204,7 +205,7 @@ class SongListItem extends StatelessWidget {
                               });
                             });
                           }),
-                          PopupMenuItem(child: Text("Move to Archive"), onTap: () {
+                          PopupMenuItem(child: Text(AppLocalizations.of(context).get("@move_to_archive")), onTap: () {
                             appStorage.songIdList.remove(song.id);
                             appStorage.archiveIdList.add(song.id);
                             for(int i = 0 ; i < appStorage.playlists.get("").songs.length; i++) {
@@ -222,7 +223,7 @@ class SongListItem extends StatelessWidget {
                         ];
 
                         if(playlistId != "") {
-                          list.add(PopupMenuItem(child: Text("Remove From Playlist"), onTap: () {
+                          list.add(PopupMenuItem(child: Text(AppLocalizations.of(context).get("@remove_from_playlist")), onTap: () {
                             appState.setFragmentState(() {
                               appStorage.playlists.get(playlistId).songs.remove(song.id);
                             });
@@ -230,12 +231,12 @@ class SongListItem extends StatelessWidget {
                           }));
                         }
 
-                        list.add(PopupMenuItem(child: Text("Delete"), onTap: () {
+                        list.add(PopupMenuItem(child: Text(AppLocalizations.of(context).get("@delete")), onTap: () {
                           showDialog(
                               context: context,
                               builder: (context) {
                                 return ConfirmationDialog(
-                                  title: "",
+                                  title: AppLocalizations.of(context).get("@dialog_title_delete_song"),
                                   onConfirmed: () {
                                     song.delete();
                                     appState.setFragmentState(() {

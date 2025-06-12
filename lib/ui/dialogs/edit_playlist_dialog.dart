@@ -1,3 +1,4 @@
+import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/music/playlist.dart';
 
@@ -34,7 +35,7 @@ class _EditPlaylistDialogState extends State<EditPlaylistDialog> {
               child: TextField(
                   controller: controller,
                 decoration: InputDecoration(
-                  hintText: "Name"
+                  hintText: AppLocalizations.of(context).get("@title")
                 ),
               ),
             ),

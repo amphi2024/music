@@ -2,6 +2,7 @@
 import 'dart:io';
 
 import 'package:amphi/models/app.dart';
+import 'package:amphi/models/app_localizations.dart';
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
@@ -29,8 +30,8 @@ class _NavigationMenuState extends State<NavigationMenu> {
   @override
   Widget build(BuildContext context) {
     List<Widget> children = [
-      _MenuHeader(text: "Library"),
-      _MenuItem(title: "Songs", icon: Icons.music_note, onPressed: () {
+      _MenuHeader(text: AppLocalizations.of(context).get("@library")),
+      _MenuItem(title: AppLocalizations.of(context).get("@songs"), icon: Icons.music_note, onPressed: () {
         appState.setMainViewState(() {
           appState.fragmentTitleMinimized = false;
           appState.fragmentTitleShowing = true;
@@ -40,7 +41,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
           saveWindowSize();
         }
       }),
-      _MenuItem(title: "Artists", icon: Icons.people, onPressed: () {
+      _MenuItem(title: AppLocalizations.of(context).get("@artists"), icon: Icons.people, onPressed: () {
         appState.setMainViewState(() {
           appState.fragmentTitleMinimized = false;
           appState.fragmentTitleShowing = true;
@@ -50,7 +51,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
           saveWindowSize();
         }
       }),
-      _MenuItem(title: "Albums", icon: Icons.album, onPressed: () {
+      _MenuItem(title: AppLocalizations.of(context).get("@albums"), icon: Icons.album, onPressed: () {
         appState.setMainViewState(() {
           appState.fragmentTitleMinimized = false;
           appState.fragmentTitleShowing = true;
@@ -60,7 +61,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
           saveWindowSize();
         }
       }),
-      _MenuItem(title: "Genres", icon: Icons.piano, onPressed: () {
+      _MenuItem(title: AppLocalizations.of(context).get("@genres"), icon: Icons.piano, onPressed: () {
         appState.setMainViewState(() {
           appState.fragmentTitleMinimized = false;
           appState.fragmentTitleShowing = true;
@@ -70,7 +71,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
           saveWindowSize();
         }
       }),
-      _MenuItem(title: "Archive", icon: Icons.archive, onPressed: () {
+      _MenuItem(title: AppLocalizations.of(context).get("@archive"), icon: Icons.archive, onPressed: () {
         appState.setMainViewState(() {
           appState.fragmentTitleMinimized = false;
           appState.fragmentTitleShowing = true;
@@ -80,7 +81,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
           saveWindowSize();
         }
       }),
-      _MenuHeader(text: "Playlists"),
+      _MenuHeader(text: AppLocalizations.of(context).get("@playlists")),
     ];
 
     if(Platform.isMacOS && !appWindow.isMaximized) {
@@ -112,7 +113,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
       },
       onLongPressed: () {
         showDialog(context: context, builder: (context) {
-          return ConfirmationDialog(title: "", onConfirmed: () {
+          return ConfirmationDialog(title: AppLocalizations.of(context).get("@dialog_title_delete_playlist"), onConfirmed: () {
             appState.setState(() {
               playlist.delete();
               appStorage.playlists.remove(playlist.id);

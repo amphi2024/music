@@ -50,7 +50,7 @@ class _EditAlbumDialogState extends State<EditAlbumDialog> {
       var filePath = album.covers[i];
       var child = GestureDetector(
         onLongPress: () {
-            showConfirmationDialog("@", () async {
+            showConfirmationDialog("@dialog_title_remove_album_cover", () async {
               var file = File(filePath);
               await file.delete();
               appWebChannel.deleteAlbumCover(id: album.id, filePath: filePath);
@@ -77,7 +77,7 @@ class _EditAlbumDialogState extends State<EditAlbumDialog> {
         var filePath = selectedFiles![i].xFile.path;
         var child = GestureDetector(
           onLongPress: () {
-            showConfirmationDialog("@", () async {
+            showConfirmationDialog("@dialog_title_remove_album_cover", () async {
               setState(() {
                 selectedFiles!.removeAt(i);
                 i--;

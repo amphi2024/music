@@ -79,7 +79,7 @@ class _AlbumsFragmentState extends State<AlbumsFragment> {
                         }
                       },
                     onLongPressed: () {
-                        showConfirmationDialog("@", () {
+                        showConfirmationDialog("@dialog_title_delete_album", () {
                           setState(() {
                             album.delete();
                             appStorage.albums.remove(id);

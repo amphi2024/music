@@ -1,3 +1,4 @@
+import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_cache.dart';
 import 'package:music/models/music/playlist.dart';
@@ -29,11 +30,11 @@ class AddItemButton extends StatelessWidget {
         },
         itemBuilder: (context) {
           return [
-            PopupMenuItem(child: Text("Song"), onTap: () async {
+            PopupMenuItem(child: Text(AppLocalizations.of(context).get("@song")), onTap: () async {
               appStorage.selectMusicFilesAndSave();
             }),
             PopupMenuItem(
-                child: Text("Album"), onTap: () {
+                child: Text(AppLocalizations.of(context).get("@album")), onTap: () {
               showDialog(context: context, builder: (context) {
                 return EditAlbumDialog(creating: true, album: Album.created(metadata: {}, artistId: "", albumCover: []), onSave: (album) {
                   appState.setFragmentState(() {
@@ -45,7 +46,7 @@ class AddItemButton extends StatelessWidget {
               });
             }),
             PopupMenuItem(
-                child: Text("Artist"), onTap: () {
+                child: Text(AppLocalizations.of(context).get("@artist")), onTap: () {
               showDialog(context: context, builder: (context) {
                 return EditArtistDialog(artist: Artist.created({}), onSave: (artist) {
                   appState.setFragmentState(() {
@@ -56,7 +57,7 @@ class AddItemButton extends StatelessWidget {
                 });
               });
             }),
-            PopupMenuItem(child: Text("Playlist"), onTap: () {
+            PopupMenuItem(child: Text(AppLocalizations.of(context).get("@playlist")), onTap: () {
               showDialog(context: context, builder: (context) {
                 return EditPlaylistDialog(
                     playlist: Playlist.created(),

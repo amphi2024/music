@@ -1,4 +1,5 @@
 
+import 'package:amphi/models/app_localizations.dart';
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -118,7 +119,7 @@ class _Buttons extends StatelessWidget {
       children: [
         FloatingMenuButton(
             icon: Icons.music_note,
-            label: "Songs",
+            label: AppLocalizations.of(context).get("@songs"),
             onPressed: () {
               appState.setMainViewState(() {
                 appState.fragmentTitleMinimized = false;
@@ -127,7 +128,7 @@ class _Buttons extends StatelessWidget {
             }),
         FloatingMenuButton(
             icon: Icons.people,
-            label: "Artists",
+            label: AppLocalizations.of(context).get("@artists"),
             onPressed: () {
               appState.setMainViewState(() {
                 appState.fragmentTitleMinimized = false;
@@ -136,7 +137,7 @@ class _Buttons extends StatelessWidget {
             }),
         FloatingMenuButton(
             icon: Icons.album,
-            label: "Albums",
+            label: AppLocalizations.of(context).get("@albums"),
             onPressed: () {
               appState.setMainViewState(() {
                 appState.fragmentTitleMinimized = false;
@@ -145,7 +146,7 @@ class _Buttons extends StatelessWidget {
             }),
         FloatingMenuButton(
             icon: Icons.piano,
-            label: "Genres",
+            label: AppLocalizations.of(context).get("@genres"),
             onPressed: () {
               appState.setMainViewState(() {
                 appState.fragmentTitleMinimized = false;
@@ -154,7 +155,7 @@ class _Buttons extends StatelessWidget {
             }),
         FloatingMenuButton(
             icon: Icons.archive,
-            label: "Archive",
+            label: AppLocalizations.of(context).get("@archive"),
             onPressed: () {
               appState.setMainViewState(() {
                 appState.fragmentTitleMinimized = false;
@@ -183,7 +184,7 @@ class _Playlists extends StatelessWidget {
             label: playlist.title,
             onLongPressed: () {
               showDialog(context: context, builder: (context) {
-                return ConfirmationDialog(title: "", onConfirmed: () {
+                return ConfirmationDialog(title: AppLocalizations.of(context).get("@dialog_title_delete_playlist"), onConfirmed: () {
                   appState.setState(() {
                     playlist.delete();
                     appStorage.playlists.remove(playlist.id);

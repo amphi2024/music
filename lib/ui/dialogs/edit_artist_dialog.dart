@@ -48,7 +48,7 @@ class _EditArtistDialogState extends State<EditArtistDialog> {
       var filePath = artist.profileImages[i];
       var child = GestureDetector(
         onLongPress: () {
-          showConfirmationDialog("@", () async {
+          showConfirmationDialog("@dialog_title_remove_artist_picture", () async {
             var file = File(filePath);
             await file.delete();
             appWebChannel.deleteArtistFile(id: artist.id, filePath: filePath);
@@ -75,7 +75,7 @@ class _EditArtistDialogState extends State<EditArtistDialog> {
         var filePath = selectedFiles![i].xFile.path;
         var child = GestureDetector(
           onLongPress: () {
-            showConfirmationDialog("@", () async {
+            showConfirmationDialog("@dialog_title_remove_artist_picture", () async {
               setState(() {
                 selectedFiles!.removeAt(i);
                 i--;

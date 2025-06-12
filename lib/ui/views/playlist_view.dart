@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/playlist.dart';
@@ -54,7 +55,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text("Sort by Title"),
+                                Text(AppLocalizations.of(context).get("@sort_by_title")),
                                 Visibility(
                                     visible: sortOption == SortOption.title || sortOption == SortOption.titleDescending,
                                     child: Icon(sortOption == SortOption.title ? Icons.arrow_upward : Icons.arrow_downward))
@@ -72,7 +73,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text("Sort by Artist"),
+                                Text(AppLocalizations.of(context).get("@sort_by_artist")),
                                 Visibility(
                                     visible: sortOption == SortOption.artist || sortOption == SortOption.artistDescending,
                                     child: Icon(sortOption == SortOption.artist ? Icons.arrow_upward : Icons.arrow_downward))
@@ -90,7 +91,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text("Sort by Album"),
+                                Text(AppLocalizations.of(context).get("@sort_by_album")),
                                 Visibility(
                                     visible: sortOption == SortOption.album || sortOption == SortOption.albumDescending,
                                     child: Icon(sortOption == SortOption.album ? Icons.arrow_upward : Icons.arrow_downward))

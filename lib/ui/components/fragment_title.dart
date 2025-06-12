@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:amphi/models/app.dart';
+import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_cache.dart';
 import 'package:music/models/app_state.dart';
@@ -100,7 +101,7 @@ class FragmentTitle extends StatelessWidget {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("Sort by Title"),
+                                  Text(AppLocalizations.of(context).get("@sort_by_title")),
                                   Visibility(
                                       visible: sortOption == SortOption.title || sortOption == SortOption.titleDescending,
                                       child: Icon(sortOption == SortOption.title ? Icons.arrow_upward : Icons.arrow_downward))
@@ -121,7 +122,7 @@ class FragmentTitle extends StatelessWidget {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("Sort by Artist"),
+                                  Text(AppLocalizations.of(context).get("@sort_by_artist")),
                                   Visibility(
                                       visible: sortOption == SortOption.artist || sortOption == SortOption.artistDescending,
                                       child: Icon(sortOption == SortOption.artist ? Icons.arrow_upward : Icons.arrow_downward))
@@ -142,7 +143,7 @@ class FragmentTitle extends StatelessWidget {
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text("Sort by Album"),
+                                  Text(AppLocalizations.of(context).get("@sort_by_album")),
                                   Visibility(
                                       visible: sortOption == SortOption.album || sortOption == SortOption.albumDescending,
                                       child: Icon(sortOption == SortOption.album ? Icons.arrow_upward : Icons.arrow_downward))
@@ -159,8 +160,8 @@ class FragmentTitle extends StatelessWidget {
                         }
 
                         if (appState.selectedSongs != null) {
-                          items.add(PopupMenuItem(child: Text("Add to Playlist"), onTap: () {}));
-                          items.add(PopupMenuItem(child: Text("Move to Archive"), onTap: () {}));
+                          items.add(PopupMenuItem(child: Text(AppLocalizations.of(context).get("@add_to_playlist")), onTap: () {}));
+                          items.add(PopupMenuItem(child: Text(AppLocalizations.of(context).get("@move_to_archive")), onTap: () {}));
                         }
                         return items;
                       },

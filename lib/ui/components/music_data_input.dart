@@ -1,3 +1,4 @@
+import 'package:amphi/models/app_localizations.dart';
 import 'package:amphi/widgets/settings/language.dart';
 import 'package:flutter/material.dart';
 
@@ -79,7 +80,7 @@ class _MusicDataInputState extends State<MusicDataInput> {
                     widget.data[key] = text;
                   },
                   decoration: InputDecoration(
-                    hintText: "Title"
+                    hintText: AppLocalizations.of(context).get("@title")
                   ),
                   controller: controllers.putIfAbsent(key, () => TextEditingController(text: widget.data[key])),
                 )),

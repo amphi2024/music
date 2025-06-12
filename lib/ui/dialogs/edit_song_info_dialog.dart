@@ -1,4 +1,5 @@
 import 'package:amphi/models/app.dart';
+import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -66,7 +67,7 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                   ),
                   _ArtistInput(
                     artist: song.artist,
-                    hint: "(Artist)",
+                    hint: AppLocalizations.of(context).get("@edit_info_label_artist"),
                     languageCode: langCode,
                     onSelected: (id) {
                       setState(() {
@@ -81,7 +82,7 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                         Expanded(
                             child: Text(song.album.title[langCode] ??
                                 song.album.title["default"] ??
-                                "(Album)")),
+                                AppLocalizations.of(context).get("@edit_info_label_album"))),
                         IconButton(
                             onPressed: () {
                               showDialog(
@@ -105,7 +106,7 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
-                        Text("Track number:"),
+                        Text(AppLocalizations.of(context).get("@edit_info_label_track_number")),
                         Padding(
                           padding: const EdgeInsets.only(left: 8.0),
                           child: SizedBox(
@@ -123,7 +124,7 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
-                        Text("Disc number:"),
+                        Text(AppLocalizations.of(context).get("@edit_info_label_disc_number")),
                         Padding(
                           padding: const EdgeInsets.only(left: 8.0),
                           child: SizedBox(
@@ -141,7 +142,7 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
-                        Expanded(child: Text("Released: ${DateFormat.yMMMEd(Localizations.localeOf(context).languageCode.toString()).format(song.released)}")),
+                        Expanded(child: Text("${AppLocalizations.of(context).get("@edit_info_label_released")} ${DateFormat.yMMMEd(Localizations.localeOf(context).languageCode.toString()).format(song.released)}")),
                         IconButton(
                             onPressed: () async {
                               final now = DateTime.now();
@@ -201,7 +202,7 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                   ),
                   _ArtistInput(
                     artist: song.composer,
-                    hint: "(Composer)",
+                    hint: AppLocalizations.of(context).get("@edit_info_label_composer"),
                     languageCode: langCode,
                     onSelected: (id) {
                       setState(() {
@@ -211,7 +212,7 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                   ),
                   _ArtistInput(
                     artist: song.lyricist ?? Artist(),
-                    hint: "(Lyricist)",
+                    hint: AppLocalizations.of(context).get("@edit_info_label_lyricist"),
                     languageCode: langCode,
                     onSelected: (id) {
                       setState(() {
@@ -221,7 +222,7 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                   ),
                   _ArtistInput(
                     artist: song.arranger ?? Artist(),
-                    hint: "(Arranger)",
+                    hint: AppLocalizations.of(context).get("@edit_info_label_arranger"),
                     languageCode: langCode,
                     onSelected: (id) {
                       setState(() {
@@ -231,7 +232,7 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                   ),
                   _ArtistInput(
                     artist: song.producer ?? Artist(),
-                    hint: "(Producer)",
+                    hint: AppLocalizations.of(context).get("@edit_info_label_producer"),
                     languageCode: langCode,
                     onSelected: (id) {
                       setState(() {
