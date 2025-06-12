@@ -249,7 +249,7 @@ extension MusicTitleExtension on Map<String, dynamic> {
       return value;
     }
     else {
-      return "Unknown";
+      return "";
     }
   }
 }
