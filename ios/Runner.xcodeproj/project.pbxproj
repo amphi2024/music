@@ -16,6 +16,10 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		A11550462DDECD55008592EB /* bass.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A11550452DDECD55008592EB /* bass.xcframework */; };
+		A1306F112DF9553B0013024A /* MusicService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1306F102DF955360013024A /* MusicService.swift */; };
+		A13132E42DE7FA2D005CD25B /* PlayableItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A13132E32DE7FA29005CD25B /* PlayableItem.swift */; };
+		A1B36A842DDEDAED0094EBCB /* bass.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A11550452DDECD55008592EB /* bass.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +39,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				A1B36A842DDEDAED0094EBCB /* bass.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -62,6 +67,10 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A11550452DDECD55008592EB /* bass.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = bass.xcframework; sourceTree = "<group>"; };
+		A1306F102DF955360013024A /* MusicService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicService.swift; sourceTree = "<group>"; };
+		A13132E32DE7FA29005CD25B /* PlayableItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayableItem.swift; sourceTree = "<group>"; };
+		A1B36A822DDEDA820094EBCB /* bass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bass.h; sourceTree = "<group>"; };
 		A8F4BCCCD2C77FD8AA77256E /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
 		BAF9324E9E8E4F78A4CCC6BD /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		D400F78AC0BB1FFD60611692 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -80,6 +89,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A11550462DDECD55008592EB /* bass.xcframework in Frameworks */,
 				62B76DFAB626FD813A94FEC4 /* Pods_Runner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -105,7 +115,6 @@
 				D400F78AC0BB1FFD60611692 /* Pods-RunnerTests.release.xcconfig */,
 				A8F4BCCCD2C77FD8AA77256E /* Pods-RunnerTests.profile.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -129,6 +138,7 @@
 				331C8082294A63A400263BE5 /* RunnerTests */,
 				62F1E262CA7B9A474745FB30 /* Pods */,
 				D0D43C6BC6E45EC2B21FEBB7 /* Frameworks */,
+				A1B36A822DDEDA820094EBCB /* bass.h */,
 			);
 			sourceTree = "<group>";
 		};
@@ -144,6 +154,8 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				A1306F102DF955360013024A /* MusicService.swift */,
+				A13132E32DE7FA29005CD25B /* PlayableItem.swift */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
@@ -161,6 +173,7 @@
 			children = (
 				6D9A395D7782DFB3918EDBBD /* Pods_Runner.framework */,
 				23E6BFED9DD0C29DE1756AFA /* Pods_RunnerTests.framework */,
+				A11550452DDECD55008592EB /* bass.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -379,6 +392,8 @@
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
+				A13132E42DE7FA2D005CD25B /* PlayableItem.swift in Sources */,
+				A1306F112DF9553B0013024A /* MusicService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -471,11 +486,33 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = W59D8M5CU7;
 				ENABLE_BITCODE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/DKImagePickerController/DKImagePickerController.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/DKPhotoGallery/DKPhotoGallery.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/SDWebImage/SDWebImage.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/SwiftyGif/SwiftyGif.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/device_info_plus/device_info_plus.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/file_picker/file_picker.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/media_kit_libs_ios_video/media_kit_libs_ios_video.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/media_kit_video/media_kit_video.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/package_info_plus/package_info_plus.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/path_provider_foundation/path_provider_foundation.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/volume_controller/volume_controller.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/wakelock_plus/wakelock_plus.framework/Headers\"",
+					"\".\"",
+				);
 				INFOPLIST_FILE = Runner/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.amphi.music;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -653,11 +690,33 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = W59D8M5CU7;
 				ENABLE_BITCODE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/DKImagePickerController/DKImagePickerController.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/DKPhotoGallery/DKPhotoGallery.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/SDWebImage/SDWebImage.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/SwiftyGif/SwiftyGif.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/device_info_plus/device_info_plus.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/file_picker/file_picker.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/media_kit_libs_ios_video/media_kit_libs_ios_video.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/media_kit_video/media_kit_video.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/package_info_plus/package_info_plus.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/path_provider_foundation/path_provider_foundation.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/volume_controller/volume_controller.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/wakelock_plus/wakelock_plus.framework/Headers\"",
+					"\".\"",
+				);
 				INFOPLIST_FILE = Runner/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.amphi.music;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -675,11 +734,33 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				DEVELOPMENT_TEAM = W59D8M5CU7;
 				ENABLE_BITCODE = NO;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/DKImagePickerController/DKImagePickerController.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/DKPhotoGallery/DKPhotoGallery.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/SDWebImage/SDWebImage.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/SwiftyGif/SwiftyGif.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/device_info_plus/device_info_plus.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/file_picker/file_picker.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/media_kit_libs_ios_video/media_kit_libs_ios_video.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/media_kit_video/media_kit_video.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/package_info_plus/package_info_plus.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/path_provider_foundation/path_provider_foundation.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/volume_controller/volume_controller.framework/Headers\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/wakelock_plus/wakelock_plus.framework/Headers\"",
+					"\".\"",
+				);
 				INFOPLIST_FILE = Runner/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.amphi.music;
 				PRODUCT_NAME = "$(TARGET_NAME)";
