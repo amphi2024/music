@@ -508,6 +508,7 @@ class AppStorage extends AppStorageCore {
             else {
               songIdList.add(song.id);
             }
+            song.downloadMissingFiles();
             appState.setFragmentState(() {
               songIdList.sortSongList(appCacheData.sortOption("!SONGS"));
             });
