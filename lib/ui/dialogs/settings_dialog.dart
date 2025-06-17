@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_settings.dart';
 
@@ -55,7 +56,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                   visible: Platform.isAndroid,
                   child: Row(
                     children: [
-                      Text("Transparent Navigation Bar"),
+                      Text(AppLocalizations.of(context).get("@transparent_navigation_bar")),
                       Checkbox(value: appSettings.transparentNavigationBar, onChanged: (value) {
                         if(value != null) {
                           setState(() {
@@ -68,7 +69,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 ),
                 Row(
                   children: [
-                    Text("Use My Own Server"),
+                    Text(AppLocalizations.of(context).get("@use_my_own_server")),
                     Checkbox(value: appSettings.useOwnServer, onChanged: (value) {
                       if(value != null) {
                         setState(() {
@@ -82,7 +83,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 Center(
                   child: ElevatedButton(onPressed: () {
                     appStorage.syncMissingData();
-                  }, child: Text("Refresh All")),
+                  }, child: Text(AppLocalizations.of(context).get("@refresh_library"))),
                 )
               ],
             ),
