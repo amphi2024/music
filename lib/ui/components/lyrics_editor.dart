@@ -1,3 +1,4 @@
+import 'package:amphi/models/app_localizations.dart';
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/lyrics_editing_controller.dart';
@@ -34,7 +35,7 @@ class _LyricsEditorState extends State<LyricsEditor> {
     var lyrics = widget.lyricsEditingController.lyrics;
     if(lyrics.data.get("default").isEmpty) {
       if(widget.lyricsEditingController.readOnly) {
-        return Text("Empty Lyrics");
+        return Text(AppLocalizations.of(context).get("@no_lyrics_available"));
       }
     }
     else if(readOnly) {
@@ -42,8 +43,8 @@ class _LyricsEditorState extends State<LyricsEditor> {
           itemCount: lyrics.data.get("default").length,
           itemBuilder: (context, index) {
             var text = lyrics.data.get("default")[index].text;
-            if(text.isEmpty) {
-              text = "Empty Lyrics";
+            if(text.isEmpty && lyrics.data.get("default").isEmpty) {
+              text = AppLocalizations.of(context).get("@no_lyrics_available");
             }
         return Text(text);
       });
@@ -85,7 +86,7 @@ class _LyricsEditorState extends State<LyricsEditor> {
                     ),
                     GestureDetector(
                       onLongPress: () {
-                        showDialog(context: context, builder: (context) => ConfirmationDialog(title: "", onConfirmed: () {
+                        showDialog(context: context, builder: (context) => ConfirmationDialog(title: AppLocalizations.of(context).get("@dialog_title_delete_lyric"), onConfirmed: () {
                           setState(() {
                             widget.lyricsEditingController.lyrics.data.get("default").removeAt(index);
                           });
