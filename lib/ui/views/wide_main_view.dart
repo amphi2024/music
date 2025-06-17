@@ -122,6 +122,11 @@ class _WideMainViewState extends State<WideMainView> {
                 normal: Theme.of(context).scaffoldBackgroundColor))
       ];
     }
+    if(Platform.isMacOS) {
+      children = [
+        Expanded(child: MoveWindow(child: FragmentTitle(title: fragmentTitle()))),
+      ];
+    }
 
     return PopScope(
       canPop: !appState.floatingMenuShowing,
