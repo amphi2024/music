@@ -650,6 +650,7 @@ class AppStorage extends AppStorageCore {
    songs.clear();
    playlists.clear();
    artists.clear();
+   archiveIdList.clear();
    songIdList.clear();
    albumIdList.clear();
    artistIdList.clear();
