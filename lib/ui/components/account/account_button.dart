@@ -93,7 +93,7 @@ void onUserRemoved() {
 
 void onUserAdded() {
   appSettings.getData();
-  appState.setState(() {
+  appState.setFragmentState(() {
     appStorage.clearMusic();
     appStorage.initMusic();
   });
@@ -108,7 +108,7 @@ void onSelectedUserChanged(User user) {
   appWebChannel.disconnectWebSocket();
   appWebChannel.connectWebSocket();
   appStorage.clearMusic();
-  appState.setState(() {
+  appState.setFragmentState(() {
     appStorage.initMusic();
     appStorage.syncDataFromEvents();
   });
@@ -123,5 +123,8 @@ void onLoggedIn({required String id, required String token, required String user
   appStorage.selectedUser.name = username;
   appStorage.selectedUser.token = token;
   await appStorage.saveSelectedUserInformation();
-  appStorage.syncMissingData();
+  await appStorage.syncMissingData();
+  appState.setFragmentState(() {
+
+  });
 }
