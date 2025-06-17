@@ -1,229 +1,242 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "CFBundleName" : {
-      "extractionState" : "manual",
+    "CFBundleDisplayName" : {
+      "comment" : "Bundle display name",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الموسيقى"
+            "value" : "الموسيقى+"
           }
         },
         "bn" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "সঙ্গীত"
+            "value" : "সঙ্গীত+"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hudba"
+            "value" : "Hudba+"
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Musik"
+            "value" : "Musik+"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Musik"
+            "value" : "Musik+"
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Μουσική"
+            "value" : "Μουσική+"
           }
         },
         "en" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "new",
             "value" : "Music"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Música"
+            "value" : "Música+"
           }
         },
         "es-419" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Música"
+            "value" : "Música+"
           }
         },
         "es-US" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Música"
+            "value" : "Música+"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Musiikki"
+            "value" : "Musiikki+"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Musique"
+            "value" : "Musique+"
           }
         },
         "he" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "מוזיקה"
+            "value" : "מוזיקה+"
           }
         },
         "hi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "संगीत"
+            "value" : "संगीत+"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zene"
+            "value" : "Zene+"
           }
         },
         "id" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Musik"
+            "value" : "Musik+"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Musica"
+            "value" : "Musica+"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ミュージック"
+            "value" : "ミュージック+"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "음악"
+            "value" : "음악+"
           }
         },
         "ms" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Muzik"
+            "value" : "Muzik+"
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Musikk"
+            "value" : "Musikk+"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Muziek"
+            "value" : "Muziek+"
           }
         },
         "pa" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ਸੰਗੀਤ"
+            "value" : "ਸੰਗੀਤ+"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Muzyka"
+            "value" : "Muzyka+"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Música"
+            "value" : "Música+"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Música"
+            "value" : "Música+"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Muzică"
+            "value" : "Muzică+"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Музыка"
+            "value" : "Музыка+"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Musik"
+            "value" : "Musik+"
           }
         },
         "th" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "เพลง"
+            "value" : "เพลง+"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Müzik"
+            "value" : "Müzik+"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Музика"
+            "value" : "Музика+"
           }
         },
         "ur" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "موسیقی"
+            "value" : "موسیقی+"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Âm nhạc"
+            "value" : "Âm nhạc+"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "音乐"
+            "value" : "音乐+"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "音乐"
+            "value" : "音乐+"
           }
         },
         "zh-HK" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "音乐"
+            "value" : "音乐+"
+          }
+        }
+      }
+    },
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "music"
           }
         }
       }
@@ -260,18 +273,6 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "This app requires access to the Documents folder to manage your files."
-          }
-        }
-      }
-    },
-    "NSHumanReadableCopyright" : {
-      "comment" : "Copyright (human-readable)",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Copyright © 2025 Amphi. All rights reserved."
           }
         }
       }
