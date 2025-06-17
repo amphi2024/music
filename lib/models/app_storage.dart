@@ -444,8 +444,10 @@ class AppStorage extends AppStorageCore {
             var playlist = Playlist();
             playlist.id = id;
             playlist.path = PathUtils.join(playlistsPath, filename);
+            playlist.data = data;
             playlist.save(upload: false);
             playlistIdList.add(id);
+            playlists[id] = playlist;
           });
         }
       }
