@@ -82,5 +82,8 @@
   "@dialog_title_delete_album": "Вы хотите удалить этот альбом?",
   "@dialog_title_remove_album_cover": "Вы хотите удалить обложку альбома?",
   "@dialog_title_delete_artist": "Вы хотите удалить этого исполнителя?",
-  "@dialog_title_remove_artist_picture": "Вы хотите удалить это изображение?"
+  "@dialog_title_remove_artist_picture": "Вы хотите удалить это изображение?",
+  "@dialog_title_delete_lyric": "Удалить эту строку?",
+  "@no_lyrics_available": "Текст песни недоступен"
+
 }

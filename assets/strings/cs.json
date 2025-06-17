@@ -82,5 +82,8 @@
   "@dialog_title_delete_album": "Opravdu chcete toto album smazat?",
   "@dialog_title_remove_album_cover": "Opravdu chcete odstranit obal alba?",
   "@dialog_title_delete_artist": "Opravdu chcete smazat tohoto umělce?",
-  "@dialog_title_remove_artist_picture": "Opravdu chcete odstranit tento obrázek?"
+  "@dialog_title_remove_artist_picture": "Opravdu chcete odstranit tento obrázek?",
+  "@dialog_title_delete_lyric": "Smazat tento řádek?",
+  "@no_lyrics_available": "Text písně není k dispozici"
+
 }

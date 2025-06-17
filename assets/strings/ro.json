@@ -82,5 +82,8 @@
   "@dialog_title_delete_album": "Vrei să ștergi acest album?",
   "@dialog_title_remove_album_cover": "Vrei să elimini coperta albumului?",
   "@dialog_title_delete_artist": "Vrei să ștergi acest artist?",
-  "@dialog_title_remove_artist_picture": "Vrei să elimini această imagine?"
+  "@dialog_title_remove_artist_picture": "Vrei să elimini această imagine?",
+  "@dialog_title_delete_lyric": "Ștergeți acest rând?",
+  "@no_lyrics_available": "Niciun vers disponibil"
+
 }

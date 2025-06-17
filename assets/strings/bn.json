@@ -82,5 +82,8 @@
   "@dialog_title_delete_album": "আপনি কি এই অ্যালবামটি মুছে ফেলতে চান?",
   "@dialog_title_remove_album_cover": "আপনি কি অ্যালবামের কভার সরাতে চান?",
   "@dialog_title_delete_artist": "আপনি কি এই শিল্পীকে মুছে ফেলতে চান?",
-  "@dialog_title_remove_artist_picture": "আপনি কি এই ছবিটি সরাতে চান?"
+  "@dialog_title_remove_artist_picture": "আপনি কি এই ছবিটি সরাতে চান?",
+  "@dialog_title_delete_lyric": "এই লাইনটি মুছে ফেলবেন?",
+  "@no_lyrics_available": "কোন গানের কথা পাওয়া যায়নি"
+
 }

@@ -82,5 +82,8 @@
   "@dialog_title_delete_album": "Ви впевнені, що хочете видалити цей альбом?",
   "@dialog_title_remove_album_cover": "Ви хочете видалити обкладинку альбому?",
   "@dialog_title_delete_artist": "Ви впевнені, що хочете видалити цього артиста?",
-  "@dialog_title_remove_artist_picture": "Ви хочете видалити це фото?"
+  "@dialog_title_remove_artist_picture": "Ви хочете видалити це фото?",
+  "@dialog_title_delete_lyric": "Видалити цей рядок?",
+  "@no_lyrics_available": "Текст пісні недоступний"
+
 }

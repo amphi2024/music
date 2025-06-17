@@ -82,5 +82,8 @@
   "@dialog_title_delete_album": "האם ברצונך למחוק אלבום זה?",
   "@dialog_title_remove_album_cover": "האם ברצונך להסיר את עטיפת האלבום?",
   "@dialog_title_delete_artist": "האם ברצונך למחוק אמן זה?",
-  "@dialog_title_remove_artist_picture": "האם ברצונך להסיר תמונה זו?"
+  "@dialog_title_remove_artist_picture": "האם ברצונך להסיר תמונה זו?",
+  "@dialog_title_delete_lyric": "למחוק שורה זו?",
+  "@no_lyrics_available": "אין מילים זמינות"
+
 }

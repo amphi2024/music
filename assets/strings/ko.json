@@ -100,6 +100,8 @@
   "@dialog_title_delete_album": "해당 앨범을 삭제하시겠습니까?",
   "@dialog_title_remove_album_cover": "해당 앨범 커버를 제거하시겠습니까?",
   "@dialog_title_delete_artist": "해당 아티스트를 삭제하시겠습니까?",
-  "@dialog_title_remove_artist_picture": "해당 사진을 제거하시겠습니까?"
+  "@dialog_title_remove_artist_picture": "해당 사진을 제거하시겠습니까?",
+  "@dialog_title_delete_lyric": "지우시겠습니까？",
+  "@no_lyrics_available": "가사가 없습니다"
 
 }

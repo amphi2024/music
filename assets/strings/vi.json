@@ -82,5 +82,8 @@
   "@dialog_title_delete_album": "Bạn có chắc chắn muốn xóa album này không?",
   "@dialog_title_remove_album_cover": "Bạn có muốn xóa bìa album này không?",
   "@dialog_title_delete_artist": "Bạn có chắc chắn muốn xóa nghệ sĩ này không?",
-  "@dialog_title_remove_artist_picture": "Bạn có muốn xóa hình ảnh này không?"
+  "@dialog_title_remove_artist_picture": "Bạn có muốn xóa hình ảnh này không?",
+  "@dialog_title_delete_lyric": "Xóa dòng này?",
+  "@no_lyrics_available": "Không có lời bài hát"
+
 }

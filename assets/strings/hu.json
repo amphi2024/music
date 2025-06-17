@@ -82,5 +82,8 @@
   "@dialog_title_delete_album": "Törölni szeretnéd ezt az albumot?",
   "@dialog_title_remove_album_cover": "Eltávolítod az album borítóját?",
   "@dialog_title_delete_artist": "Törölni szeretnéd ezt az előadót?",
-  "@dialog_title_remove_artist_picture": "Eltávolítod ezt a képet?"
+  "@dialog_title_remove_artist_picture": "Eltávolítod ezt a képet?",
+  "@dialog_title_delete_lyric": "Törölje ezt a sort?",
+  "@no_lyrics_available": "Nincsenek dalszövegek"
+
 }

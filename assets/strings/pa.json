@@ -82,5 +82,8 @@
   "@dialog_title_delete_album": "ਕੀ ਤੁਸੀਂ ਇਹ ਐਲਬਮ ਹਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ?",
   "@dialog_title_remove_album_cover": "ਕੀ ਤੁਸੀਂ ਐਲਬਮ ਕਵਰ ਹਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ?",
   "@dialog_title_delete_artist": "ਕੀ ਤੁਸੀਂ ਇਹ ਕਲਾਕਾਰ ਹਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ?",
-  "@dialog_title_remove_artist_picture": "ਕੀ ਤੁਸੀਂ ਇਹ ਚਿੱਤਰ ਹਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ?"
+  "@dialog_title_remove_artist_picture": "ਕੀ ਤੁਸੀਂ ਇਹ ਚਿੱਤਰ ਹਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ?",
+  "@dialog_title_delete_lyric": "ਕੀ ਤੁਸੀਂ ਇਹ ਲਾਈਨ ਮਿਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ?",
+  "@no_lyrics_available": "ਕੋਈ ਗੀਤ ਉਪਲਬਧ ਨਹੀਂ ਹੈ"
+
 }

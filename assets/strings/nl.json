@@ -82,5 +82,8 @@
   "@dialog_title_delete_album": "Wilt u dit album verwijderen?",
   "@dialog_title_remove_album_cover": "Wilt u de albumhoes verwijderen?",
   "@dialog_title_delete_artist": "Wilt u deze artiest verwijderen?",
-  "@dialog_title_remove_artist_picture": "Wilt u deze afbeelding verwijderen?"
+  "@dialog_title_remove_artist_picture": "Wilt u deze afbeelding verwijderen?",
+  "@dialog_title_delete_lyric": "Deze regel verwijderen?",
+  "@no_lyrics_available": "Geen songtekst beschikbaar"
+
 }

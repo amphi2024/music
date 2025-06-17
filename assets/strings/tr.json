@@ -82,5 +82,8 @@
   "@dialog_title_delete_album": "Bu albümü silmek istediğinizden emin misiniz?",
   "@dialog_title_remove_album_cover": "Bu albüm kapağını kaldırmak istiyor musunuz?",
   "@dialog_title_delete_artist": "Bu sanatçıyı silmek istediğinizden emin misiniz?",
-  "@dialog_title_remove_artist_picture": "Bu resmi kaldırmak istiyor musunuz?"
+  "@dialog_title_remove_artist_picture": "Bu resmi kaldırmak istiyor musunuz?",
+  "@dialog_title_delete_lyric": "Bu satır silinsin mi?",
+  "@no_lyrics_available": "Şarkı sözü mevcut değil"
+
 }

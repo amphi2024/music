@@ -82,5 +82,8 @@
   "@dialog_title_delete_album": "Haluatko poistaa tämän albumin?",
   "@dialog_title_remove_album_cover": "Haluatko poistaa albumin kannen?",
   "@dialog_title_delete_artist": "Haluatko poistaa tämän artistin?",
-  "@dialog_title_remove_artist_picture": "Haluatko poistaa tämän kuvan?"
+  "@dialog_title_remove_artist_picture": "Haluatko poistaa tämän kuvan?",
+  "@dialog_title_delete_lyric": "Poistetaanko tämä rivi?",
+  "@no_lyrics_available": "Ei sanoituksia saatavilla"
+
 }

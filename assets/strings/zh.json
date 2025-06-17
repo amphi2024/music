@@ -82,5 +82,8 @@
   "@dialog_title_delete_album": "您确定要删除此专辑吗？",
   "@dialog_title_remove_album_cover": "您想删除专辑封面吗？",
   "@dialog_title_delete_artist": "您确定要删除此艺术家吗？",
-  "@dialog_title_remove_artist_picture": "您想删除这张图片吗？"
+  "@dialog_title_remove_artist_picture": "您想删除这张图片吗？",
+  "@dialog_title_delete_lyric": "要删除这一行吗？",
+  "@no_lyrics_available": "暂无歌词"
+
 }

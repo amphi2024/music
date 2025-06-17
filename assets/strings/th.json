@@ -82,5 +82,8 @@
   "@dialog_title_delete_album": "คุณแน่ใจว่าจะลบอัลบั้มนี้หรือไม่?",
   "@dialog_title_remove_album_cover": "คุณต้องการลบหน้าปกอัลบั้มนี้หรือไม่?",
   "@dialog_title_delete_artist": "คุณแน่ใจว่าจะลบศิลปินนี้หรือไม่?",
-  "@dialog_title_remove_artist_picture": "คุณต้องการลบรูปภาพนี้หรือไม่?"
+  "@dialog_title_remove_artist_picture": "คุณต้องการลบรูปภาพนี้หรือไม่?",
+  "@dialog_title_delete_lyric": "ลบบรรทัดนี้หรือไม่?",
+  "@no_lyrics_available": "ไม่มีเนื้อเพลง"
+
 }

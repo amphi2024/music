@@ -82,5 +82,8 @@
   "@dialog_title_delete_album": "Vil du slette dette albumet?",
   "@dialog_title_remove_album_cover": "Vil du fjerne albumomslaget?",
   "@dialog_title_delete_artist": "Vil du slette denne artisten?",
-  "@dialog_title_remove_artist_picture": "Vil du fjerne dette bildet?"
+  "@dialog_title_remove_artist_picture": "Vil du fjerne dette bildet?",
+  "@dialog_title_delete_lyric": "Slette denne linjen?",
+  "@no_lyrics_available": "Ingen sangtekst tilgjengelig"
+
 }

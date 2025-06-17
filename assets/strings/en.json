@@ -97,5 +97,8 @@
   "@dialog_title_delete_album": "Are you sure you want to delete this album?",
   "@dialog_title_remove_album_cover": "Do you want to remove this album cover?",
   "@dialog_title_delete_artist": "Are you sure you want to delete this artist?",
-  "@dialog_title_remove_artist_picture": "Are you sure you want to remove this picture?"
+  "@dialog_title_remove_artist_picture": "Are you sure you want to remove this picture?",
+  "@dialog_title_delete_lyric": "Delete this line?",
+
+  "@no_lyrics_available": "No lyrics available"
 }

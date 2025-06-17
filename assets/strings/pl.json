@@ -82,5 +82,8 @@
   "@dialog_title_delete_album": "Czy chcesz usunąć ten album?",
   "@dialog_title_remove_album_cover": "Czy chcesz usunąć okładkę albumu?",
   "@dialog_title_delete_artist": "Czy chcesz usunąć tego artystę?",
-  "@dialog_title_remove_artist_picture": "Czy chcesz usunąć ten obraz?"
+  "@dialog_title_remove_artist_picture": "Czy chcesz usunąć ten obraz?",
+  "@dialog_title_delete_lyric": "Usunąć ten wers?",
+  "@no_lyrics_available": "Brak dostępnych tekstów piosenek"
+
 }

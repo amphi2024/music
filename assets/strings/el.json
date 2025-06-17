@@ -82,5 +82,8 @@
   "@dialog_title_delete_album": "Θέλετε να διαγράψετε αυτό το άλμπουμ;",
   "@dialog_title_remove_album_cover": "Θέλετε να αφαιρέσετε το εξώφυλλο του άλμπουμ;",
   "@dialog_title_delete_artist": "Θέλετε να διαγράψετε αυτόν τον καλλιτέχνη;",
-  "@dialog_title_remove_artist_picture": "Θέλετε να αφαιρέσετε αυτή την εικόνα;"
+  "@dialog_title_remove_artist_picture": "Θέλετε να αφαιρέσετε αυτή την εικόνα;",
+  "@dialog_title_delete_lyric": "Να διαγραφεί αυτή η γραμμή;",
+  "@no_lyrics_available": "Δεν υπάρχουν διαθέσιμοι στίχοι"
+
 }

@@ -82,5 +82,8 @@
   "@dialog_title_delete_album": "کیا آپ واقعی اس البم کو حذف کرنا چاہتے ہیں؟",
   "@dialog_title_remove_album_cover": "کیا آپ اس البم کا کور ہٹانا چاہتے ہیں؟",
   "@dialog_title_delete_artist": "کیا آپ واقعی اس فنکار کو حذف کرنا چاہتے ہیں؟",
-  "@dialog_title_remove_artist_picture": "کیا آپ اس تصویر کو ہٹانا چاہتے ہیں؟"
+  "@dialog_title_remove_artist_picture": "کیا آپ اس تصویر کو ہٹانا چاہتے ہیں؟",
+  "@dialog_title_delete_lyric": "کیا آپ اس سطر کو حذف کرنا چاہتے ہیں؟",
+  "@no_lyrics_available": "کوئی بول دستیاب نہیں"
+
 }
