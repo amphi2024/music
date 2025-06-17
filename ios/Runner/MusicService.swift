@@ -22,6 +22,67 @@ class MusicService {
     
     private init() {
         BASS_Init(-1, 44100, 0, nil, nil)
+        
+        let commandCenter = MPRemoteCommandCenter.shared()
+        
+        commandCenter.nextTrackCommand.isEnabled = true
+        commandCenter.previousTrackCommand.isEnabled = true
+        commandCenter.playCommand.isEnabled = true
+        commandCenter.pauseCommand.isEnabled = true
+        commandCenter.togglePlayPauseCommand.isEnabled = true
+        commandCenter.changePlaybackPositionCommand.isEnabled = true
+        
+        commandCenter.playCommand.addTarget { [weak self] event in
+            guard let self = self else { return .commandFailed }
+            resume()
+            return .success
+        }
+        
+        commandCenter.pauseCommand.addTarget { [weak self] event in
+            guard let self = self else { return .commandFailed }
+            pause()
+            return .success
+        }
+        
+        commandCenter.togglePlayPauseCommand.addTarget { [weak self] event in
+            guard let self = self else { return .commandFailed }
+            if self.isPlaying {
+                pause()
+            } else {
+                resume()
+            }
+            self.methodChannel?.invokeMethod("sync_media_source_to_flutter", arguments: [
+                "index": index,
+                "is_playing": self.isPlaying
+            ])
+            return .success
+        }
+        
+        commandCenter.previousTrackCommand.addTarget { [weak self] event in
+            guard let self = self else { return .commandFailed }
+            self.playPrevious()
+            return .success
+        }
+        
+        commandCenter.nextTrackCommand.addTarget { [weak self] event in
+            guard let self = self else { return .commandFailed }
+            self.playNext()
+            return .success
+        }
+        
+        commandCenter.changePlaybackPositionCommand.addTarget { [weak self] event in
+            guard let self = self else { return .commandFailed }
+            if let positionEvent = event as? MPChangePlaybackPositionCommandEvent {
+                  let positionInSeconds = positionEvent.positionTime
+                  let positionInMilliseconds = Int(positionInSeconds * 1000)
+                  self.applyPlaybackPosition(position: positionInMilliseconds)
+
+                  return .success
+              }
+            else {
+                return .commandFailed
+            }
+        }
     }
     
     func pause() {
@@ -101,38 +162,6 @@ class MusicService {
         }
         
         UIApplication.shared.beginReceivingRemoteControlEvents()
-        
-        let commandCenter = MPRemoteCommandCenter.shared()
-        
-        commandCenter.nextTrackCommand.isEnabled = true
-        commandCenter.previousTrackCommand.isEnabled = true
-        commandCenter.togglePlayPauseCommand.addTarget { [weak self] event in
-            guard let self = self else { return .commandFailed }
-            if self.isPlaying {
-                self.isPlaying = false
-                BASS_ChannelPause(self.stream)
-            } else {
-                self.isPlaying = true
-                BASS_ChannelPlay(self.stream, 0)
-            }
-            self.methodChannel?.invokeMethod("sync_media_source_to_flutter", arguments: [
-                "index": index,
-                "is_playing": self.isPlaying
-            ])
-            return .success
-        }
-        
-        commandCenter.previousTrackCommand.addTarget { [weak self] event in
-            guard let self = self else { return .commandFailed }
-            self.playPrevious()
-            return .success
-        }
-        
-        commandCenter.nextTrackCommand.addTarget { [weak self] event in
-            guard let self = self else { return .commandFailed }
-            self.playNext()
-            return .success
-        }
         
         var info: [String: Any] = [
             MPMediaItemPropertyTitle: self.title,
