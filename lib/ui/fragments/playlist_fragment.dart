@@ -57,7 +57,7 @@ class _PlaylistFragmentState extends State<PlaylistFragment> {
       itemBuilder: (context, index) {
         if(index == 0) {
           return Padding(
-              padding: const EdgeInsets.only(left: 15.0, right: 5),
+              padding: const EdgeInsets.only(left: 15.0, right: 5, top: 10),
               child: PlaylistFragmentTitle(playlist: playlist)
           );
         }
