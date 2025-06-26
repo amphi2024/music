@@ -97,7 +97,7 @@ class _WideMainViewState extends State<WideMainView> {
       Expanded(child: FragmentTitle(title: fragmentTitle())),
     ];
 
-    if (Platform.isWindows || Platform.isLinux) {
+    if (Platform.isWindows) {
       children = [
         Expanded(child: MoveWindow(child: FragmentTitle(title: fragmentTitle()))),
         Visibility(
