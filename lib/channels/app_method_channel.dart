@@ -16,7 +16,7 @@ class AppMethodChannel extends MethodChannel {
   static final AppMethodChannel _instance = AppMethodChannel._internal("music_method_channel");
 
   AppMethodChannel._internal(super.name) {
-    if (Platform.isWindows) {
+    if (Platform.isWindows || Platform.isLinux) {
       timer = Timer.periodic(Duration(milliseconds: 500), (timer) async {
         final position = await getPlaybackPosition();
         if (playerService.isPlaying) {
