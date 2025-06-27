@@ -73,21 +73,7 @@ class _AlbumFragmentState extends State<AlbumFragment> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = [];
     final album = appStorage.albums.get(appState.showingAlbumId ?? "");
-    children.add(
-      Padding(
-        padding: const EdgeInsets.only(left: 15.0, right: 5, top: 50),
-        child: AlbumFragmentTitle(album: album),
-      )
-    );
-    for(var songId in album.songs) {
-      var trackNumberWidget = TrackNumber(trackNumber: appStorage.songs.get(songId).trackNumber);
-      children.add(SongListItem(song: appStorage.songs.get(songId), playlistId: "!ALBUM,${album.id}", albumCover: trackNumberWidget));
-    }
-    children.add(
-      SizedBox(height: 80,)
-    );
 
     return ListView.builder(
       padding: fragmentPadding(context),
