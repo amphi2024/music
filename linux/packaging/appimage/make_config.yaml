@@ -1,0 +1,46 @@
+display_name: Music
+
+icon: assets/logo/icon_512x512.png
+
+keywords:
+  - Music
+  - Application
+
+generic_name: Music Player
+
+# supported mime types that can be opened using this application
+# supported_mime_type:
+#   - audio/mpeg
+
+metainfo: linux/packaging/music.appdata.xml
+
+#actions:
+#  - name: Say Hi
+#    label: say-hi
+#    arguments:
+#      - --say
+#      - hi
+#  - name: Say Bye
+#    label: say-bye
+#    arguments:
+#      - --say
+#      - bye
+
+categories:
+  - Music
+  - Utility
+  - Productivity
+
+startup_notify: false
+
+# You can specify the shared libraries that you want to bundle with your app
+#
+# flutter_distributor automatically detects the shared libraries that your app
+# depends on, but you can also specify them manually here.
+#
+# The following example shows how to bundle the libcurl library with your app.
+#
+# include:
+#   - libcurl.so.4
+include: []
+#  - libmpv.so.2

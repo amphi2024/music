@@ -1,0 +1,28 @@
+display_name: Music
+packager: Amphi
+packagerEmail: amphiprioninae2024@gmail.com
+url: https://amphi.site
+license: APACHE
+
+icon: assets/logo/icon_512x512.png
+
+requires:
+  - libfuse2
+  - libmpv-dev
+  - mpv
+  - libmimalloc-dev
+  - libmimalloc2.0
+
+keywords:
+  - Music
+
+generic_name: Music Player
+summary: Lightweight music player powered by MPV
+group: Applications/Multimedia
+
+categories:
+  - AudioVideo
+  - Music
+  - Player
+
+startup_notify: false
