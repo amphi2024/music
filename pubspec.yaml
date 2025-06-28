@@ -47,8 +47,8 @@ dependencies:
   provider: ^6.1.4
   scrollable_positioned_list: ^0.3.8
   amphi:
-#    git: https://github.com/amphi2024/flutter-shared.git
-    path: ../amphi
+    git: https://github.com/amphi2024/flutter-shared.git
+#    path: ../amphi
 dev_dependencies:
   flutter_test:
     sdk: flutter
