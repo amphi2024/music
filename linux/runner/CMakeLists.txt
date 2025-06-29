@@ -27,7 +27,7 @@ set_target_properties(bass PROPERTIES
 )
 
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(TAGLIB IMPORTED_TARGET taglib)
+pkg_check_modules(TAGLIB REQUIRED IMPORTED_TARGET taglib)
 
 add_executable(${BINARY_NAME}
   "main.cc"
@@ -45,7 +45,7 @@ apply_standard_settings(${BINARY_NAME})
 add_definitions(-DAPPLICATION_ID="${APPLICATION_ID}")
 
 # Add dependency libraries. Add any application-specific dependencies here.
-target_link_libraries(${BINARY_NAME} PRIVATE flutter PkgConfig::taglib bass)
+target_link_libraries(${BINARY_NAME} PRIVATE flutter PkgConfig::TAGLIB bass)
 target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK)
 
-target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}"  ${BASS_INCLUDE_DIR}  ${taglib_INCLUDE_DIRS})
+target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}"  ${BASS_INCLUDE_DIR})
