@@ -50,10 +50,12 @@ target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK)
 
 target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}"  ${BASS_INCLUDE_DIR})
 
+set(FLUTTER_BUNDLE_LIB_DIR "${CMAKE_BINARY_DIR}/bundle/lib/${BASS_ARCH}")
+
 add_custom_command(TARGET ${BINARY_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-            "$<TARGET_FILE_DIR:${BINARY_NAME}>/lib/${BASS_ARCH}"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${FLUTTER_BUNDLE_LIB_DIR}"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${BASS_LIB_PATH}"
-            "$<TARGET_FILE_DIR:${BINARY_NAME}>/lib/${BASS_ARCH}"
+        "${BASS_LIB_PATH}"
+        "${FLUTTER_BUNDLE_LIB_DIR}/libbass.so"
+    COMMENT "Copying libbass.so to Flutter bundle directory"
 )
