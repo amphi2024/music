@@ -4,7 +4,6 @@ icon: assets/logo/icon_512x512.png
 
 keywords:
   - Music
-  - Application
 
 generic_name: Music Player
 
@@ -12,7 +11,7 @@ generic_name: Music Player
 # supported_mime_type:
 #   - audio/mpeg
 
-metainfo: linux/packaging/music.appdata.xml
+#metainfo: linux/packaging/music.appdata.xml
 
 #actions:
 #  - name: Say Hi
@@ -28,8 +27,6 @@ metainfo: linux/packaging/music.appdata.xml
 
 categories:
   - Music
-  - Utility
-  - Productivity
 
 startup_notify: false
 
