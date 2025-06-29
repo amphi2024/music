@@ -28,6 +28,13 @@ set_target_properties(bass PROPERTIES
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(TAGLIB REQUIRED taglib)
+
+add_library(PkgConfig::TAGLIB INTERFACE IMPORTED)
+set_target_properties(PkgConfig::TAGLIB PROPERTIES
+  INTERFACE_INCLUDE_DIRECTORIES "${TAGLIB_INCLUDE_DIRS}"
+  INTERFACE_LINK_LIBRARIES "${TAGLIB_LIBRARIES}"
+)
+
 add_executable(${BINARY_NAME}
   "main.cc"
   "my_application.cc"
