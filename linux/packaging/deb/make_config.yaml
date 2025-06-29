@@ -14,10 +14,9 @@ pre_dependencies:
 
 dependencies:
   - libfuse2
-  - libmpv-dev
-  - mpv
   - libmimalloc-dev
   - libmimalloc2.0
+  - libtag1v5
 
 postinstall_scripts:
   - echo "Installed Amphi Music successfully"
