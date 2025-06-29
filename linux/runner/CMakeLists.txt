@@ -49,3 +49,9 @@ target_link_libraries(${BINARY_NAME} PRIVATE flutter PkgConfig::TAGLIB bass)
 target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK)
 
 target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}"  ${BASS_INCLUDE_DIR})
+
+add_custom_command(TARGET ${BINARY_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${BASS_LIB_PATH}"
+    $<TARGET_FILE_DIR:${BINARY_NAME}>
+)
