@@ -4,9 +4,11 @@ packages:
   amphi:
     dependency: "direct main"
     description:
-      path: "../amphi"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "2709ae4fdbdb7ad2079680bfd6ad43ce032925e9"
+      url: "https://github.com/amphi2024/flutter-shared.git"
+    source: git
     version: "1.2.0"
   archive:
     dependency: transitive
