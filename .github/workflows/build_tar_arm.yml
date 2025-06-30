@@ -25,6 +25,24 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Build TagLib and copy to project
+        run: |
+          if [ ! -d linux/external ]; then
+          mkdir -p linux/external
+          fi
+
+          cd linux/external
+          git clone --depth 1 --recurse-submodules https://github.com/taglib/taglib.git
+          cd taglib
+
+          mkdir build && cd build
+          cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON
+          make -j$(nproc)
+
+          cp taglib/libtag.so.2 ../../../libs/x86_64/
+
+          cd ../../../../
+
       - name: Build App
         run: |
           flutter build linux
