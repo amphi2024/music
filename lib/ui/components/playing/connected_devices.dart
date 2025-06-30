@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:music/channels/app_method_channel.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/song.dart';
@@ -83,7 +84,9 @@ class _ConnectedDevicesState extends State<ConnectedDevices> {
           var song = appStorage.songs[device.songId];
           if(song != null) {
             playerService.isPlaying = true;
-            playerService.startPlay(song: song, playlistId: device.playlistId, playNow: true);
+            playerService.startPlay(song: song, playlistId: device.playlistId, playNow: false);
+            appMethodChannel.applyPlaybackPosition(device.position);
+            appMethodChannel.resumeMusic();
           }
         },
         child: Padding(
