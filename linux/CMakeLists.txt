@@ -141,6 +141,9 @@ endif()
 
 target_link_libraries(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/libs/${BASS_ARCH}/libbass.so")
 
+target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/external/taglib/include")
+target_link_libraries(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/libs/${BASS_ARCH}/libtag.so.2")
+
 set(BASS_LIB_PATH "${CMAKE_SOURCE_DIR}/libs/${BASS_ARCH}")
 install(DIRECTORY "${BASS_LIB_PATH}/" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
     COMPONENT Runtime)

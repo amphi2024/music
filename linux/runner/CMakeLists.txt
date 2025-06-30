@@ -7,9 +7,6 @@ project(runner LANGUAGES CXX)
 #
 # Any new source files that you add to the application should be added here.
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(TAGLIB REQUIRED IMPORTED_TARGET taglib)
-
 add_executable(${BINARY_NAME}
   "main.cc"
   "my_application.cc"
@@ -26,7 +23,7 @@ apply_standard_settings(${BINARY_NAME})
 add_definitions(-DAPPLICATION_ID="${APPLICATION_ID}")
 
 # Add dependency libraries. Add any application-specific dependencies here.
-target_link_libraries(${BINARY_NAME} PRIVATE flutter PkgConfig::TAGLIB)
+target_link_libraries(${BINARY_NAME} PRIVATE flutter)
 target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK)
 
 target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}" )
