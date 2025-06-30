@@ -10,11 +10,11 @@ std::map<std::string, std::string> MusicMetadata(std::string filePath)
 
       TagLib::Tag* tag = file.tag();
 
-      data["title"]       = tag->title().to8Bit(true);
-      data["artist"]      = tag->artist().to8Bit(true);
-      data["album"]       = tag->album().to8Bit(true);
-      data["comment"]     = tag->comment().to8Bit(true);
-      data["genre"]       = tag->genre().to8Bit(true);
+      data["title"]       = tag->title().toCString();
+      data["artist"]      = tag->artist().toCString();
+      data["album"]       = tag->album().toCString();
+      data["comment"]     = tag->comment().toCString();
+      data["genre"]       = tag->genre().toCString();
       data["year"]        = std::to_string(tag->year());
       data["trackNumber"] = std::to_string(tag->track());
   }
