@@ -7,25 +7,6 @@ project(runner LANGUAGES CXX)
 #
 # Any new source files that you add to the application should be added here.
 
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
-    set(BASS_ARCH "x86_64")
-elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "i686" OR CMAKE_SYSTEM_PROCESSOR MATCHES "i386")
-    set(BASS_ARCH "x86")
-elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
-    set(BASS_ARCH "aarch64")
-elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "armv7" OR CMAKE_SYSTEM_PROCESSOR MATCHES "armhf")
-    set(BASS_ARCH "armhf")
-else()
-    message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
-endif()
-
-set(BASS_LIB_PATH "${CMAKE_SOURCE_DIR}/libs/${BASS_ARCH}/libbass.so")
-
-add_library(bass SHARED IMPORTED GLOBAL)
-set_target_properties(bass PROPERTIES
-    IMPORTED_LOCATION "${BASS_LIB_PATH}"
-)
-
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(TAGLIB REQUIRED IMPORTED_TARGET taglib)
 
@@ -45,17 +26,7 @@ apply_standard_settings(${BINARY_NAME})
 add_definitions(-DAPPLICATION_ID="${APPLICATION_ID}")
 
 # Add dependency libraries. Add any application-specific dependencies here.
-target_link_libraries(${BINARY_NAME} PRIVATE flutter PkgConfig::TAGLIB bass)
+target_link_libraries(${BINARY_NAME} PRIVATE flutter PkgConfig::TAGLIB)
 target_link_libraries(${BINARY_NAME} PRIVATE PkgConfig::GTK)
 
-target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}"  ${BASS_INCLUDE_DIR})
-
-set(FLUTTER_BUNDLE_LIB_DIR "${CMAKE_BINARY_DIR}/bundle/lib/${BASS_ARCH}")
-
-add_custom_command(TARGET ${BINARY_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${FLUTTER_BUNDLE_LIB_DIR}"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${BASS_LIB_PATH}"
-        "${FLUTTER_BUNDLE_LIB_DIR}/libbass.so"
-    COMMENT "Copying libbass.so to Flutter bundle directory"
-)
+target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}" )
