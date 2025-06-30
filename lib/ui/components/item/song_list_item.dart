@@ -5,6 +5,7 @@ import 'package:amphi/utils/path_utils.dart';
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:music/channels/app_web_channel.dart';
+import 'package:music/models/app_settings.dart';
 import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/song.dart';
@@ -122,7 +123,7 @@ class SongListItem extends StatelessWidget {
                           size: 13,
                         ))),
                     Visibility(
-                      visible: song.transferring == true,
+                      visible: song.transferring == true && appSettings.useOwnServer,
                         child: const CircularProgressIndicator(
                          constraints: BoxConstraints(
                            minWidth: 15,
