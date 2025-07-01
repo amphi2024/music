@@ -6,11 +6,11 @@ license: APACHE
 
 icon: assets/logo/icon_512x512.png
 
-requires:
-  - libfuse2
-  - libmimalloc-dev
-  - libmimalloc2.0
-  - taglib
+#requires:
+#  - libfuse2
+#  - libmimalloc-dev
+#  - libmimalloc2.0
+#  - taglib
 
 keywords:
   - Music
