@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:music/channels/app_method_channel.dart';
 import 'package:music/models/app_cache.dart';
@@ -33,6 +35,12 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
       controlsPanelWidth = 250;
     }
 
+    double height = 60;
+
+    if(Platform.isIOS || Platform.isAndroid) {
+      height = 70;
+    }
+
     return AnimatedPositioned(
       duration: Duration(milliseconds: 1000),
         curve: Curves.easeOutQuint,
@@ -42,7 +50,7 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
         child: AnimatedContainer(
           duration: Duration(milliseconds: 1000),
           curve: Curves.easeOutQuint,
-          height: 60,
+          height: height,
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(12),
@@ -91,7 +99,7 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
               ),
               SizedBox(
                 width: controlsPanelWidth,
-                height: 60,
+                height: height,
                 child: DesktopPlayControls(
                   setState: setState,
                 ),
