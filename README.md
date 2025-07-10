@@ -12,7 +12,7 @@ Once your music library is set up, you can sync your data across devices via a s
 ## Download
 
 - [Official Website](https://amphi.site)
-- [GitHub Releases](https://github.com/amphi2024/notes/releases/latest)
+- [GitHub Releases](https://github.com/amphi2024/music/releases/latest)
 - [Play Store](https://play.google.com/store/apps/details?id=com.amphi.music)
 - [iOS App Store](https://apps.apple.com/app/amphi-music/id6747280291?l)
 - [Arch User Repository](https://aur.archlinux.org/packages/amphi-music)
