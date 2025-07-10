@@ -1,17 +1,24 @@
+![logo](assets/logo/icon_256x256.png)
+
 # Amphi Music
 
-Music App is coming!
+Amphi Music is a free and open-source, cross-platform music player.<br>
+It plays all your music in most popular formats — no conversion required.<br>
+You can easily edit song, album, and artist information.<br>
+Once your music library is set up, you can sync your data across devices via a self-hosted server, letting you access and play your library on any platform.
 
-## What makes it different from other music apps?
+[Server Setup Guide](https://amphi.site/archive/servers)
 
-- Sync your music via a self-hosted server
-- Offline-accessible live lyrics
-- Multiple versions of each track (live, MV, or any version you prefer)
-- Play video as canvas (to be implemented starting in version 1.1.0)
-- Works across all platforms
-- Smart playlist features (to be implemented starting in version 1.1.0)
-- Localized song info: titles, artists, albums, genres
+## Download
 
-If you want to see this app released faster, please consider donating!
+- [Official Website](https://amphi.site)
+- [GitHub Releases](https://github.com/amphi2024/notes/releases/latest)
+- [Play Store](https://play.google.com/store/apps/details?id=com.amphi.music)
+- [iOS App Store](https://apps.apple.com/app/amphi-music/id6747280291?l)
+- [Arch User Repository](https://aur.archlinux.org/packages/amphi-music)
 
-https://amphi.site
+## Contributing
+
+If you find a bug or notice any incorrect or awkward translations, please feel free to fix them.
+You can contribute by forking the repository, making your changes, and submitting a pull request.
+Thank you for helping improve Amphi Music!
