@@ -15,7 +15,11 @@ Once your music library is set up, you can sync your data across devices via a s
 - [GitHub Releases](https://github.com/amphi2024/music/releases/latest)
 - [Play Store](https://play.google.com/store/apps/details?id=com.amphi.music)
 - [iOS App Store](https://apps.apple.com/app/amphi-music/id6747280291?l)
-- [Arch User Repository](https://aur.archlinux.org/packages/amphi-music)
+- [Scoop](https://github.com/amphi2024/scoop-bucket)
+- [Homebrew](https://github.com/amphi2024/homebrew-amphi)
+- [AUR](https://aur.archlinux.org/packages/amphi-music)
+- [Flatpak](https://github.com/amphi2024/amphi-flatpak)
+- [Snap Store](https://snapcraft.io/amphi-music)
 
 ## Contributing
 
