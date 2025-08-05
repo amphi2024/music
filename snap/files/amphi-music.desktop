@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Music
+Comment=Cross-platform music player with support for syncing libraries via a self-hosted server
+Exec=amphi-music.music
+Icon=icon.png
+Terminal=false
+Type=Application
+Categories=Music;
