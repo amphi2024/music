@@ -1,42 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:music/models/music/song.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music/providers/artists_provider.dart';
+import 'package:music/providers/playing_state_provider.dart';
 import 'package:music/utils/duration_converter.dart';
+import 'package:music/utils/localized_title.dart';
 
 import '../../../channels/app_method_channel.dart';
-import '../../../models/player_service.dart';
+import '../../../services/player_service.dart';
 
-class PlayControls extends StatefulWidget {
-
+class PlayControls extends ConsumerWidget {
   const PlayControls({super.key});
 
   @override
-  State<PlayControls> createState() => _PlayControlsState();
-}
-
-class _PlayControlsState extends State<PlayControls> {
-
-  void playbackListener(position) {
-    setState(() {
-
-    });
-  }
-
-  @override
-  void dispose() {
-    appMethodChannel.playbackListeners.remove(playbackListener);
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    appMethodChannel.playbackListeners.add(playbackListener);
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    var themeData = Theme.of(context);
-    var textTheme = themeData.textTheme;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeData = Theme.of(context);
+    final textTheme = themeData.textTheme;
+    final song = ref.watch(playingSongsProvider.notifier).playingSong();
+    final duration = ref.watch(durationProvider);
+    final position = ref.watch(positionProvider);
+    final isPlaying = ref.watch(isPlayingProvider);
+    final artist = ref.watch(artistsProvider).get(song.id);
 
     return Column(
       children: [
@@ -46,22 +29,14 @@ class _PlayControlsState extends State<PlayControls> {
               padding: const EdgeInsets.all(8.0),
               child: Center(
                 child: Text(
-                  playerService
-                      .nowPlaying()
-                      .title
-                      .byContext(context),
-                  style: textTheme.bodyLarge
-                      ?.copyWith(fontWeight: FontWeight.bold, fontSize: 25),
+                  song.title.toLocalized(),
+                  style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold, fontSize: 25),
                 ),
               ),
             ),
             Center(
               child: Text(
-                playerService
-                    .nowPlaying()
-                    .artist
-                    .name
-                    .byContext(context),
+                artist.name.toLocalized(),
                 style: textTheme.bodyMedium,
               ),
             ),
@@ -74,28 +49,26 @@ class _PlayControlsState extends State<PlayControls> {
               Padding(
                 padding: const EdgeInsets.only(top: 8, bottom: 8),
                 child: Slider(
-                    min: 0,
-                    max: playerService.musicDuration.toDouble(),
-                    value: playerService.playbackPosition.toDouble(),
+                  min: 0,
+                  max: duration.toDouble(),
+                  value: position.toDouble(),
                   onChanged: (d) {
-                    setState(() {
-                      playerService.playbackPosition = d.toInt();
-                    });
+                    ref.watch(positionProvider.notifier).set(d.toInt());
                   },
                   onChangeEnd: (d) {
                     appMethodChannel.applyPlaybackPosition(d.toInt());
-                  },),
+                  },
+                ),
               ),
               Row(
-                mainAxisAlignment:
-                MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    DurationConverter.convertedDuration(playerService.playbackPosition),
+                    DurationConverter.convertedDuration(position),
                     style: textTheme.bodyMedium,
                   ),
                   Text(
-                    DurationConverter.convertedDuration(playerService.musicDuration),
+                    DurationConverter.convertedDuration(duration),
                     style: textTheme.bodyMedium,
                   )
                 ],
@@ -104,38 +77,27 @@ class _PlayControlsState extends State<PlayControls> {
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom + 15),
+          padding: EdgeInsets.only(bottom: MediaQuery
+              .of(context)
+              .padding
+              .bottom + 15),
           child: Row(
-            mainAxisAlignment:
-            MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               IconButton(
                   icon: Icon(Icons.fast_rewind, size: 45),
                   onPressed: () {
-                    playerService.playPrevious(Localizations.localeOf(context).languageCode);
+                    playPrevious(ref);
                   }),
               IconButton(
-                  icon: Icon(
-                      playerService.isPlaying
-                          ? Icons.pause
-                          : Icons.play_arrow,
-                      size: 60),
-                  onPressed: ()  {
-                    if(playerService.isPlaying) {
+                  icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow, size: 60),
+                  onPressed: () {
+                    if (isPlaying) {
                       appMethodChannel.pauseMusic();
-                      if(mounted) {
-                        setState(() {
-                          playerService.isPlaying = false;
-                        });
-                      }
-                    }
-                    else {
-                       appMethodChannel.resumeMusic();
-                      if(mounted) {
-                        setState(() {
-                          playerService.isPlaying = true;
-                        });
-                      }
+                      ref.read(isPlayingProvider.notifier).set(false);
+                    } else {
+                      appMethodChannel.resumeMusic();
+                      ref.read(isPlayingProvider.notifier).set(true);
                     }
                   }),
               IconButton(
@@ -144,7 +106,7 @@ class _PlayControlsState extends State<PlayControls> {
                     size: 45,
                   ),
                   onPressed: () {
-                    playerService.playNext(Localizations.localeOf(context).languageCode);
+                    playNext(ref);
                   })
             ],
           ),

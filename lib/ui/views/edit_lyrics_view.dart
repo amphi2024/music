@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:music/models/lyrics_editing_controller.dart';
 import 'package:music/ui/components/lyrics_editor.dart';
 
-import '../../models/app_state.dart';
 import '../../models/music/lyrics.dart';
 
 class EditLyricsView extends StatefulWidget {
@@ -19,9 +18,9 @@ class _EditLyricsViewState extends State<EditLyricsView> {
   Widget build(BuildContext context) {
     return PopScope(
       onPopInvokedWithResult: (didPop, result) {
-        appState.setMainViewState(() {
-          appState.playingBarShowing = true;
-        });
+        // appState.setMainViewState(() {
+        //   appState.playingBarShowing = true;
+        // });
       },
       child: Scaffold(
         appBar: AppBar(

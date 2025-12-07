@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music/providers/playing_state_provider.dart';
 import 'package:music/ui/components/icon/shuffle_icon.dart';
 import 'package:music/ui/components/playing/playing_queue.dart';
 
 import '../../../channels/app_method_channel.dart';
 import '../../../models/app_cache.dart';
-import '../../../models/player_service.dart';
+import '../../../services/player_service.dart';
 import '../icon/repeat_icon.dart';
 
-class MobilePlayingQueue extends StatefulWidget {
+class MobilePlayingQueue extends ConsumerStatefulWidget {
 
   final void Function() onRemove;
+
   const MobilePlayingQueue({super.key, required this.onRemove});
 
   @override
-  State<MobilePlayingQueue> createState() => _MobilePlayingQueueState();
+  ConsumerState<MobilePlayingQueue> createState() => _MobilePlayingQueueState();
 }
 
-class _MobilePlayingQueueState extends State<MobilePlayingQueue> {
+class _MobilePlayingQueueState extends ConsumerState<MobilePlayingQueue> {
 
   double opacity = 0;
   bool following = true;
@@ -33,6 +36,7 @@ class _MobilePlayingQueueState extends State<MobilePlayingQueue> {
 
   @override
   Widget build(BuildContext context) {
+    final volume = ref.watch(volumeProvider);
     return PopScope(
       onPopInvokedWithResult: (didPop, result) {
         widget.onRemove();
@@ -64,32 +68,26 @@ class _MobilePlayingQueueState extends State<MobilePlayingQueue> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Icon( playerService.volume > 0.5 ? Icons.volume_up : playerService.volume > 0.1 ? Icons.volume_down : Icons.volume_mute ,),
+                        Icon(volume > 0.5 ? Icons.volume_up : volume > 0.1 ? Icons.volume_down : Icons.volume_mute),
                         Expanded(
                           child: Padding(
                             padding: const EdgeInsets.only(right: 8, left: 5),
                             child: Slider(
                                 max: 1,
-                                value: playerService.volume,
+                                value: volume,
                                 onChanged: (value) {
                                   appCacheData.volume = value;
                                   appCacheData.save();
                                   appMethodChannel.setVolume(value);
-                                  setState(() {
-                                    playerService.volume = value;
-                                  });
+                                  ref.read(volumeProvider.notifier).set(value);
                                 }),
                           ),
                         ),
                         IconButton(onPressed: () {
-                          setState(() {
-                            playerService.toggleShuffle();
-                          });
+                          toggleShuffle(ref);
                         }, icon: ShuffleIcon()),
                         IconButton(onPressed: () {
-                          setState(() {
-                            playerService.togglePlayMode();
-                          });
+                          togglePlayMode(ref);
                         }, icon: RepeatIcon()),
                       ],
                     ),

@@ -1,26 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:music/models/app_storage.dart';
-import 'package:music/models/music/song.dart';
-import 'package:music/models/player_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music/providers/playing_state_provider.dart';
+import 'package:music/providers/songs_provider.dart';
 import 'package:music/ui/components/playing/playing_queue_item.dart';
 
-class PlayingQueue extends StatelessWidget {
+class PlayingQueue extends ConsumerWidget {
   final Color? textColor;
+
   const PlayingQueue({super.key, this.textColor});
 
   @override
-  Widget build(BuildContext context) {
-    var playingQueue = playerService.songs;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final idList = ref.watch(playingSongsProvider).songs;
+    final songs = ref.watch(songsProvider);
 
     return ListView.builder(
-      padding: EdgeInsets.zero,
-      itemCount: playingQueue.length,
+        padding: EdgeInsets.zero,
+        itemCount: idList.length,
         itemBuilder: (context, index) {
-      return PlayingQueueItem(
-          song: appStorage.songs[playingQueue[index]] ?? Song(),
-        index: index,
-          textColor: textColor
-      );
-    });
+          return PlayingQueueItem(
+              song: songs.get(idList[index]),
+              index: index,
+              textColor: textColor
+          );
+        });
   }
 }

@@ -1,61 +1,52 @@
 import 'package:flutter/material.dart';
-import 'package:music/models/app_state.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/models/music/lyrics.dart';
+import 'package:music/providers/playing_state_provider.dart';
+import 'package:music/utils/lyrics_scroll.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../../channels/app_method_channel.dart';
-import '../../../models/player_service.dart';
 
-class PlayingLyrics extends StatefulWidget {
+class PlayingLyrics extends ConsumerStatefulWidget {
 
   final void Function() onRemove;
+
   const PlayingLyrics({super.key, required this.onRemove});
 
   @override
-  State<PlayingLyrics> createState() => _PlayingLyricsState();
+  ConsumerState<PlayingLyrics> createState() => _PlayingLyricsState();
 }
 
-class _PlayingLyricsState extends State<PlayingLyrics> {
+class _PlayingLyricsState extends ConsumerState<PlayingLyrics> {
   double opacity = 0;
   bool following = true;
   final scrollController = ItemScrollController();
 
-  void playbackListener(int position) {
-    var lyrics = playerService.nowPlaying().playingFile().lyrics;
-    var lines = lyrics.getLinesByLocale(context);
-    setState(() {
-      if(appState.autoScrollLyrics) {
-        for (int i = 0; i < lines.length; i ++) {
-          if (lines[i].endsAt >= position && position >= lines[i].startsAt) {
-            scrollController.scrollTo(index: i, duration: Duration(milliseconds: 500), curve: Curves.easeOutQuint);
-            break;
-          }
-        }
-      }
-    });
-  }
-
   @override
   void dispose() {
-    appMethodChannel.playbackListeners.remove(playbackListener);
     super.dispose();
   }
 
   @override
   void initState() {
     super.initState();
-    appMethodChannel.playbackListeners.add(playbackListener);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         opacity = 0.5;
+      });
+      ref.listen(positionProvider, (prev, position) {
+        scrollToCurrentLyric(ref: ref, position: position, scrollController: scrollController);
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    Lyrics lyrics =  playerService.nowPlaying().playingFile().lyrics;
-    List<LyricLine> lines = lyrics.getLinesByLocale(context);
+    final Lyrics lyrics = ref.watch(playingSongsProvider.notifier).playingSong().playingFile()
+        .lyrics;
+    final List<LyricLine> lines = lyrics.getLinesByLocale(context);
+    final position = ref.watch(positionProvider);
+    final duration = ref.watch(durationProvider);
 
     return PopScope(
       onPopInvokedWithResult: (didPop, result) {
@@ -92,8 +83,8 @@ class _PlayingLyricsState extends State<PlayingLyrics> {
                     itemBuilder: (context, index) {
                       var focused = false;
                       var line = lines[index];
-                      if (line.startsAt <= playerService.playbackPosition &&
-                          line.endsAt >= playerService.playbackPosition) {
+                      if (line.startsAt <= position &&
+                          line.endsAt >= duration) {
                         focused = true;
                       }
                       return SelectableText(

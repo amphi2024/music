@@ -4,7 +4,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:music/models/app_storage.dart';
-import 'package:music/models/app_theme.dart';
+import 'package:music/models/theme_model.dart';
 
 final appSettings = AppSettings.getInstance();
 
@@ -19,7 +19,7 @@ class AppSettings {
   set localeCode(value) => data["locale"] = value;
   String? get localeCode => data["locale"];
   Locale? locale;
-  AppTheme appTheme = AppTheme(created: DateTime.now(), modified: DateTime.now());
+  ThemeModel themeModel = ThemeModel(created: DateTime.now(), modified: DateTime.now());
 
   set transparentNavigationBar(value) => data["transparentNavigationBar"] = value;
   bool get transparentNavigationBar => data.putIfAbsent("transparentNavigationBar", () => false);
@@ -30,7 +30,7 @@ class AppSettings {
   set serverAddress(value) => data["serverAddress"] = value;
   String get serverAddress => data.putIfAbsent("serverAddress", () => "");
 
-  void getData() {
+  Future<void> getData() async {
     try {
       var file = File(appStorage.settingsPath);
       data = jsonDecode(file.readAsStringSync());

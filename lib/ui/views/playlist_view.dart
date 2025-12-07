@@ -1,49 +1,52 @@
-import 'dart:math';
-
 import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:music/models/app_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/models/music/playlist.dart';
+import 'package:music/providers/songs_provider.dart';
 import 'package:music/ui/components/item/song_list_item.dart';
 import 'package:music/ui/components/playlist_thumbnail.dart';
 
 import '../../models/app_cache.dart';
-import '../../models/app_state.dart';
-import '../../models/player_service.dart';
 import '../../models/sort_option.dart';
-import '../components/image/album_cover.dart';
 import '../fragments/components/floating_button.dart';
 
-class PlaylistView extends StatefulWidget {
+class PlaylistView extends ConsumerStatefulWidget {
 
   final Playlist playlist;
+
   const PlaylistView({super.key, required this.playlist});
 
   @override
-  State<PlaylistView> createState() => _PlaylistViewState();
+  ConsumerState<PlaylistView> createState() => _PlaylistViewState();
 }
 
-class _PlaylistViewState extends State<PlaylistView> {
+class _PlaylistViewState extends ConsumerState<PlaylistView> {
 
   void sortListByOption(String sortOption) {
-       setState(() {
-          appStorage.playlists.get(widget.playlist.id).songs.sortSongList(sortOption);
-        });
-        appCacheData.setSortOption(sortOption: sortOption, playlistId: widget.playlist.id);
-    appCacheData.save();
+    //    setState(() {
+    //       appStorage.playlists.get(widget.playlist.id).songs.sortSongList(sortOption);
+    //     });
+    //     appCacheData.setSortOption(sortOption: sortOption, playlistId: widget.playlist.id);
+    // appCacheData.save();
   }
 
   @override
   Widget build(BuildContext context) {
     final playlist = widget.playlist;
 
-    var imageSize = MediaQuery.of(context).size.width - 100;
+    var imageSize = MediaQuery
+        .of(context)
+        .size
+        .width - 100;
 
     return Scaffold(
       body: CustomScrollView(
           slivers: [
             SliverAppBar(
-              expandedHeight: MediaQuery.of(context).size.width + 80,
+              expandedHeight: MediaQuery
+                  .of(context)
+                  .size
+                  .width + 80,
               pinned: true,
               actions: [
                 PopupMenuButton(
@@ -62,7 +65,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                               ],
                             ),
                             onTap: () {
-                              if(sortOption == SortOption.title) {
+                              if (sortOption == SortOption.title) {
                                 sortListByOption(SortOption.titleDescending);
                               }
                               else {
@@ -80,7 +83,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                               ],
                             ),
                             onTap: () {
-                              if(sortOption == SortOption.artist) {
+                              if (sortOption == SortOption.artist) {
                                 sortListByOption(SortOption.artistDescending);
                               }
                               else {
@@ -98,7 +101,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                               ],
                             ),
                             onTap: () {
-                              if(sortOption == SortOption.album) {
+                              if (sortOption == SortOption.album) {
                                 sortListByOption(SortOption.albumDescending);
                               }
                               else {
@@ -145,54 +148,40 @@ class _PlaylistViewState extends State<PlaylistView> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Padding(padding: EdgeInsets.only(right: 15), child: FloatingButton(icon: Icons.play_arrow, onPressed: () {
-                      if(playlist.songs.isNotEmpty) {
-                        appState.setState(() {
-                          var id = playlist.songs[0];
-                          var song = appStorage.songs.get(id);
-                          playerService.isPlaying = true;
-                          playerService.startPlay(song: song, playlistId: playlist.id);
-                          playerService.shuffled = false;
-                        });
+                      if (playlist.songs.isNotEmpty) {
+                        // appState.setState(() {
+                        //   var id = playlist.songs[0];
+                        //   var song = ref.watch(songsProvider).get(id);
+                        //   playerService.isPlaying = true;
+                        //   playerService.startPlay(song: song, playlistId: playlist.id);
+                        //   playerService.shuffled = false;
+                        // });
                       }
                     })),
                     FloatingButton(icon: Icons.shuffle, onPressed: () {
-                      if(playlist.songs.isNotEmpty) {
-                        var index = Random().nextInt(playlist.songs.length);
-                        var id = playlist.songs[index];
-                        var song = appStorage.songs.get(id);
-                        appState.setState(() {
-                          playerService.isPlaying = true;
-                          playerService.startPlay(song: song, playlistId: playlist.id, shuffle: true);
-                        });
-                      }
+                      // if (playlist.songs.isNotEmpty) {
+                      //   var index = Random().nextInt(playlist.songs.length);
+                      //   var id = playlist.songs[index];
+                      //   var song = ref.watch(songsProvider).get(id);
+                      // }
                     })
                   ],
                 ),
               ),
             ),
             SliverPadding(
-              padding: EdgeInsets.only(bottom: 80 + MediaQuery.of(context).padding.bottom),
+              padding: EdgeInsets.only(bottom: 80 + MediaQuery
+                  .of(context)
+                  .padding
+                  .bottom),
               sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                    var id = playlist.songs[index];
-                    var song = appStorage.songs.get(id);
-                    var albumCover = Padding(
-                      padding: const EdgeInsets.only(left: 10, right: 10),
-                      child: SizedBox(
-                          width: 50,
-                          height: 50,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: AlbumCover(
-                              album: song.album,
-                            ),
-                          )
-                      ),
-                    );
-                    return SongListItem(song: song, playlistId: playlist.id, albumCover: albumCover);
-                  },
-                  childCount: playlist.songs.length
-                  ),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final id = playlist.songs[index];
+                  final song = ref.watch(songsProvider).get(id);
+                  return SongListItem(song: song, playlistId: playlist.id);
+                },
+                    childCount: playlist.songs.length
+                ),
               ),
             )
           ]

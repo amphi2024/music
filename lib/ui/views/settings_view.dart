@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_settings.dart';
-import 'package:music/models/app_storage.dart';
 import 'package:music/ui/components/settings/server_settings_component.dart';
 
 import '../../channels/app_method_channel.dart';
@@ -78,7 +77,7 @@ class _SettingsViewState extends State<SettingsView> {
             Visibility(child: ServerSettingComponent(serverAddressController: serverAddressController)),
             Center(
               child: ElevatedButton(onPressed: () {
-                appStorage.syncMissingData();
+                // appStorage.syncMissingData();
               }, child: Text(AppLocalizations.of(context).get("@refresh_library"))),
             )
           ],

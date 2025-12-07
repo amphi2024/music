@@ -1,76 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:music/models/app_cache.dart';
-import 'package:music/models/app_state.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music/providers/playing_state_provider.dart';
 import 'package:music/ui/components/icon/repeat_icon.dart';
 
 import '../../../channels/app_method_channel.dart';
-import '../../../models/player_service.dart';
+import '../../../services/player_service.dart';
 import '../../../utils/duration_converter.dart';
 import '../icon/shuffle_icon.dart';
 
-class DesktopPlayControls extends StatefulWidget {
-
-  final void Function(void Function()) setState;
-  const DesktopPlayControls({super.key, required this.setState});
+class DesktopPlayControls extends ConsumerWidget {
+  const DesktopPlayControls({super.key});
 
   @override
-  State<DesktopPlayControls> createState() => _DesktopPlayControlsState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isPlaying = ref.watch(isPlayingProvider);
+    final duration = ref.watch(durationProvider);
+    final position = ref.watch(positionProvider);
 
-class _DesktopPlayControlsState extends State<DesktopPlayControls> {
-
-  bool changingPosition = false;
-
-  void playbackListener(int position) {
-    if(!changingPosition) {
-      setState(() {
-
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    appMethodChannel.playbackListeners.remove(playbackListener);
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    appMethodChannel.playbackListeners.add(playbackListener);
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-
-    final resumeButton =  IconButton(
-        icon: Icon(
-            playerService.isPlaying
-                ? Icons.pause
-                : Icons.play_arrow,
-            size: 25),
+    final resumeButton = IconButton(
+        icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow, size: 25),
         onPressed: () {
-          if(playerService.isPlaying) {
+          if (isPlaying) {
             appMethodChannel.pauseMusic();
-            if(mounted) {
-              setState(() {
-                playerService.isPlaying = false;
-              });
-            }
-          }
-          else {
+            ref.read(isPlayingProvider.notifier).set(false);
+          } else {
             appMethodChannel.resumeMusic();
-            if(mounted) {
-              setState(() {
-                playerService.isPlaying = true;
-              });
-            }
+            ref.read(isPlayingProvider.notifier).set(true);
           }
         });
 
-    final screenWidth = MediaQuery.of(context).size.width;
-    if(screenWidth < 800) {
+    if (MediaQuery.of(context).size.width < 800) {
       return resumeButton;
     }
 
@@ -85,16 +44,12 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
             IconButton(
                 icon: ShuffleIcon(size: 15),
                 onPressed: () {
-                  appState.setState(() {
-                    playerService.toggleShuffle();
-                    appCacheData.shuffled = playerService.shuffled;
-                    appCacheData.save();
-                  });
+                  toggleShuffle(ref);
                 }),
             IconButton(
                 icon: Icon(Icons.fast_rewind, size: 15),
                 onPressed: () {
-                  playerService.playPrevious(Localizations.localeOf(context).languageCode);
+                  playPrevious(ref);
                 }),
             resumeButton,
             IconButton(
@@ -103,16 +58,12 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
                   size: 15,
                 ),
                 onPressed: () {
-                  playerService.playNext(Localizations.localeOf(context).languageCode);
+                  playNext(ref);
                 }),
             IconButton(
                 icon: RepeatIcon(size: 15),
                 onPressed: () {
-                  setState(() {
-                    playerService.togglePlayMode();
-                    appCacheData.playMode = playerService.playMode;
-                    appCacheData.save();
-                  });
+                  togglePlayMode(ref);
                 }),
           ],
         ),
@@ -122,38 +73,28 @@ class _DesktopPlayControlsState extends State<DesktopPlayControls> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                DurationConverter.convertedDuration(playerService.playbackPosition),
-                style: TextStyle(
-                  fontSize: 13
-                ),
+                DurationConverter.convertedDuration(position),
+                style: TextStyle(fontSize: 13),
               ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 8.0, right: 8, bottom: 0, top: 0),
                   child: Slider(
-                      min: 0,
-                      max: playerService.musicDuration.toDouble(),
-                      value: playerService.playbackPosition.toDouble(),
-                      onChangeStart: (d) {
-                        changingPosition = true;
-                      },
-                      onChanged: (d) {
-                        setState(() {
-                          playerService.playbackPosition = d.toInt();
-                        });
-                      },
+                    min: 0,
+                    max: duration.toDouble(),
+                    value: position.toDouble(),
+                    onChanged: (d) {
+                      ref.read(positionProvider.notifier).set(d.toInt());
+                    },
                     onChangeEnd: (d) {
                       appMethodChannel.applyPlaybackPosition(d.toInt());
-                      changingPosition = false;
                     },
-                      ),
+                  ),
                 ),
               ),
               Text(
-                DurationConverter.convertedDuration(playerService.musicDuration),
-                style: TextStyle(
-                    fontSize: 13
-                ),
+                DurationConverter.convertedDuration(duration),
+                style: TextStyle(fontSize: 13),
               ),
             ],
           ),

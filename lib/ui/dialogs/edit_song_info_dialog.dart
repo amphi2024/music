@@ -2,13 +2,13 @@ import 'package:amphi/models/app.dart';
 import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:music/models/app_state.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/models/lyrics_editing_controller.dart';
 import 'package:music/models/music/artist.dart';
 import 'package:music/models/music/lyrics.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/music/song_file.dart';
+import 'package:music/providers/providers.dart';
 import 'package:music/ui/components/edit_music_genre.dart';
 import 'package:music/ui/components/lyrics_editor.dart';
 import 'package:music/ui/components/music_data_input.dart';
@@ -16,21 +16,24 @@ import 'package:music/ui/dialogs/edit_lyrics_dialog.dart';
 import 'package:music/ui/dialogs/select_album_dialog.dart';
 import 'package:music/ui/dialogs/select_artist_dialog.dart';
 import 'package:music/ui/views/edit_lyrics_view.dart';
+import 'package:music/utils/media_file_path.dart';
 
-class EditSongInfoDialog extends StatefulWidget {
+import '../../providers/albums_provider.dart';
+import '../../providers/artists_provider.dart';
+
+class EditSongInfoDialog extends ConsumerStatefulWidget {
   final Song song;
-
   const EditSongInfoDialog({super.key, required this.song});
 
   @override
-  State<EditSongInfoDialog> createState() => _EditSongInfoDialogState();
+  ConsumerState<EditSongInfoDialog> createState() => _EditSongInfoDialogState();
 }
 
-class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
+class _EditSongInfoDialogState extends ConsumerState<EditSongInfoDialog> {
   late final trackNumberController =
-      TextEditingController(text: song.trackNumber.toString());
+  TextEditingController(text: song.trackNumber.toString());
   late final discNumberController =
-      TextEditingController(text: song.discNumber.toString());
+  TextEditingController(text: song.discNumber.toString());
   late Song song = widget.song;
 
   @override
@@ -42,20 +45,28 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final langCode = Localizations.localeOf(context).languageCode;
-    var songFile = song.files.entries.firstOrNull?.value ?? SongFile();
+    final langCode = Localizations
+        .localeOf(context)
+        .languageCode;
+    var songFile = song.files.firstOrNull ?? SongFile(id: "", filename: "");
     var lyricsEditingController = LyricsEditingController(
         lyrics: songFile.lyrics,
         readOnly: true,
-        songFilePath: songFile.mediaFilepath);
-    var maxHeight = MediaQuery.of(context).size.height - 20;
+        songFilePath: songMediaFilePath(song.id, songFile.filename));
+    var maxHeight = MediaQuery
+        .of(context)
+        .size
+        .height - 20;
     if (maxHeight > 500) {
       maxHeight = 500;
     }
+    final album = ref.watch(albumsProvider).get(song.id);
+    final artist = ref.watch(artistsProvider).get(song.id);
+    
     return Dialog(
       child: ConstrainedBox(
         constraints:
-            BoxConstraints(maxWidth: 500, minHeight: 250, maxHeight: maxHeight),
+        BoxConstraints(maxWidth: 500, minHeight: 250, maxHeight: maxHeight),
         child: Column(
           children: [
             Expanded(
@@ -66,12 +77,12 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                     child: MusicDataInput(data: song.title),
                   ),
                   _ArtistInput(
-                    artist: song.artist,
+                    artist: artist,
                     hint: AppLocalizations.of(context).get("@edit_info_label_artist"),
                     languageCode: langCode,
                     onSelected: (id) {
                       setState(() {
-                        song.data["artist"] = id;
+                        // // song.data["artist"] = id;
                       });
                     },
                   ),
@@ -80,8 +91,8 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                     child: Row(
                       children: [
                         Expanded(
-                            child: Text(song.album.title[langCode] ??
-                                song.album.title["default"] ??
+                            child: Text(album.title[langCode] ??
+                                album.title["default"] ??
                                 AppLocalizations.of(context).get("@edit_info_label_album"))),
                         IconButton(
                             onPressed: () {
@@ -89,10 +100,10 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                                   context: context,
                                   builder: (context) {
                                     return SelectAlbumDialog(
-                                        excepting: song.albumId,
+                                        excepting: album.id,
                                         onSelected: (albumId) {
                                           setState(() {
-                                            song.data["album"] = albumId;
+                                            // song.data["album"] = albumId;
                                           });
                                         });
                                   });
@@ -101,7 +112,7 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                       ],
                     ),
                   ),
-                  EditMusicGenre(genre: song.genre),
+                  EditMusicGenre(genre: song.genres),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -142,15 +153,18 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
-                        Expanded(child: Text("${AppLocalizations.of(context).get("@edit_info_label_released")} ${DateFormat.yMMMEd(Localizations.localeOf(context).languageCode.toString()).format(song.released)}")),
+                        // Expanded(child: Text("${AppLocalizations.of(context).get("@edit_info_label_released")} ${DateFormat.yMMMEd(Localizations
+                        //     .localeOf(context)
+                        //     .languageCode
+                        //     .toString()).format(song.released)}")),
                         IconButton(
                             onPressed: () async {
                               final now = DateTime.now();
                               DateTime? result = await showDatePicker(context: context, firstDate: DateTime(1600), lastDate: DateTime(
                                   now.year + 100
-                              ), initialDate: song.released, );
+                              ), initialDate: song.released,);
 
-                              if(result != null) {
+                              if (result != null) {
                                 setState(() {
                                   song.released = result;
                                 });
@@ -165,20 +179,18 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                     child: GestureDetector(
                       onTap: () {
                         lyricsEditingController.readOnly = false;
-                        if(App.isDesktop() || App.isWideScreen(context)) {
+                        if (App.isDesktop() || App.isWideScreen(context)) {
                           showDialog(context: context, builder: (context) {
-                           return EditLyricsDialog(lyricsEditingController: lyricsEditingController, onChanged: (lyrics) {
-                             setState(() {
-                               songFile.lyrics.data["default"] =
-                                   lyrics.data.get("default");
-                             });
-                           });
+                            return EditLyricsDialog(lyricsEditingController: lyricsEditingController, onChanged: (lyrics) {
+                              setState(() {
+                                songFile.lyrics.data["default"] =
+                                    lyrics.data.get("default");
+                              });
+                            });
                           });
                         }
                         else {
-                          appState.setMainViewState(() {
-                            appState.playingBarShowing = false;
-                          });
+                          ref.read(playingBarShowingProvider.notifier).set(false);
                           Navigator.push(context,
                               CupertinoPageRoute(builder: (context) {
                                 return EditLyricsView(
@@ -200,46 +212,46 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                       ),
                     ),
                   ),
-                  _ArtistInput(
-                    artist: song.composer,
-                    hint: AppLocalizations.of(context).get("@edit_info_label_composer"),
-                    languageCode: langCode,
-                    onSelected: (id) {
-                      setState(() {
-                        song.data["composer"] = id;
-                      });
-                    },
-                  ),
-                  _ArtistInput(
-                    artist: song.lyricist ?? Artist(),
-                    hint: AppLocalizations.of(context).get("@edit_info_label_lyricist"),
-                    languageCode: langCode,
-                    onSelected: (id) {
-                      setState(() {
-                        song.data["lyricist"] = id;
-                      });
-                    },
-                  ),
-                  _ArtistInput(
-                    artist: song.arranger ?? Artist(),
-                    hint: AppLocalizations.of(context).get("@edit_info_label_arranger"),
-                    languageCode: langCode,
-                    onSelected: (id) {
-                      setState(() {
-                        song.data["arranger"] = id;
-                      });
-                    },
-                  ),
-                  _ArtistInput(
-                    artist: song.producer ?? Artist(),
-                    hint: AppLocalizations.of(context).get("@edit_info_label_producer"),
-                    languageCode: langCode,
-                    onSelected: (id) {
-                      setState(() {
-                        song.data["producer"] = id;
-                      });
-                    },
-                  ),
+                  // _ArtistInput(
+                  //   artist: song.composer,
+                  //   hint: AppLocalizations.of(context).get("@edit_info_label_composer"),
+                  //   languageCode: langCode,
+                  //   onSelected: (id) {
+                  //     setState(() {
+                  //       // song.data["composer"] = id;
+                  //     });
+                  //   },
+                  // ),
+                  // _ArtistInput(
+                  //   artist: song.lyricist ?? Artist(id: ""),
+                  //   hint: AppLocalizations.of(context).get("@edit_info_label_lyricist"),
+                  //   languageCode: langCode,
+                  //   onSelected: (id) {
+                  //     setState(() {
+                  //       // song.data["lyricist"] = id;
+                  //     });
+                  //   },
+                  // ),
+                  // _ArtistInput(
+                  //   artist: song.arranger ?? Artist(id: ""),
+                  //   hint: AppLocalizations.of(context).get("@edit_info_label_arranger"),
+                  //   languageCode: langCode,
+                  //   onSelected: (id) {
+                  //     setState(() {
+                  //       // song.data["arranger"] = id;
+                  //     });
+                  //   },
+                  // ),
+                  // _ArtistInput(
+                  //   artist: song.producer ?? Artist(id: ""),
+                  //   hint: AppLocalizations.of(context).get("@edit_info_label_producer"),
+                  //   languageCode: langCode,
+                  //   onSelected: (id) {
+                  //     setState(() {
+                  //       // song.data["producer"] = id;
+                  //     });
+                  //   },
+                  // ),
                 ],
               ),
             ),
@@ -262,11 +274,10 @@ class _EditSongInfoDialogState extends State<EditSongInfoDialog> {
                     song.discNumber = discNumber ?? 0;
 
                     song.save();
-                    songFile.save();
                     Navigator.pop(context);
-                    appState.setState(() {
-                      song.artist.refreshAlbums();
-                    });
+                    // appState.setState(() {
+                    //   song.artist.refreshAlbums();
+                    // });
                   },
                 )
               ],
@@ -284,11 +295,10 @@ class _ArtistInput extends StatelessWidget {
   final Artist artist;
   final void Function(String) onSelected;
 
-  const _ArtistInput(
-      {required this.artist,
-      required this.onSelected,
-      required this.languageCode,
-      required this.hint});
+  const _ArtistInput({required this.artist,
+    required this.onSelected,
+    required this.languageCode,
+    required this.hint});
 
   @override
   Widget build(BuildContext context) {

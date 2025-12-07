@@ -30,7 +30,7 @@ class AppCacheData extends AppCacheDataCore {
     String sortOption(String playlistId) {
         var dirName = PathUtils.basename(appStorage.selectedUser.storagePath);
         if(data["sortOption"]?[dirName] is Map) {
-            var option = data["sortOption"][dirName][playlistId];
+            var option = data["sortOption"][dirName][playlistId.isEmpty ? "!SONGS" : playlistId];
             if(option is String) {
                 return option;
             }

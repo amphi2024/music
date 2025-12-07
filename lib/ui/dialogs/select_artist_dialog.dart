@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:music/models/music/artist.dart';
 import 'package:music/ui/components/item/artist_linear_item.dart';
 
-import '../../models/app_storage.dart';
-
 class SelectArtistDialog extends StatefulWidget {
 
   final String excepting;
   final void Function(String) onSelected;
-  const SelectArtistDialog({super.key, required this.excepting, required this.onSelected});
+  const SelectArtistDialog({super.key, required this.onSelected, required this.excepting});
 
   @override
   State<SelectArtistDialog> createState() => _SelectArtistDialogState();
@@ -20,11 +18,11 @@ class _SelectArtistDialogState extends State<SelectArtistDialog> {
 
   @override
   void initState() {
-    appStorage.artists.forEach((id, artist) {
-      if(widget.excepting != id) {
-        artists.add(artist);
-      }
-    });
+    // appStorage.artists.forEach((id, artist) {
+    //   if(widget.excepting != id) {
+    //     artists.add(artist);
+    //   }
+    // });
     super.initState();
   }
 

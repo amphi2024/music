@@ -1,72 +1,53 @@
 import 'package:flutter/material.dart';
-import 'package:music/models/app_state.dart';
-import 'package:music/models/player_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music/providers/genres_provider.dart';
+import 'package:music/providers/providers.dart';
 import 'package:music/ui/fragments/components/floating_button.dart';
+import 'package:music/utils/fragment_scroll_listener.dart';
+import 'package:music/utils/localized_title.dart';
 
-import '../../models/app_storage.dart';
-import '../../models/fragment_index.dart';
 import '../../models/music/song.dart';
-import '../components/image/album_cover.dart';
+import '../../providers/fragment_provider.dart';
+import '../../providers/songs_provider.dart';
 import '../components/item/song_list_item.dart';
 import 'components/fragment_padding.dart';
 
-class GenreFragment extends StatefulWidget {
+class GenreFragment extends ConsumerStatefulWidget {
   const GenreFragment({super.key});
 
   @override
-  State<GenreFragment> createState() => _GenreFragmentState();
+  ConsumerState<GenreFragment> createState() => _GenreFragmentState();
 }
 
-class _GenreFragmentState extends State<GenreFragment> {
-  var scrollController = ScrollController();
+class _GenreFragmentState extends ConsumerState<GenreFragment> with FragmentViewMixin {
+
   late OverlayEntry overlayEntry;
 
   @override
   void dispose() {
-    scrollController.dispose();
     overlayEntry.remove();
     super.dispose();
   }
 
   @override
   void initState() {
-    appState.setFragmentState = setState;
-    scrollController.addListener(() {
-      if(scrollController.offset > 60 && appState.selectedSongs == null) {
-        appState.setMainViewState(() {
-          appState.fragmentTitleShowing = true;
-          appState.fragmentTitleMinimized = true;
-        });
-      }
-      else {
-        appState.setMainViewState(() {
-          appState.fragmentTitleShowing = false;
-          appState.fragmentTitleMinimized = false;
-        });
-      }
-    });
-    appState.requestScrollToTop = () {
-      scrollController.animateTo(0, duration: Duration(milliseconds: 750), curve: Curves.easeOutQuint);
-    };
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final overlay = Overlay.of(context);
       overlayEntry = OverlayEntry(
-        builder: (context) => Stack(
-          children: [
-            Positioned(
-                left: 205,
-                top: 5,
-                child: IconButton(onPressed: () {
-                  appState.setMainViewState(() {
-                    appState.fragmentIndex = FragmentIndex.genres;
-                    appState.showingGenre = null;
-                    appState.fragmentTitleShowing = true;
-                  });
-                }, icon: Icon(Icons.arrow_back_ios_new, size: 15,))),
-          ],
-        ),
+        builder: (context) =>
+            Stack(
+              children: [
+                Positioned(
+                    left: 205,
+                    top: 5,
+                    child: IconButton(onPressed: () {
+                      ref.read(showingPlaylistIdProvider.notifier).set("!GENRES");
+                      ref.read(fragmentStateProvider.notifier).setState(titleMinimized: true, titleShowing: true);
+                    }, icon: Icon(Icons.arrow_back_ios_new, size: 15,))),
+              ],
+            ),
       );
       overlay.insert(overlayEntry);
     });
@@ -75,12 +56,14 @@ class _GenreFragmentState extends State<GenreFragment> {
   @override
   Widget build(BuildContext context) {
     List<Song> songList = [];
-    final genre = appStorage.genres[appState.showingGenre ?? ""] ?? {};
+    final genreId = ref.watch(showingPlaylistIdProvider).split(",").last;
+    final genres = ref.watch(genresProvider);
+    final genre = genres[genreId] ?? {};
     final genreName = genre["default"];
     final playlistId = "!GENRE,${genreName}";
-    appStorage.songs.forEach((key, song) {
-      for (var genre in song.genre) {
-        if (genre is Map<String, dynamic> && genre.containsValue(genreName)) {
+    ref.watch(songsProvider).forEach((key, song) {
+      for (var genre in song.genres) {
+        if (genre.containsValue(genreName)) {
           songList.add(song);
         }
       }
@@ -91,7 +74,7 @@ class _GenreFragmentState extends State<GenreFragment> {
       controller: scrollController,
       itemCount: songList.length + 2,
       itemBuilder: (context, index) {
-        if(index == 0) {
+        if (index == 0) {
           return Padding(
             padding: const EdgeInsets.only(left: 15.0, bottom: 5),
             child: Text(genre.byContext(context), style: TextStyle(
@@ -100,20 +83,20 @@ class _GenreFragmentState extends State<GenreFragment> {
             ),),
           );
         }
-        else if(index == 1) {
+        else if (index == 1) {
           return Row(
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 15, bottom: 15),
                 child: FloatingButton(icon: Icons.play_arrow, onPressed: () {
-                  appState.setState(() {
-                    var song = songList.firstOrNull;
-                    if(song != null) {
-                      playerService.isPlaying = true;
-                      playerService.shuffled = false;
-                      playerService.startPlay(song: song, playlistId: playlistId);
-                    }
-                  });
+                  // appState.setState(() {
+                  //   var song = songList.firstOrNull;
+                  //   if (song != null) {
+                  //     playerService.isPlaying = true;
+                  //     playerService.shuffled = false;
+                  //     playerService.startPlay(song: song, playlistId: playlistId);
+                  //   }
+                  // });
                 }),
               ),
               Padding(
@@ -121,33 +104,20 @@ class _GenreFragmentState extends State<GenreFragment> {
                   child: FloatingButton(
                       icon: Icons.shuffle,
                       onPressed: () {
-                        appState.setState(() {
-                          var song = songList.firstOrNull;
-                          if(song != null) {
-                            playerService.isPlaying = true;
-                            playerService.startPlay(song: song, playlistId: playlistId, shuffle: true);
-                          }
-                        });
+                        // appState.setState(() {
+                        //   var song = songList.firstOrNull;
+                        //   if (song != null) {
+                        //     playerService.isPlaying = true;
+                        //     playerService.startPlay(song: song, playlistId: playlistId, shuffle: true);
+                        //   }
+                        // });
                       }))
             ],
           );
         }
         else {
           var song = songList[index - 2];
-          var albumCover = Padding(
-            padding: const EdgeInsets.only(left: 10, right: 10),
-            child: SizedBox(
-                width: 50,
-                height: 50,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: AlbumCover(
-                    album: song.album,
-                  ),
-                )
-            ),
-          );
-          return SongListItem(song: song, playlistId: playlistId, albumCover: albumCover);
+          return SongListItem(song: song, playlistId: playlistId);
         }
       },
     );

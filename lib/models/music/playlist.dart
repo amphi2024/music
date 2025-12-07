@@ -2,79 +2,78 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:amphi/utils/file_name_utils.dart';
-import 'package:amphi/utils/path_utils.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/channels/app_web_channel.dart';
-import 'package:music/models/app_storage.dart';
+import 'package:music/database/database_helper.dart';
+import 'package:music/providers/songs_provider.dart';
+import 'package:music/utils/generated_id.dart';
+import 'package:music/utils/json_value_extractor.dart';
+import 'package:sqflite/sqflite.dart';
+
+import '../../utils/media_file_path.dart';
 
 class Playlist {
-  String path = "";
-  String id = "";
-  Map<String, dynamic> data = {
-    "title": "",
-    "songs": []
-  };
+  String id;
+  String title;
+  List<String> songs = [];
+  DateTime created = DateTime.now();
+  DateTime modified = DateTime.now();
+  DateTime? deleted;
+  List<Map<String, dynamic>> thumbnails = [];
+  String? note;
 
-  set title(value) => data["title"] = value;
-  String get title => data["title"];
+  Set<int> thumbnailIndexes = {};
 
-  List<dynamic> get songs => data["songs"];
-  set songs(value) => data["songs"] = value;
+  Playlist({
+    required this.id,
+    this.title = "",
+  });
 
-  List<int> thumbnailData = [];
-
-  static Playlist created() {
-    var playlist = Playlist();
-    var filename = FilenameUtils.generatedFileName(".playlist", appStorage.playlistsPath);
-    playlist.path = PathUtils.join(appStorage.playlistsPath, filename);
-    playlist.id = FilenameUtils.nameOnly(filename);
-    return playlist;
-  }
-
-  static Playlist fromFile(File file) {
-    try {
-      var playlist = Playlist();
-      playlist.id = FilenameUtils.nameOnly(PathUtils.basename(file.path));
-      playlist.path = file.path;
-      playlist.data = jsonDecode(file.readAsStringSync());
-
-      if(playlist.songs.length > 3) {
-        for (int i = 0; i < 4; i++) {
-          int index = Random().nextInt(playlist.songs.length);
-          if (playlist.thumbnailData.contains(index)) {
-            i--;
-          }
-          else {
-            playlist.thumbnailData.add(index);
-          }
-        }
+  Playlist.fromMap(Map<String, dynamic> data)
+      : id = data["id"],
+        title = data["title"],
+        songs = data.getStringList("songs"),
+        created = data.getDateTime("created"),
+        modified = data.getDateTime("modified"),
+        deleted = data.getNullableDateTime("deleted"),
+        thumbnails = data.getMapList("thumbnails"),
+        note = data["note"] {
+    if(songs.length > 3) {
+      while(thumbnailIndexes.length < 4) {
+        final index = Random().nextInt(songs.length);
+        thumbnailIndexes.add(index);
       }
-      return playlist;
-    }
-    catch(e) {
-      return Playlist();
     }
   }
 
-  void save({bool upload = true}) async {
-    var file = File(path);
-    await file.writeAsString(jsonEncode(data));
+  Future<void> save({bool upload = true}) async {
+    if (id.isEmpty) {
+      id = await generatedPlaylistId();
+    }
+    final database = await databaseHelper.database;
+    await database.insert("playlists", toJsonBody(), conflictAlgorithm: ConflictAlgorithm.replace);
 
-    if(upload) {
+    if (upload) {
       appWebChannel.uploadPlaylist(playlist: this);
     }
   }
 
   Future<void> delete({bool upload = true}) async {
-    var file = File(path);
-    var directory = Directory(PathUtils.join(appStorage.playlistsPath, id));
-    if(await directory.exists()) {
-      await directory.delete(recursive: true);
+    if (id.isEmpty) {
+      return;
     }
-    await file.delete();
-    if(upload) {
+    final database = await databaseHelper.database;
+    await database.delete("playlists", where: "id = ?", whereArgs: [id]);
+
+    final directory = Directory(mediaDirectoryPath(id, "playlists"));
+    await directory.delete(recursive: true);
+    if (upload) {
       appWebChannel.deletePlaylist(id: id);
     }
+  }
+
+  void sort(Ref ref) {
+    songs.sortSongs(id, ref);
   }
 
   void shuffle() {
@@ -84,5 +83,31 @@ class Playlist {
 
   bool isNormalPlaylist() {
     return id != "" && !id.startsWith("!ALBUM") && !id.startsWith("!ARTIST") && !id.startsWith("!GENRE") && id != "!ARCHIVE";
+  }
+
+  Map<String, dynamic> toSqlInsertMap() {
+    return {
+      "id": id,
+      "title": title,
+      "songs": jsonEncode(songs),
+      "created": created.toUtc().millisecondsSinceEpoch,
+      "modified": modified.toUtc().millisecondsSinceEpoch,
+      "deleted": deleted?.toUtc().millisecondsSinceEpoch,
+      "thumbnails": jsonEncode(thumbnails),
+      "note": note
+    };
+  }
+
+  Map<String, dynamic> toJsonBody() {
+    return {
+      "id": id,
+      "title": title,
+      "songs": songs,
+      "created": created.toUtc().millisecondsSinceEpoch,
+      "modified": modified.toUtc().millisecondsSinceEpoch,
+      "deleted": deleted?.toUtc().millisecondsSinceEpoch,
+      "thumbnails": thumbnails,
+      "note": note
+    };
   }
 }

@@ -4,7 +4,6 @@ import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:music/models/app_settings.dart';
 
-import '../../models/app_storage.dart';
 import '../components/settings/server_settings_component.dart';
 
 class SettingsDialog extends StatefulWidget {
@@ -82,7 +81,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                 Visibility(child: ServerSettingComponent(serverAddressController: serverAddressController)),
                 Center(
                   child: ElevatedButton(onPressed: () {
-                    appStorage.syncMissingData();
+                    // appStorage.syncMissingData();
                   }, child: Text(AppLocalizations.of(context).get("@refresh_library"))),
                 )
               ],

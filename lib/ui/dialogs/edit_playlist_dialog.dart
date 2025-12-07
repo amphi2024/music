@@ -1,12 +1,14 @@
 import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/models/music/playlist.dart';
+import 'package:music/providers/playlists_provider.dart';
 
 class EditPlaylistDialog extends StatefulWidget {
 
   final Playlist playlist;
-  final void Function(Playlist) onSave;
-  const EditPlaylistDialog({super.key, required this.onSave, required this.playlist});
+  final WidgetRef ref;
+  const EditPlaylistDialog({super.key, required this.playlist, required this.ref});
 
   @override
   State<EditPlaylistDialog> createState() => _EditPlaylistDialogState();
@@ -52,8 +54,9 @@ class _EditPlaylistDialogState extends State<EditPlaylistDialog> {
                   icon: Icon(Icons.check),
                   onPressed: () {
                     widget.playlist.title = controller.text;
+                    widget.playlist.modified = DateTime.now();
                     widget.playlist.save();
-                    widget.onSave(widget.playlist);
+                    widget.ref.read(playlistsProvider.notifier).insertPlaylist(widget.playlist);
                     Navigator.pop(context);
                   },
                 ),

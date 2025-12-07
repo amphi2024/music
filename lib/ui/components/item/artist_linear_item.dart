@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:music/models/music/artist.dart';
-import 'package:music/models/music/song.dart';
+import 'package:music/utils/localized_title.dart';
 
 import '../image/artist_profile_image.dart';
 

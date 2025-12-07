@@ -5,7 +5,6 @@ import 'package:amphi/widgets/account/account_info.dart';
 import 'package:flutter/material.dart';
 import 'package:amphi/widgets/account/profile_image.dart';
 import 'package:music/models/app_cache.dart';
-import 'package:music/models/app_state.dart';
 import 'package:music/models/app_storage.dart';
 import 'package:music/ui/components/bottom_sheet_drag_handle.dart';
 
@@ -93,10 +92,10 @@ void onUserRemoved() {
 
 void onUserAdded() {
   appSettings.getData();
-  appState.setFragmentState(() {
-    appStorage.clearMusic();
-    appStorage.initMusic();
-  });
+  // appState.setFragmentState(() {
+  //   appStorage.clearMusic();
+  //   appStorage.initMusic();
+  // });
 }
 
 void onUsernameChanged() {
@@ -107,11 +106,11 @@ void onSelectedUserChanged(User user) {
   appSettings.getData();
   appWebChannel.disconnectWebSocket();
   appWebChannel.connectWebSocket();
-  appStorage.clearMusic();
-  appState.setFragmentState(() {
-    appStorage.initMusic();
-    appStorage.syncDataFromEvents();
-  });
+  // appStorage.clearMusic();
+  // appState.setFragmentState(() {
+  //   appStorage.initMusic();
+  //   appStorage.syncDataFromEvents();
+  // });
 }
 
 void onLoggedIn({required String id, required String token, required String username, required BuildContext context}) async {
@@ -123,8 +122,8 @@ void onLoggedIn({required String id, required String token, required String user
   appStorage.selectedUser.name = username;
   appStorage.selectedUser.token = token;
   await appStorage.saveSelectedUserInformation();
-  await appStorage.syncMissingData();
-  appState.setFragmentState(() {
-
-  });
+  // await appStorage.syncMissingData();
+  // appState.setFragmentState(() {
+  //
+  // });
 }

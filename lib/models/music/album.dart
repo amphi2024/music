@@ -1,157 +1,106 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:amphi/utils/file_name_utils.dart';
-import 'package:amphi/utils/path_utils.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:amphi/utils/try_json_decode.dart';
 import 'package:music/channels/app_web_channel.dart';
-import 'package:music/models/music/artist.dart';
-import 'package:music/utils/random_alphabet.dart';
-
-import '../app_storage.dart';
+import 'package:music/database/database_helper.dart';
+import 'package:music/utils/generated_id.dart';
+import 'package:music/utils/json_value_extractor.dart';
+import 'package:music/utils/media_file_path.dart';
+import 'package:sqflite/sqflite.dart';
 
 class Album {
+  String id;
+  Map<String, dynamic> title;
+  List<Map<String, dynamic>> genres;
+  List<String> artistIds;
+  List<Map<String, dynamic>> covers;
+  DateTime created;
+  DateTime modified;
+  DateTime? deleted;
+  DateTime? released;
+  String? description;
 
-  Map<String, dynamic> data = {
-    "title": <String, dynamic>{},
-    "genre": <String, dynamic>{},
-    "artist": "",
-    "added": DateTime.now().toUtc().millisecondsSinceEpoch,
-    "modified": DateTime.now().toUtc().millisecondsSinceEpoch
-  };
+  Album(
+      {required this.id,
+      this.title = const {},
+      this.genres = const [],
+      this.artistIds = const [],
+      this.covers = const [],
+      DateTime? created,
+      DateTime? modified,
+      this.deleted,
+      this.released,
+      this.description})
+      : created = created ?? DateTime.now(),
+        modified = modified ?? DateTime.now();
 
-  Map<String, dynamic> get title => data["title"];
-  Map<String, dynamic> get genre => data["genre"];
-  Artist get artist => appStorage.artists[data["artist"]] ?? Artist();
-  String get artistId => data["artist"];
-  set artist(value) => data["artist"] = value;
-  List<String> covers = [];
-  List<String> songs = [];
-  DateTime get added => DateTime.fromMillisecondsSinceEpoch(data["added"], isUtc: true).toLocal();
-  DateTime get modified => DateTime.fromMillisecondsSinceEpoch(data["modified"], isUtc: true).toLocal();
-  String id = "";
-  String path = "";
+  Album.fromMap(Map<String, dynamic> data)
+      : id = data["id"],
+        title = tryJsonDecode(data["title"], defaultValue: {"default": data["title"]}),
+        covers = data.getMapList("covers"),
+        genres = data.getMapList("genres"),
+        artistIds = data.getStringList("artist_ids"),
+        created = data.getDateTime("created"),
+        modified = data.getDateTime("modified"),
+        deleted = data.getNullableDateTime("deleted"),
+        released = data.getNullableDateTime("released"),
+        description = data["description"];
 
-  static Album created({required Map metadata, required String artistId, required List<int> albumCover}) {
-    var album = Album();
-    String alphabet = randomAlphabet();
-    var filename = FilenameUtils.generatedDirectoryNameWithChar(appStorage.albumsPath, alphabet);
-
-    var directory = Directory(PathUtils.join(appStorage.albumsPath , alphabet , filename));
-
-    album.path = directory.path;
-    album.id = filename;
-
-    album.title["default"] = metadata["album"];
-    album.genre["default"] = metadata["genre"];
-    album.artist = artistId;
-
-    if(albumCover.isNotEmpty) {
-      var coverFilename = FilenameUtils.generatedFileName(".jpg", album.path);
-      var coverFile = File(PathUtils.join(album.path, coverFilename));
-      directory.createSync(recursive: true);
-      coverFile.writeAsBytes(albumCover);
-      album.covers.add(coverFile.path);
+  Future<void> save({bool upload = true}) async {
+    if (id.isEmpty) {
+      id = await generatedAlbumId();
     }
 
-    return album;
-  }
+    final database = await databaseHelper.database;
+    await database.insert("albums", toSqlInsertMap(), conflictAlgorithm: ConflictAlgorithm.replace);
 
-  static Album fromDirectory(Directory directory) {
-    Album album = Album();
-    album.path = directory.path;
-    album.id = PathUtils.basename(album.path);
-
-    for(var file in directory.listSync()) {
-      if(!file.path.endsWith(".json")) {
-        album.covers.add(file.path);
-      }
-    }
-    var infoFile = File(PathUtils.join(album.path, "info.json"));
-    if(infoFile.existsSync()) {
-      album.data = jsonDecode(infoFile.readAsStringSync());
-    }
-    appStorage.songs.forEach((key, song) {
-      if(song.albumId == album.id) {
-        album.songs.add(song.id);
-      }
-    });
-
-    return album;
-  }
-
-  Future<void> save({bool upload = true, List<PlatformFile>? selectedCoverFiles}) async {
-    var directory = Directory(path);
-    if(!await directory.exists()) {
-      await directory.create(recursive: true);
-    }
-    var infoFile = File(PathUtils.join(path, "info.json"));
-    await infoFile.writeAsString(jsonEncode(data));
-
-    if(selectedCoverFiles != null) {
-      for(var selectedCover in selectedCoverFiles) {
-        var filename = FilenameUtils.generatedFileName(".${selectedCover.extension!}", path);
-        var file = File(PathUtils.join(path, filename));
-        var bytes = await selectedCover.xFile.readAsBytes();
-        await file.writeAsBytes(bytes);
-        covers.add(file.path);
-        appWebChannel.uploadAlbumCover(albumId: id, filePath: file.path);
-      }
-    }
-
-    if(upload) {
-      appWebChannel.uploadAlbumInfo(album: this);
-      appWebChannel.getAlbumCovers(id: id, onSuccess: (list) {
-
-          for(var filePath in covers) {
-            bool exists = false;
-            for(var fileInfo in list) {
-              var filename = PathUtils.basename(filePath);
-              if (filename == fileInfo["filename"]) {
-                exists = true;
-                break;
-              }
-            }
-            if(!exists) {
-              appWebChannel.uploadAlbumCover(albumId: id, filePath: filePath);
-            }
-          }
-
-      });
-
+    if (upload) {
+      appWebChannel.uploadAlbum(album: this);
     }
   }
 
   Future<void> delete({bool upload = true}) async {
-    var directory = Directory(path);
+    if (id.isEmpty) {
+      return;
+    }
+    final database = await databaseHelper.database;
+    await database.delete("albums", where: "id = ?", whereArgs: [id]);
+
+    final directory = Directory(mediaDirectoryPath(id, "albums"));
     await directory.delete(recursive: true);
-    if(upload) {
+    if (upload) {
       appWebChannel.deleteAlbum(id: id);
     }
   }
 
-  Future<void> downloadMissingCovers() async {
-    if(id.isNotEmpty) {
-      appWebChannel.getAlbumCovers(id: id, onSuccess: (list) async {
-        for (var coverInfo in list) {
-          var filename = coverInfo["filename"];
-          var file = File(PathUtils.join(path, filename));
-
-          if (!await file.exists()) {
-            appWebChannel.downloadAlbumCover(album: this, filename: filename);
-            covers.add(file.path);
-          }
-        }
-      });
-    }
+  Map<String, dynamic> toSqlInsertMap() {
+    return {
+      "id": id,
+      "title": title,
+      "genres": jsonEncode(genres),
+      "artist_ids": jsonEncode(artistIds),
+      "covers": jsonEncode(covers),
+      "created": created.toUtc().millisecondsSinceEpoch,
+      "modified": modified.toUtc().millisecondsSinceEpoch,
+      "deleted": deleted?.toUtc().millisecondsSinceEpoch,
+      "released": released?.toUtc().millisecondsSinceEpoch,
+      "description": description
+    };
   }
 
-  @override
-  String toString() {
-    return """
-    id: ${id}
-    artist: ${artist.toString()},
-    title: ${title}
-    """;
+  Map<String, dynamic> toJsonBody() {
+    return {
+      "id": id,
+      "title": title,
+      "genres": genres,
+      "artist_ids": artistIds,
+      "covers": covers,
+      "created": created.toUtc().millisecondsSinceEpoch,
+      "modified": modified.toUtc().millisecondsSinceEpoch,
+      "deleted": deleted?.toUtc().millisecondsSinceEpoch,
+      "released": released?.toUtc().millisecondsSinceEpoch,
+      "description": description
+    };
   }
 }

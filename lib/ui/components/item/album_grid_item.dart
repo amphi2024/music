@@ -1,19 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/models/music/album.dart';
-import 'package:music/models/music/song.dart';
+import 'package:music/providers/artists_provider.dart';
+import 'package:music/utils/localized_title.dart';
 
 import '../image/album_cover.dart';
 
-class AlbumGridItem extends StatelessWidget {
+class AlbumGridItem extends ConsumerWidget {
   final Album album;
   final bool showArtistName;
   final void Function()? onPressed;
   final void Function()? onLongPressed;
+
   const AlbumGridItem({super.key, required this.album, this.onPressed, this.onLongPressed, this.showArtistName = true});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final artist = ref.watch(artistsProvider).get(album.id);
     return GestureDetector(
       onTap: onPressed,
       onLongPress: onLongPressed,
@@ -42,7 +46,7 @@ class AlbumGridItem extends StatelessWidget {
             Visibility(
               visible: showArtistName,
               child: Text(
-                  album.artist.name.byContext(context)
+                  artist.name.byContext(context)
               ),
             ),
           ],

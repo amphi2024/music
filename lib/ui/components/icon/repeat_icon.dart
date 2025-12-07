@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:music/models/player_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music/providers/playing_state_provider.dart';
 
-class RepeatIcon extends StatelessWidget {
-
+class RepeatIcon extends ConsumerWidget {
   final double? size;
+
   const RepeatIcon({super.key, this.size});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final playMode = ref.watch(playModeProvider);
     return Icon(
-        playerService.playMode == repeatOne ? Icons.repeat_one : Icons.repeat,
-            color: playerService.playMode == playOnce ? Theme.of(context).dividerColor : null,
+      playMode == repeatOne ? Icons.repeat_one : Icons.repeat,
+      color: playMode == playOnce ? Theme.of(context).dividerColor : null,
       size: size,
     );
   }

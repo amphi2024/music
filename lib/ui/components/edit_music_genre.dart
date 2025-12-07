@@ -1,21 +1,23 @@
 import 'package:amphi/widgets/settings/language.dart';
 import 'package:flutter/material.dart';
-import 'package:music/models/app_storage.dart';
-import 'package:music/models/music/song.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music/providers/genres_provider.dart';
 import 'package:music/ui/components/music_data_input.dart';
+import 'package:music/utils/localized_title.dart';
 
-class EditMusicGenre extends StatefulWidget {
+class EditMusicGenre extends ConsumerStatefulWidget {
   final List<dynamic> genre;
 
   const EditMusicGenre({super.key, required this.genre});
 
   @override
-  State<EditMusicGenre> createState() => _EditMusicGenreState();
+  ConsumerState<EditMusicGenre> createState() => _EditMusicGenreState();
 }
 
-class _EditMusicGenreState extends State<EditMusicGenre> {
+class _EditMusicGenreState extends ConsumerState<EditMusicGenre> {
   @override
   Widget build(BuildContext context) {
+    final genres = ref.watch(genresProvider);
     List<Widget> children = [];
 
     for (int i = 0; i < widget.genre.length; i++) {
@@ -37,7 +39,7 @@ class _EditMusicGenreState extends State<EditMusicGenre> {
       }
     }
 
-    final genreList = _getGenreList(context);
+    final genreList = _getGenreList(context, genres);
 
     children.add(Center(
       child: PopupMenuButton(
@@ -46,15 +48,15 @@ class _EditMusicGenreState extends State<EditMusicGenre> {
             return List.generate(genreList.length, (index) {
               return PopupMenuItem(child: Text(genreList[index].byContext(context)),
                 onTap: () {
-                setState(() {
-                  widget.genre.add(genreList[index]);
-                });
+                  setState(() {
+                    widget.genre.add(genreList[index]);
+                  });
                 },
               );
             });
           }),
     )
-        );
+    );
 
     return SizedBox(
       height: 250,
@@ -125,7 +127,7 @@ List<PopupMenuItem> popupMenuItems(BuildContext context, void Function(String) o
   }).toList();
 }
 
-List<Map<String, dynamic>> _getGenreList(BuildContext context) {
+List<Map<String, dynamic>> _getGenreList(BuildContext context, Map<String, Map<String, dynamic>> genres) {
   List<Map<String, dynamic>> list = [
     {
       "default": "Pop",
@@ -479,23 +481,23 @@ List<Map<String, dynamic>> _getGenreList(BuildContext context) {
       "zh-Hant": "舞蹈"
     }
   ];
-  
-  appStorage.genres.forEach((key, existingGenre) {
+
+  genres.forEach((key, existingGenre) {
     bool exists = false;
-    for(var genre in list) {
-      if(genre["default"] == existingGenre["default"]) {
+    for (var genre in list) {
+      if (genre["default"] == existingGenre["default"]) {
         exists = true;
         break;
       }
     }
-    if(!exists) {
+    if (!exists) {
       list.add(existingGenre);
     }
   });
-  
-  list.add( {
+
+  list.add({
     "default": "Custom"
   });
-  
+
   return list;
 }

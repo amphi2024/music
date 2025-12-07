@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:music/models/music/song.dart';
+import 'package:music/utils/localized_title.dart';
 
 class GenreListItem extends StatelessWidget {
   

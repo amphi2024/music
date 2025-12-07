@@ -1,131 +1,124 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
-import 'package:amphi/utils/file_name_utils.dart';
-import 'package:amphi/utils/path_utils.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:amphi/utils/try_json_decode.dart';
 import 'package:music/channels/app_web_channel.dart';
-import 'package:music/models/app_storage.dart';
-import 'package:music/utils/random_alphabet.dart';
+import 'package:music/database/database_helper.dart';
+import 'package:music/utils/generated_id.dart';
+import 'package:music/utils/json_value_extractor.dart';
+import 'package:music/utils/media_file_path.dart';
+import 'package:sqflite/sqflite.dart';
 
 class Artist {
+  String id;
+  Map<String, dynamic> name;
+  List<Member> members;
+  List<Map<String, dynamic>> images;
+  DateTime created;
+  DateTime modified;
+  DateTime? deleted;
+  DateTime? debut;
+  String? country;
+  String? description;
+  int imageIndex = 0;
 
-  Map<String, dynamic> data = {
-    "name": <String, dynamic>{},
-    "albums": <String>[],
-    "members": <String>[],
-    "added": DateTime.now().toUtc().millisecondsSinceEpoch,
-    "modified": DateTime.now().toUtc().millisecondsSinceEpoch
-  };
-  Map<String, dynamic> get name => data["name"];
-  List<dynamic> get albums => data["albums"];
-  List<dynamic> get members => data["members"];
-  DateTime get added => DateTime.fromMillisecondsSinceEpoch(data["added"], isUtc: true).toLocal();
-  DateTime get modified => DateTime.fromMillisecondsSinceEpoch(data["modified"], isUtc: true).toLocal();
-  List<String> profileImages = [];
-  String id = "";
+  Artist({
+    required this.id,
+    this.name = const {},
+    this.members = const [],
+    this.images = const [],
+    DateTime? created,
+    DateTime? modified,
+    this.deleted,
+    this.debut,
+    this.country,
+    this.description,
+  }) : created = created ?? DateTime.now(),
+        modified = modified ?? DateTime.now();
 
-  String path = "";
-
-  void refreshAlbums() {
-    albums.clear();
-    appStorage.albums.forEach((key, album) {
-      if(id == album.artistId) {
-        albums.add(album.id);
-      }
-    });
+  Artist.fromMap(Map<String, dynamic> data)
+      : id = data["id"],
+        name = tryJsonDecode(data["name"], defaultValue: {"default": data["name"].toString()}) as Map<String, dynamic>,
+        members = data.getMapList("members").map((e) => Member.fromMap(e)).toList(),
+        images = data.getMapList("images"),
+        created = data.getDateTime("created"),
+        modified = data.getDateTime("modified"),
+        deleted = data.getNullableDateTime("deleted"),
+        debut = data.getNullableDateTime("debut"),
+        country = data["country"],
+        description = data["description"] {
+    imageIndex = Random().nextInt(images.length);
   }
 
-  static Artist fromDirectory(Directory directory) {
-    var artist = Artist();
-
-    artist.path = directory.path;
-    artist.id = PathUtils.basename(directory.path);
-    var infoFile = File(PathUtils.join(artist.path, "info.json"));
-    if(infoFile.existsSync()) {
-      artist.data = jsonDecode(infoFile.readAsStringSync());
+  Future<void> save({bool upload = true}) async {
+    if(id.isEmpty) {
+      id = await generatedArtistId();
     }
-
-    artist.albums.clear();
-
-    appStorage.albums.forEach((key, album) {
-      if(artist.id == album.artistId) {
-        artist.albums.add(album.id);
-      }
-    });
-
-    for(var file in directory.listSync()) {
-      if(!file.path.endsWith("info.json")) {
-        artist.profileImages.add(file.path);
-      }
-    }
-    return artist;
-  }
-
-  static Artist created(Map metadata) {
-    var artist = Artist();
-    var alphabet = randomAlphabet();
-    var filename = FilenameUtils.generatedDirectoryNameWithChar(appStorage.artistsPath, alphabet);
-    var directory = Directory(PathUtils.join(appStorage.artistsPath , alphabet ,filename));
-    artist.path = directory.path;
-    artist.id = filename;
-    artist.name["default"] = metadata["artist"];
-
-    return artist;
-  }
-
-  Future<void> save({bool upload = true, List<PlatformFile>? selectedCoverFiles}) async {
-    var directory = Directory(path);
-    if(!await directory.exists()) {
-      await directory.create(recursive: true);
-    }
-    var infoFile = File(PathUtils.join(path, "info.json"));
-    await infoFile.writeAsString(jsonEncode(data));
-
-    if(selectedCoverFiles != null) {
-      for(var selectedCover in selectedCoverFiles) {
-        var filename = FilenameUtils.generatedFileName(".${selectedCover.extension!}", path);
-        var file = File(PathUtils.join(path, filename));
-        var bytes = await selectedCover.xFile.readAsBytes();
-        await file.writeAsBytes(bytes);
-        profileImages.add(file.path);
-        appWebChannel.uploadArtistFile(id: id, filePath: file.path);
-      }
-    }
+    final database = await databaseHelper.database;
+    await database.insert("artists", toSqlInsertMap(), conflictAlgorithm: ConflictAlgorithm.replace);
 
     if(upload) {
-      appWebChannel.uploadArtistInfo(artist: this);
+      appWebChannel.uploadArtist(artist: this);
     }
   }
 
   Future<void> delete({bool upload = true}) async {
-    var directory = Directory(path);
+    if(id.isEmpty) {
+      return;
+    }
+
+    final database = await databaseHelper.database;
+    await database.delete("artists", where: "id = ?", whereArgs: [id]);
+
+    final directory = Directory(mediaDirectoryPath(id, "artists"));
     await directory.delete(recursive: true);
     if(upload) {
       appWebChannel.deleteArtist(id: id);
     }
   }
 
-  Future<void> downloadMissingFiles() async {
-    appWebChannel.getArtistFiles(id: id, onSuccess: (files) async {
-      for(var fileInfo in files) {
-        var filename = fileInfo["filename"];
-        var file = File(PathUtils.join(path, filename));
-        if(!await file.exists()) {
-          appWebChannel.downloadArtistFile(artist: this, filename: filename);
-          profileImages.add(file.path);
-        }
-      }
-    });
+  Map<String, dynamic> toSqlInsertMap() {
+    return {
+      "id": id,
+      "name": jsonEncode(name),
+      "members": jsonEncode(members.map((e) => e.toMap()).toList()),
+      "images": jsonEncode(images),
+      "created": created.toUtc().millisecondsSinceEpoch,
+      "modified": modified.toUtc().millisecondsSinceEpoch,
+      "deleted": deleted?.toUtc().millisecondsSinceEpoch,
+      "debut": debut?.toUtc().millisecondsSinceEpoch,
+      "country": country,
+      "description": description
+    };
   }
 
-  @override
-  String toString() {
-    return """
-    id: ${id}
-    name: ${name}
-    """;
+  Map<String, dynamic> toJsonBody() {
+    return {
+      "id": id,
+      "name": name,
+      "members": members.map((e) => e.toMap()).toList(),
+      "images": images,
+      "created": created.toUtc().millisecondsSinceEpoch,
+      "modified": modified.toUtc().millisecondsSinceEpoch,
+      "deleted": deleted?.toUtc().millisecondsSinceEpoch,
+      "debut": debut?.toUtc().millisecondsSinceEpoch,
+      "country": country,
+      "description": description
+    };
   }
 }
 
+class Member {
+  String id;
+  String? role;
 
+  Member.fromMap(Map<String, dynamic> map) : id = map["id"], role = map["role"];
+
+  Map<String, dynamic> toMap() {
+    return {
+      "id": id,
+      "role": role
+    };
+  }
+}

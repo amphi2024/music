@@ -1,43 +1,48 @@
-import 'package:amphi/models/app.dart';
 import 'package:amphi/models/app_localizations.dart';
-import 'package:amphi/utils/file_name_utils.dart';
-import 'package:amphi/utils/path_utils.dart';
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/channels/app_web_channel.dart';
-import 'package:music/models/app_settings.dart';
-import 'package:music/models/app_state.dart';
-import 'package:music/models/app_storage.dart';
 import 'package:music/models/music/song.dart';
+import 'package:music/providers/playing_state_provider.dart';
+import 'package:music/providers/playlists_provider.dart';
+import 'package:music/providers/providers.dart';
+import 'package:music/providers/songs_provider.dart';
 import 'package:music/ui/components/select_playlist.dart';
 import 'package:music/ui/dialogs/edit_song_info_dialog.dart';
+import 'package:music/utils/localized_title.dart';
+import 'package:music/utils/screen_size.dart';
 
-import '../../../models/player_service.dart';
+import '../../../providers/albums_provider.dart';
+import '../../../providers/artists_provider.dart';
+import '../../../services/player_service.dart';
 import '../bottom_sheet_drag_handle.dart';
+import '../image/album_cover.dart';
+import '../track_number.dart';
 
-class SongListItem extends StatelessWidget {
+enum CoverStyle {cover, trackNumber}
 
-  final Widget albumCover;
+class SongListItem extends ConsumerWidget {
+
   final Song song;
   final String playlistId;
-  const SongListItem({super.key, required this.song, required this.playlistId, required this.albumCover});
+  final CoverStyle coverStyle;
+  const SongListItem({super.key, required this.song, required this.playlistId, this.coverStyle = CoverStyle.cover});
 
   @override
-  Widget build(BuildContext context) {
-
-    bool playing = playerService.nowPlaying().id == song.id && playerService.playlistId == playlistId;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final playing = playingSongId(ref) == song.id && ref.watch(playingSongsProvider).playlistId == playlistId;
+    final selectedSongs = ref.watch(selectedItemsProvider);
+    final album = ref.watch(albumsProvider).get(song.albumId);
+    final artists = ref.watch(artistsProvider).getAll(song.artistIds);
+    // final transferring = ref.watch(transferringProvider)
 
     return GestureDetector(
       onLongPress: () {
-        // appState.setState(() {
-        //   appState.selectedSongs = [];
-        // });
+        ref.read(selectedItemsProvider.notifier).startSelection();
       },
       onTap: () {
-        appState.setState(() {
-          playerService.isPlaying = true;
-          playerService.startPlay(song: song, localeCode: Localizations.localeOf(context).languageCode, playlistId: playlistId, shuffle: playerService.shuffled);
-        });
+        startPlay(song: song, playlistId: playlistId, ref: ref);
       },
       child: Padding(
         padding: const EdgeInsets.all(5),
@@ -48,32 +53,42 @@ class SongListItem extends StatelessWidget {
               Positioned(
                 left: 15,
                 bottom: 10,
-                child: AnimatedOpacity(opacity: appState.selectedSongs != null ? 1 : 0,
-                    curve: Curves.easeOutQuint, duration: Duration(milliseconds: 1000),
-                  child: Checkbox(value: appState.selectedSongs?.contains(song.id) ?? false, onChanged: (value) {
-                      if(appState.selectedSongs?.contains(song.id) == true) {
-                        appState.setState(() {
-                          appState.selectedSongs?.remove(song.id);
-                        });
-                      }
-                      else {
-                        appState.setState(() {
-                          appState.selectedSongs?.add(song.id);
-                        });
-                      }
+                child: AnimatedOpacity(opacity: selectedSongs != null ? 1 : 0,
+                  curve: Curves.easeOutQuint, duration: Duration(milliseconds: 1000),
+                  child: Checkbox(value: selectedSongs?.contains(song.id) ?? false, onChanged: (value) {
+                    // if (selectedSongs?.contains(song.id) == true) {
+                    //   appState.setState(() {
+                    //     selectedSongs?.remove(song.id);
+                    //   });
+                    // }
+                    // else {
+                    //   appState.setState(() {
+                    //     selectedSongs?.add(song.id);
+                    //   });
+                    // }
                   }),),
               ),
               AnimatedPositioned(
                 curve: Curves.easeOutQuint,
                 duration: Duration(milliseconds: 1000),
-                left: appState.selectedSongs != null ? 45 : 0,
+                left: selectedSongs != null ? 45 : 0,
                 top: 0,
                 bottom: 0,
                 right: 0,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    albumCover,
+                    coverStyle == CoverStyle.cover ?  Padding(
+                      padding: const EdgeInsets.only(left: 10, right: 10),
+                      child: SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: AlbumCover(album: album),
+                        ),
+                      ),
+                    ) : TrackNumber(trackNumber: song.trackNumber ?? -1),
                     Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,109 +100,94 @@ class SongListItem extends StatelessWidget {
                               maxLines: 1,
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: playing ? Theme.of(context).highlightColor : null
+                                  color: playing ? Theme
+                                      .of(context)
+                                      .highlightColor : null
                               ),
                             ),
                             Text(
-                              song.artist.name.byContext(context),
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: playing? Theme.of(context).highlightColor : null
+                              artists.map((e) => e.name.toLocalized()).join(),
+                              style: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                  color: playing ? Theme
+                                      .of(context)
+                                      .highlightColor : null
                               ),
                             )
                           ],
                         )
                     ),
                     Visibility(
-                      visible: !song.availableOnOffline() && song.transferring == null,
+                        visible: !song.availableOnOffline(),
                         child: IconButton(onPressed: () async {
-                          appState.setFragmentState(() {
-                            song.transferring = true;
-                          });
-                          appWebChannel.getSongFiles(songId: song.id, onSuccess: (list) async {
-                            for(var fileInfo in list) {
-                              String filename = fileInfo["filename"];
-                              String id = FilenameUtils.nameOnly(filename);
-                              if(!filename.endsWith(".json")) {
-                                appWebChannel.downloadSongFile(song: song, filename: filename, onSuccess: () {
-                                  var mediaFilePath = PathUtils.join(song.path, filename);
-                                  appState.setFragmentState(() {
-                                    song.transferring = null;
-                                    song.files[id]!.mediaFilepath = mediaFilePath;
-                                  });
-                                });
-                              }
-                            }
-                          });
+                          for(final songFile in song.files) {
+                            appWebChannel.downloadSongFile(songId: song.id, filename: songFile.filename, onProgress: (received, total) {
+                              
+                            });
+                          }
                         }, icon: Icon(
                           Icons.arrow_downward_outlined,
                           size: 13,
                         ))),
-                    Visibility(
-                      visible: song.transferring == true && appSettings.useOwnServer,
-                        child: const CircularProgressIndicator(
-                         constraints: BoxConstraints(
-                           minWidth: 15,
-                           minHeight: 15,
-                           maxWidth: 15,
-                           maxHeight: 15
-                         ),
-                        )),
+                    // TODO Show uploading/downloading state
                     PopupMenuButton(
                       icon: Icon(Icons.more_vert),
                       itemBuilder: (context) {
                         List<PopupMenuItem> list = [
-                          PopupMenuItem(child: Text(AppLocalizations.of(context).get("@remove_download")), onTap: () {
-                            appState.setFragmentState(() {
-                              song.removeDownload();
-                            });
+                          PopupMenuItem(child: Text(AppLocalizations.of(context).get("@remove_download")), onTap: () async {
+                            await song.removeDownload();
+                            ref.read(songsProvider.notifier).insertSong(song);
                           }),
                           PopupMenuItem(child: Text(AppLocalizations.of(context).get("@add_to_playlist")), onTap: () {
-                            if(App.isDesktop() || App.isWideScreen(context)) {
-                              showDialog(context: context, builder: (context) => Dialog(
-                                child: Container(
-                                  width: 300,
-                                  height: 400,
-                                  decoration: BoxDecoration(
-                                      color: Theme.of(context).cardColor,
-                                      borderRadius: BorderRadius.circular(15)
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
+                            if (isDesktopOrTablet(context)) {
+                              showDialog(context: context, builder: (context) =>
+                                  Dialog(
+                                    child: Container(
+                                      width: 300,
+                                      height: 400,
+                                      decoration: BoxDecoration(
+                                          color: Theme
+                                              .of(context)
+                                              .cardColor,
+                                          borderRadius: BorderRadius.circular(15)
+                                      ),
+                                      child: Column(
                                         children: [
-                                        IconButton(onPressed: () {
-                                          Navigator.pop(context);
-                                        }, icon: Icon(Icons.cancel_outlined))
-                                      ],),
-                                      Expanded(child: SelectPlaylist(songIdList: [song.id])),
-                                    ],
-                                  ),
-                                ),
-                              ));
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            children: [
+                                              IconButton(onPressed: () {
+                                                Navigator.pop(context);
+                                              }, icon: Icon(Icons.cancel_outlined))
+                                            ],),
+                                          Expanded(child: SelectPlaylist(songIdList: [song.id])),
+                                        ],
+                                      ),
+                                    ),
+                                  ));
                             }
                             else {
-                              appState.setMainViewState(() {
-                                appState.playingBarShowing = false;
-                              });
+                              ref.read(playingBarShowingProvider.notifier).set(false);
                               showModalBottomSheet(
                                   context: context, builder: (context) =>
                                   Container(
-                                height: 500,
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).cardColor,
-                                  borderRadius: BorderRadius.circular(15)
-                                ),
-                                child: Column(
-                                  children: [
-                                    BottomSheetDragHandle(),
-                                    Expanded(child: SelectPlaylist(songIdList: [song.id]))
-                                  ]
-                                ),
-                              )).then((value) {
-                               appState.setMainViewState(() {
-                                 appState.playingBarShowing = true;
-                               });
+                                    height: 500,
+                                    decoration: BoxDecoration(
+                                        color: Theme
+                                            .of(context)
+                                            .cardColor,
+                                        borderRadius: BorderRadius.circular(15)
+                                    ),
+                                    child: Column(
+                                        children: [
+                                          BottomSheetDragHandle(),
+                                          Expanded(child: SelectPlaylist(songIdList: [song.id]))
+                                        ]
+                                    ),
+                                  )).then((value) {
                               });
                             }
                           }),
@@ -196,39 +196,23 @@ class SongListItem extends StatelessWidget {
                               return EditSongInfoDialog(song: song);
                             });
                           }),
-                          PopupMenuItem(child: Text(AppLocalizations.of(context).get("@upload_again")), onTap: () {
-                            appState.setFragmentState(() {
-                              song.transferring = true;
-                            });
-                            appWebChannel.uploadSongFile(songId: song.id, filePath: song.playingFile().mediaFilepath, onSuccess: () {
-                              appState.setFragmentState(() {
-                                song.transferring = null;
-                              });
-                            });
-                          }),
                           PopupMenuItem(child: Text(AppLocalizations.of(context).get("@move_to_archive")), onTap: () {
-                            appStorage.songIdList.remove(song.id);
-                            appStorage.archiveIdList.add(song.id);
-                            for(int i = 0 ; i < appStorage.playlists.get("").songs.length; i++) {
-                              if(song.id == appStorage.playlists.get("").songs[i]) {
-                                appStorage.playlists.get("").songs.removeAt(i);
-                                i--;
-                                break;
-                              }
-                            }
-                            appState.setFragmentState(() {
-                              song.archived = true;
-                              song.save();
-                            });
+                            song.archived = true;
+                            song.save();
+                            ref.read(songsProvider.notifier).insertSong(song);
+                            ref.read(playlistsProvider.notifier).notifySongUpdate(song);
                           }),
                         ];
 
-                        if(playlistId != "") {
+                        if (playlistId != "!SONGS") {
                           list.add(PopupMenuItem(child: Text(AppLocalizations.of(context).get("@remove_from_playlist")), onTap: () {
-                            appState.setFragmentState(() {
-                              appStorage.playlists.get(playlistId).songs.remove(song.id);
-                            });
-                            appStorage.playlists.get(playlistId).save();
+                            // appState.setFragmentState(() {
+                            //   appStorage.playlists
+                            //       .get(playlistId)
+                            //       .songs
+                            //       .remove(song.id);
+                            // });
+                            // appStorage.playlists.get(playlistId).save();
                           }));
                         }
 
@@ -240,10 +224,10 @@ class SongListItem extends StatelessWidget {
                                   title: AppLocalizations.of(context).get("@dialog_title_delete_song"),
                                   onConfirmed: () {
                                     song.delete();
-                                    appState.setFragmentState(() {
-                                      appStorage.songs.remove(song.id);
-                                      appStorage.songIdList.remove(song.id);
-                                    });
+                                    // appState.setFragmentState(() {
+                                    //   ref.watch(songsProvider).remove(song.id);
+                                    //   appStorage.songIdList.remove(song.id);
+                                    // });
                                   },
                                 );
                               });

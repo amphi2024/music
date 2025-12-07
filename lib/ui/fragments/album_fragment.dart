@@ -1,71 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:music/models/app_state.dart';
-import 'package:music/models/app_storage.dart';
-import 'package:music/models/fragment_index.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music/providers/albums_provider.dart';
+import 'package:music/providers/fragment_provider.dart';
+import 'package:music/providers/playlists_provider.dart';
+import 'package:music/providers/providers.dart';
+import 'package:music/providers/songs_provider.dart';
 import 'package:music/ui/components/item/song_list_item.dart';
-import 'package:music/ui/components/track_number.dart';
 import 'package:music/ui/fragments/components/album_fragment_title.dart';
 import 'package:music/ui/fragments/components/fragment_padding.dart';
+import 'package:music/utils/fragment_scroll_listener.dart';
 
-class AlbumFragment extends StatefulWidget {
+class AlbumFragment extends ConsumerStatefulWidget {
   const AlbumFragment({super.key});
 
   @override
-  State<AlbumFragment> createState() => _AlbumFragmentState();
+  ConsumerState<AlbumFragment> createState() => _AlbumFragmentState();
 }
 
-class _AlbumFragmentState extends State<AlbumFragment> {
-
-  var scrollController = ScrollController();
+class _AlbumFragmentState extends ConsumerState<AlbumFragment> with FragmentViewMixin {
 
   late OverlayEntry overlayEntry;
 
   @override
   void dispose() {
-    scrollController.dispose();
     overlayEntry.remove();
     super.dispose();
   }
 
   @override
   void initState() {
-    appState.setFragmentState = setState;
-    scrollController.addListener(() {
-      if(scrollController.offset > 60 && appState.selectedSongs == null) {
-        appState.setMainViewState(() {
-          appState.fragmentTitleShowing = true;
-          appState.fragmentTitleMinimized = true;
-        });
-      }
-      else {
-        appState.setMainViewState(() {
-          appState.fragmentTitleShowing = false;
-          appState.fragmentTitleMinimized = false;
-        });
-      }
-    });
-    appState.requestScrollToTop = () {
-      scrollController.animateTo(0, duration: Duration(milliseconds: 750), curve: Curves.easeOutQuint);
-    };
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final overlay = Overlay.of(context);
       overlayEntry = OverlayEntry(
-        builder: (context) => Stack(
-          children: [
-            Positioned(
-              left: 205,
-                top: 5,
-                child: IconButton(onPressed: () {
-                  appState.setMainViewState(() {
-                    appState.fragmentIndex = FragmentIndex.albums;
-                    appState.showingAlbumId = null;
-                    appState.fragmentTitleShowing = true;
-                  });
-                }, icon: Icon(Icons.arrow_back_ios_new, size: 15,))),
-          ],
-        ),
+        builder: (context) =>
+            Stack(
+              children: [
+                Positioned(
+                    left: 205,
+                    top: 5,
+                    child: IconButton(onPressed: () {
+                      ref.read(showingPlaylistIdProvider.notifier).set("!ALBUMS");
+                      ref.read(fragmentStateProvider.notifier).setState(titleMinimized: true, titleShowing: true);
+                    }, icon: Icon(Icons.arrow_back_ios_new, size: 15,))),
+              ],
+            ),
       );
       overlay.insert(overlayEntry);
     });
@@ -73,23 +53,26 @@ class _AlbumFragmentState extends State<AlbumFragment> {
 
   @override
   Widget build(BuildContext context) {
-    final album = appStorage.albums.get(appState.showingAlbumId ?? "");
+    final albums = ref.watch(albumsProvider);
+    final songs = ref.watch(songsProvider);
+    final playlistId = ref.watch(showingPlaylistIdProvider);
+    final album = albums.get(playlistId.split(",").last);
+    final playlist = ref.watch(playlistsProvider).playlists.get(playlistId);
 
     return ListView.builder(
       padding: fragmentPadding(context),
       controller: scrollController,
-      itemCount: album.songs.length + 1,
+      itemCount: playlist.songs.length + 1,
       itemBuilder: (context, index) {
-        if(index == 0) {
+        if (index == 0) {
           return Padding(
             padding: const EdgeInsets.only(left: 15.0, right: 5, top: 50),
             child: AlbumFragmentTitle(album: album),
           );
         }
         else {
-          final songId = album.songs[index - 1];
-          var trackNumberWidget = TrackNumber(trackNumber: appStorage.songs.get(songId).trackNumber);
-          return SongListItem(song: appStorage.songs.get(songId), playlistId: "!ALBUM,${album.id}", albumCover: trackNumberWidget);
+          final songId = playlist.songs[index - 1];
+          return SongListItem(song: songs.get(songId), playlistId: "!ALBUM,${album.id}", coverStyle: CoverStyle.trackNumber);
         }
       },
     );

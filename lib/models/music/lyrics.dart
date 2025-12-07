@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:music/models/app_settings.dart';
 
 import 'lyrics/lrc.dart';
 import 'lyrics/lrc_line.dart';
@@ -20,6 +21,10 @@ class Lyrics {
   List<LyricLine> getLinesByLocale(BuildContext context) {
     var localeCode = Localizations.localeOf(context).languageCode;
     return data[localeCode] ?? data["default"] ?? [];
+  }
+
+  List<LyricLine> getLocalizedLines() {
+    return data[appSettings.localeCode ?? "default"] ?? [];
   }
 
   Map<String, dynamic> toMap() {

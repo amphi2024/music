@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:music/models/music/album.dart';
+import 'package:music/utils/media_file_path.dart';
 
 class AlbumCover extends StatelessWidget {
 
@@ -11,9 +12,9 @@ class AlbumCover extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var coverFilePath = album.covers.firstOrNull;
-    if(coverFilePath != null) {
-      return AbsoluteAlbumCover(filePath: coverFilePath, fit: fit);
+    final cover = album.covers.firstOrNull;
+    if(cover != null) {
+      return AbsoluteAlbumCover(filePath: albumCoverPath(album.id, cover["filename"]), fit: fit);
     }
     else {
       return Image.asset("assets/images/music.png", fit: fit);
@@ -29,10 +30,7 @@ class AbsoluteAlbumCover extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var file = File(filePath);
-    if(!file.existsSync()) {
-      return Image.asset("assets/images/music.png", fit: fit);
-    }
+    final file = File(filePath);
     return Image.file(
       file,
       fit: fit,

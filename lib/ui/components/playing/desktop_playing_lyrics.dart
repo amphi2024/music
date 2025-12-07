@@ -1,60 +1,40 @@
-
 import 'package:flutter/material.dart';
-import 'package:music/models/app_state.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music/providers/playing_state_provider.dart';
+import 'package:music/utils/lyrics_scroll.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 import '../../../channels/app_method_channel.dart';
 import '../../../models/music/lyrics.dart';
-import '../../../models/player_service.dart';
 
-class DesktopPlayingLyrics extends StatefulWidget {
+class DesktopPlayingLyrics extends ConsumerStatefulWidget {
   const DesktopPlayingLyrics({super.key});
 
   @override
-  State<DesktopPlayingLyrics> createState() => _DesktopPlayingLyricsState();
+  ConsumerState<DesktopPlayingLyrics> createState() => _DesktopPlayingLyricsState();
 }
 
-class _DesktopPlayingLyricsState extends State<DesktopPlayingLyrics> {
-  double opacity = 0;
+class _DesktopPlayingLyricsState extends ConsumerState<DesktopPlayingLyrics> {
   final scrollController = ItemScrollController();
-
-  void playbackListener(int position) {
-
-      var lyrics = playerService.nowPlaying().playingFile().lyrics;
-      var lines = lyrics.getLinesByLocale(context);
-      setState(() {
-        if(appState.autoScrollLyrics) {
-          for (int i = 0; i < lines.length; i ++) {
-            if (lines[i].endsAt >= position && position >= lines[i].startsAt) {
-              scrollController.scrollTo(index: i, duration: Duration(milliseconds: 1000), curve: Curves.easeOutQuint);
-              break;
-            }
-          }
-        }
-      });
-  }
-
-  @override
-  void dispose() {
-    appMethodChannel.playbackListeners.remove(playbackListener);
-    super.dispose();
-  }
-
+  
   @override
   void initState() {
-    super.initState();
-    appMethodChannel.playbackListeners.add(playbackListener);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        opacity = 0.5;
-      });
+
     });
+
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    Lyrics lyrics =  playerService.nowPlaying().playingFile().lyrics;
-    List<LyricLine> lines = lyrics.getLinesByLocale(context);
+    final lyrics = ref.watch(playingSongsProvider.notifier).playingSong().playingFile().lyrics;
+    final List<LyricLine> lines = lyrics.getLinesByLocale(context);
+    final position = ref.watch(positionProvider);
+
+    ref.listen<int>(positionProvider, (prev, position) {
+      scrollToCurrentLyric(ref: ref, scrollController: scrollController, position: position);
+    });
 
     return Padding(
       padding: EdgeInsets.all(15),
@@ -67,8 +47,8 @@ class _DesktopPlayingLyricsState extends State<DesktopPlayingLyrics> {
           itemBuilder: (context, index) {
             var focused = false;
             var line = lines[index];
-            if (line.startsAt <= playerService.playbackPosition &&
-                line.endsAt >= playerService.playbackPosition) {
+            if (line.startsAt <= position &&
+                line.endsAt >= position) {
               focused = true;
             }
             return GestureDetector(

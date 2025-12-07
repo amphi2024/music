@@ -1,88 +1,71 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:music/models/music/song.dart';
-import 'package:music/models/player_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music/providers/albums_provider.dart';
+import 'package:music/providers/artists_provider.dart';
+import 'package:music/providers/playing_state_provider.dart';
+import 'package:music/providers/providers.dart';
 import 'package:music/ui/components/image/album_cover.dart';
 import 'package:music/ui/components/playing/mobile_connected_devices.dart';
 import 'package:music/ui/components/playing/mobile_playing_queue.dart';
 import 'package:music/ui/components/playing/play_controls.dart';
 import 'package:music/ui/components/playing/playing_lyrics.dart';
+import 'package:music/utils/localized_title.dart';
 
 import '../../../channels/app_method_channel.dart';
-import '../../../models/app_state.dart';
+import '../../../providers/songs_provider.dart';
+import '../../../services/player_service.dart';
 
-class PlayingBar extends StatefulWidget {
+class PlayingBar extends ConsumerStatefulWidget {
   const PlayingBar({super.key});
 
   @override
-  State<PlayingBar> createState() => _PlayingBarState();
+  ConsumerState<PlayingBar> createState() => _PlayingBarState();
 }
 
-class _PlayingBarState extends State<PlayingBar> {
-
+class _PlayingBarState extends ConsumerState<PlayingBar> {
   PageController pageController = PageController(initialPage: 1);
   late OverlayEntry overlayEntry;
 
   @override
-  void dispose() {
-    pageController.dispose();
-    appMethodChannel.playbackListeners.remove(listener);
-    super.dispose();
-  }
-
-  void listener(int position) {
-    setState(() {
-
-    });
-  }
-
-  @override
-  void initState() {
-    appMethodChannel.playbackListeners.add(listener);
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
-    //var themeData = Theme.of(context);
-   // var textTheme = themeData.textTheme;
+    final playingBarExpanded = ref.watch(playingBarExpandedProvider);
+    final playingBarShowing = ref.watch(playingBarShowingProvider);
+
+    // final song = ref.watch(playingSongsProvider.notifier).playingSong();
+    final song = ref.watch(songsProvider).get(playingSongId(ref));
+    print(song.title);
+    final isPlaying = ref.watch(isPlayingProvider);
+    final album = ref.watch(albumsProvider).get(song.id);
+    final artist = ref.watch(artistsProvider).get(song.id);
 
     return AnimatedPositioned(
-        left: appState.playingBarExpanded ? 0 : 15,
-        right: appState.playingBarExpanded ? 0 : 15,
-        bottom: appState.playingBarExpanded
-            ? 0
-            : mediaQuery.padding.bottom +
-                (appState.playingBarShowing ? 15 : -150),
+        left: playingBarExpanded ? 0 : 15,
+        right: playingBarExpanded ? 0 : 15,
+        bottom: playingBarExpanded ? 0 : mediaQuery.padding.bottom + (playingBarShowing ? 15 : -150),
         curve: Curves.easeOutQuint,
         duration: const Duration(milliseconds: 750),
         child: GestureDetector(
           onTap: () {
-            appState.setState(() {
-              appState.playingBarExpanded = true;
-            });
+            ref.read(playingBarExpandedProvider.notifier).set(true);
           },
           onVerticalDragUpdate: (d) {
-            if (appState.playingBarExpanded) {
+            if (playingBarExpanded) {
               if (d.delta.dy > 2.2) {
-                appState.setState(() {
-                  appState.playingBarExpanded = false;
-                });
+                ref.read(playingBarExpandedProvider.notifier).set(false);
               }
             } else {
               if (d.delta.dy < -2.2) {
-                appState.setState(() {
-                  appState.playingBarExpanded = true;
-                });
+                ref.read(playingBarExpandedProvider.notifier).set(true);
               }
             }
           },
           child: Material(
             color: Colors.transparent,
             child: AnimatedContainer(
-              height: appState.playingBarExpanded ? mediaQuery.size.height : 60,
+              height: playingBarExpanded ? mediaQuery.size.height : 60,
               curve: Curves.easeOutQuint,
               duration: const Duration(milliseconds: 750),
               decoration: BoxDecoration(
@@ -95,33 +78,20 @@ class _PlayingBarState extends State<PlayingBar> {
                       offset: const Offset(0, 3),
                     )
                   ],
-                  borderRadius: appState.playingBarExpanded
-                      ? BorderRadius.zero
-                      : BorderRadius.circular(15)),
+                  borderRadius: playingBarExpanded ? BorderRadius.zero : BorderRadius.circular(15)),
               child: Stack(
                 children: [
                   AnimatedPositioned(
-                    left: appState.playingBarExpanded ? 30 : 10,
-                    top: appState.playingBarExpanded
-                        ? mediaQuery.padding.top + 20
-                        : 10,
+                    left: playingBarExpanded ? 30 : 10,
+                    top: playingBarExpanded ? mediaQuery.padding.top + 20 : 10,
                     curve: Curves.easeOutQuint,
                     duration: const Duration(milliseconds: 750),
                     child: AnimatedContainer(
                         curve: Curves.easeOutQuint,
                         duration: const Duration(milliseconds: 750),
-                        width: appState.playingBarExpanded
-                            ? mediaQuery.size.width - 60
-                            : 40,
-                        height: appState.playingBarExpanded
-                            ? mediaQuery.size.width - 60
-                            : 40,
-                        child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: AlbumCover(
-                                album: playerService.nowPlaying().album)
-                        )
-                    ),
+                        width: playingBarExpanded ? mediaQuery.size.width - 60 : 40,
+                        height: playingBarExpanded ? mediaQuery.size.width - 60 : 40,
+                        child: ClipRRect(borderRadius: BorderRadius.circular(10), child: AlbumCover(album: album))),
                   ),
                   Positioned(
                       left: 60,
@@ -129,7 +99,7 @@ class _PlayingBarState extends State<PlayingBar> {
                       bottom: 0,
                       right: 0,
                       child: AnimatedOpacity(
-                        opacity: appState.playingBarExpanded ? 0 : 1.0,
+                        opacity: playingBarExpanded ? 0 : 1.0,
                         curve: Curves.easeOutQuint,
                         duration: const Duration(milliseconds: 750),
                         child: Row(
@@ -140,46 +110,26 @@ class _PlayingBarState extends State<PlayingBar> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    playerService
-                                        .nowPlaying()
-                                        .title
-                                        .byContext(context),
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
+                                    song.title.toLocalized(),
+                                    style: Theme.of(context).textTheme.titleMedium,
                                     maxLines: 2,
                                   ),
                                   Text(
-                                    playerService
-                                        .nowPlaying()
-                                        .artist
-                                        .name
-                                        .byContext(context),
-                                    style:
-                                        Theme.of(context).textTheme.titleMedium,
+                                    artist.name.toLocalized(),
+                                    style: Theme.of(context).textTheme.titleMedium,
                                   )
                                 ],
                               ),
                             ),
                             IconButton(
-                                icon: Icon(playerService.isPlaying
-                                    ? Icons.pause
-                                    : Icons.play_arrow),
+                                icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
                                 onPressed: () {
-                                  if(playerService.isPlaying) {
+                                  if (isPlaying) {
                                     appMethodChannel.pauseMusic();
-                                    if(mounted) {
-                                      setState(() {
-                                        playerService.isPlaying = false;
-                                      });
-                                    }
-                                  }
-                                  else {
+                                    ref.read(isPlayingProvider.notifier).set(false);
+                                  } else {
                                     appMethodChannel.resumeMusic();
-                                    if(mounted) {
-                                      setState(() {
-                                        playerService.isPlaying = true;
-                                      });
-                                    }
+                                    ref.read(isPlayingProvider.notifier).set(true);
                                   }
                                 })
                           ],
@@ -189,63 +139,67 @@ class _PlayingBarState extends State<PlayingBar> {
                       left: 0,
                       right: 0,
                       top: mediaQuery.size.width + 45,
-                    bottom: mediaQuery.padding.bottom,
+                      bottom: mediaQuery.padding.bottom,
                       child: AnimatedOpacity(
-                        opacity: appState.playingBarExpanded ? 1 : 0,
+                        opacity: playingBarExpanded ? 1 : 0,
                         curve: Curves.easeOutQuint,
                         duration: const Duration(milliseconds: 1000),
                         child: Padding(
-                          padding:  EdgeInsets.only(left: 50.0, right: 50),
+                          padding: EdgeInsets.only(left: 50.0, right: 50),
                           child: Column(
                             children: [
-                              Expanded(
-                                  child: PlayControls()
-                              ),
+                              Expanded(child: PlayControls()),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
-                                  IconButton(onPressed: () {
-                                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                                      final overlay = Overlay.of(context);
-                                      overlayEntry = OverlayEntry(
-                                        builder: (context) => PlayingLyrics(
-                                          onRemove: () async {
-                                            await Future.delayed(const Duration(milliseconds: 500));
-                                            overlayEntry.remove();
-                                          },
-                                        ),
-                                      );
-                                      overlay.insert(overlayEntry);
-                                    });
-                                  }, icon: Icon(Icons.lyrics, size: 30, color: appState.autoScrollLyrics ? null : Theme.of(context).disabledColor)),
-                                  IconButton(onPressed: () {
-                                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                                      final overlay = Overlay.of(context);
-                                      overlayEntry = OverlayEntry(
-                                        builder: (context) => MobileConnectedDevices(
-                                          onRemove: () async {
-                                            await Future.delayed(const Duration(milliseconds: 500));
-                                            overlayEntry.remove();
-                                          },
-                                        ),
-                                      );
-                                      overlay.insert(overlayEntry);
-                                    });
-                                  }, icon: Icon(Icons.devices, size: 30)),
-                                  IconButton(onPressed: () {
-                                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                                      final overlay = Overlay.of(context);
-                                      overlayEntry = OverlayEntry(
-                                        builder: (context) => MobilePlayingQueue(
-                                          onRemove: () async {
-                                            await Future.delayed(const Duration(milliseconds: 500));
-                                            overlayEntry.remove();
-                                          },
-                                        ),
-                                      );
-                                      overlay.insert(overlayEntry);
-                                    });
-                                  }, icon: Icon(Icons.list, size: 30))
+                                  IconButton(
+                                      onPressed: () {
+                                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                                          final overlay = Overlay.of(context);
+                                          overlayEntry = OverlayEntry(
+                                            builder: (context) => PlayingLyrics(
+                                              onRemove: () async {
+                                                await Future.delayed(const Duration(milliseconds: 500));
+                                                overlayEntry.remove();
+                                              },
+                                            ),
+                                          );
+                                          overlay.insert(overlayEntry);
+                                        });
+                                      },
+                                      icon: Icon(Icons.lyrics, size: 30)),
+                                  IconButton(
+                                      onPressed: () {
+                                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                                          final overlay = Overlay.of(context);
+                                          overlayEntry = OverlayEntry(
+                                            builder: (context) => MobileConnectedDevices(
+                                              onRemove: () async {
+                                                await Future.delayed(const Duration(milliseconds: 500));
+                                                overlayEntry.remove();
+                                              },
+                                            ),
+                                          );
+                                          overlay.insert(overlayEntry);
+                                        });
+                                      },
+                                      icon: Icon(Icons.devices, size: 30)),
+                                  IconButton(
+                                      onPressed: () {
+                                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                                          final overlay = Overlay.of(context);
+                                          overlayEntry = OverlayEntry(
+                                            builder: (context) => MobilePlayingQueue(
+                                              onRemove: () async {
+                                                await Future.delayed(const Duration(milliseconds: 500));
+                                                overlayEntry.remove();
+                                              },
+                                            ),
+                                          );
+                                          overlay.insert(overlayEntry);
+                                        });
+                                      },
+                                      icon: Icon(Icons.list, size: 30))
                                 ],
                               )
                             ],

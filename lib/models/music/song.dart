@@ -1,255 +1,172 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:amphi/utils/file_name_utils.dart';
-import 'package:amphi/utils/path_utils.dart';
-import 'package:flutter/material.dart';
+import 'package:amphi/utils/try_json_decode.dart';
 import 'package:music/channels/app_web_channel.dart';
-import 'package:music/models/music/lyrics.dart';
 import 'package:music/models/music/song_file.dart';
+import 'package:music/utils/generated_id.dart';
+import 'package:music/utils/json_value_extractor.dart';
+import 'package:music/utils/media_file_path.dart';
+import 'package:sqflite/sqflite.dart';
 
-import '../../utils/random_alphabet.dart';
-import '../app_storage.dart';
-import 'album.dart';
-import 'artist.dart';
+import '../../database/database_helper.dart';
 
 class Song {
 
-  Map<String, dynamic> data = {
-    "title": <String, dynamic>{},
-    "genre": [],
-    "artist": "",
-    "album": "",
-    "added": DateTime.now().toUtc().millisecondsSinceEpoch,
-    "modified": DateTime.now().toUtc().millisecondsSinceEpoch,
-    "composer": "",
-    "released": DateTime.now().toUtc().millisecondsSinceEpoch
-  };
+  String id;
+  Map<String, dynamic> title;
+  List<Map<String, dynamic>> genres;
+  List<String> artistIds;
+  String albumId;
+  DateTime created;
+  DateTime modified;
+  DateTime? deleted;
+  DateTime? released;
+  List<String> composerIds;
+  List<String> lyricistIds;
+  List<String> arrangerIds;
+  List<String> producerIds;
+  int? trackNumber;
+  int? discNumber;
+  bool archived;
+  String? description;
+  List<SongFile> files;
+  int fileIndex = 0;
 
-  bool? transferring;
+  Song({
+    required this.id,
+    this.title = const {},
+    this.genres = const [],
+    this.artistIds = const [],
+    this.albumId = "",
+    DateTime? created,
+    DateTime? modified,
+    this.deleted,
+    this.released,
+    this.composerIds = const [],
+    this.lyricistIds = const [],
+    this.arrangerIds = const [],
+    this.producerIds = const [],
+    this.trackNumber,
+    this.discNumber,
+    this.archived = false,
+    this.description,
+    this.files = const [],
+    this.fileIndex = 0,
+  }) : created = created ?? DateTime.now(),
+        modified = modified ?? DateTime.now();
 
-  Map<String, dynamic> get title => data["title"];
-  List<dynamic> get genre => data["genre"];
-  set artist(value) => data["artist"] = value;
-  Artist get artist => appStorage.artists[data["artist"]] ?? Artist();
-  String get artistId => data["artist"];
+  Song.fromMap(Map<String, dynamic> data)
+      : id = data["id"],
+        archived = data["archived"] == 1,
+        title = tryJsonDecode(data["title"], defaultValue: {"default": data["title"].toString()}) as Map<String, dynamic>,
+        genres = data.getMapList("genres"),
+        artistIds = data.getStringList("artist_ids"),
+        albumId = data["album_id"] ?? "",
+        created = DateTime.fromMillisecondsSinceEpoch(data["created"] as int).toLocal(),
+        modified = DateTime.fromMillisecondsSinceEpoch(data["modified"] as int).toLocal(),
+        deleted = data.getNullableDateTime("deleted"),
+        released = data.getNullableDateTime("released"),
+        composerIds = data.getStringList("composer_ids"),
+        lyricistIds = data.getStringList("lyricist_ids"),
+        arrangerIds = data.getStringList("arranger_ids"),
+        producerIds = data.getStringList("producer_ids"),
+        trackNumber = data["track_number"],
+        discNumber = data["disc_number"],
+        description = data["description"],
+        files = data.getMapList("files")
+            .map((e) => SongFile.fromMap(data["id"], e))
+            .toList();
 
-  String get albumId => data["album"];
-  set album(value) => data["album"] = value;
-  Album get album => appStorage.albums[data["album"]] ?? Album();
-
-  String id = "";
-  String path = "";
-  DateTime get added => DateTime.fromMillisecondsSinceEpoch(data["added"], isUtc: true).toLocal();
-  set added(DateTime value) => data["added"] = value.toUtc().millisecondsSinceEpoch;
-  DateTime get modified => DateTime.fromMillisecondsSinceEpoch(data["modified"], isUtc: true).toLocal();
-  set modified(DateTime value) => data["modified"] = value.toUtc().millisecondsSinceEpoch;
-  DateTime get released => DateTime.fromMillisecondsSinceEpoch(data["released"], isUtc: true).toLocal();
-  set released(DateTime value) => data["released"] = value.toUtc().millisecondsSinceEpoch;
-  Artist get composer => appStorage.artists[data["composer"]] ?? Artist();
-  String get composerId => data["composer"];
-
-  Artist? get lyricist => appStorage.artists[data["lyricist"]];
-
-  Artist? get arranger => appStorage.artists[data["arranger"]];
-
-  Artist? get producer => appStorage.artists[data["producer"]];
-
-  int get trackNumber => data["trackNumber"] ?? 0;
-  set trackNumber(int value) => data["trackNumber"] = value;
-
-  int get discNumber => data["discNumber"] ?? 0;
-  set discNumber(int value) => data["discNumber"] = value;
-
-  bool get archived => data["archived"] ?? false;
-  set archived(value) => data["archived"] = value;
 
   bool availableOnOffline() {
-    var available = false;
-    files.forEach((id, songFile) {
-      if(songFile.mediaFileExists) {
-        available = true;
+    for(var songFile in files) {
+      if(!songFile.availableOnOffline) {
+        return false;
       }
-    });
-
-    return available;
+    }
+    return true;
   }
-
-  Map<String, SongFile> files = {};
 
   SongFile playingFile() {
-    return files.entries.firstOrNull?.value ?? SongFile();
+    return files.isEmpty ? SongFile(id: "", filename: "") : files[fileIndex];
   }
 
-  static Song created({required Map metadata, required String artistId, required String albumId, required File? file}) {
-    var song = Song();
-
-    String alphabet = randomAlphabet();
-    var filename = FilenameUtils.generatedDirectoryNameWithChar(appStorage.songsPath, alphabet);
-
-    var directory = Directory(PathUtils.join(appStorage.songsPath , alphabet ,filename));
-
-    song.title["default"] = metadata["title"];
-    song.id = filename;
-    song.path = directory.path;
-    song.artist = artistId;
-    song.album = albumId;
-
-    var genreName = metadata["genre"];
-    if(genreName is String && genreName.isNotEmpty) {
-      song.genre.add({
-        "default": genreName
-      });
+  Future<void> removeDownload() async {
+    for(var songFile in files) {
+      final file = File(songMediaFilePath(id, songFile.filename));
+      await file.delete();
+      songFile.availableOnOffline = false;
     }
-
-    var discNumber = metadata["discNumber"];
-    if(discNumber is String && discNumber.isNotEmpty) {
-      song.discNumber = int.tryParse(discNumber) ?? 0;
-    }
-    else if(discNumber is int) {
-      song.discNumber = discNumber;
-    }
-
-    var trackNumber = metadata["trackNumber"];
-    if(trackNumber is String && trackNumber.isNotEmpty) {
-      song.trackNumber = int.tryParse(trackNumber) ?? 0;
-    }
-    else if(trackNumber is int) {
-      song.trackNumber = trackNumber;
-    }
-
-    if(file != null) {
-      if (!directory.existsSync()) {
-        directory.createSync(recursive: true);
-      }
-      var songFile = SongFile.created(path: directory.path, originalFile: file);
-      songFile.songId = song.id;
-      var lyrics = Lyrics();
-      lyrics.data.get("default").add(LyricLine(text: metadata["lyrics"] ?? ""));
-      songFile.lyrics = lyrics;
-      songFile.save();
-      song.files[songFile.id] = songFile;
-    }
-
-    var releasedYear = metadata["year"];
-
-    if(releasedYear is int && releasedYear < 10000) {
-      song.released = DateTime(releasedYear);
-    }
-    else if(releasedYear is String) {
-      switch(releasedYear.length) {
-        case 4:
-          var year = int.tryParse(releasedYear);
-          if(year != null) {
-            song.released = DateTime(year);
-          }
-          break;
-        case 6:
-          var year = int.tryParse(releasedYear.substring(0 , 4));
-          var month = int.tryParse(releasedYear.substring(4, 6));
-          if(year != null && month != null) {
-            song.released = DateTime(year, month);
-          }
-          break;
-        case 8:
-          var year = int.tryParse(releasedYear.substring(0 , 4));
-          var month = int.tryParse(releasedYear.substring(4, 6));
-          var day = int.tryParse(releasedYear.substring(6, 8));
-          if(year != null && month != null && day != null) {
-            song.released = DateTime(year, month, day);
-          }
-          break;
-      }
-    }
-
-    return song;
-  }
-
-  static Song fromDirectory(Directory directory) {
-    var song = Song();
-    song.path = directory.path;
-    song.id = PathUtils.basename(directory.path);
-    var infoFile = File(PathUtils.join(song.path, "info.json"));
-    if(infoFile.existsSync()) {
-      song.data = jsonDecode(infoFile.readAsStringSync());
-    }
-    for(var file in directory.listSync()) {
-      var nameOnly = FilenameUtils.nameOnly(PathUtils.basename(file.path));
-      if(nameOnly != "info") {
-        if(FilenameUtils.extensionName(file.path) == "json") {
-          var songFile = song.files.putIfAbsent(nameOnly, () => SongFile());
-          songFile.infoFilepath = file.path;
-          songFile.songId = song.id;
-          songFile.getData();
-        }
-        else {
-          var songFile = song.files.putIfAbsent(nameOnly, () => SongFile());
-          songFile.mediaFilepath = file.path;
-        }
-      }
-    }
-
-    return song;
-  }
-
-  void removeDownload() async {
-    files.forEach((key, value) async {
-      var file = File(value.mediaFilepath);
-      value.mediaFilepath = "";
-      file.delete();
-    });
   }
 
   Future<void> save({bool upload = true}) async {
-    var directory = Directory(path);
-    if(!await directory.exists()) {
-      await directory.create(recursive: true);
+    if (id.isEmpty) {
+      id = await generatedSongId();
     }
-    var infoFile = File(PathUtils.join(path, "info.json"));
-    await infoFile.writeAsString(jsonEncode(data));
-
+    final database = await databaseHelper.database;
+    await database.insert("songs", toSqlInsertMap(), conflictAlgorithm: ConflictAlgorithm.replace);
     if(upload) {
-      appWebChannel.uploadSongInfo(song: this);
+      appWebChannel.uploadSong(song: this);
     }
   }
 
   Future<void> delete({bool upload = true}) async {
-    var directory = Directory(path);
+    if(id.isEmpty) {
+      return;
+    }
+
+    final database = await databaseHelper.database;
+    await database.delete("songs", where: "id = ?", whereArgs: [id]);
+
+    final directory = Directory(mediaDirectoryPath(id, "songs"));
     await directory.delete(recursive: true);
     if(upload) {
       appWebChannel.deleteSong(id: id);
     }
   }
 
-  Future<void> downloadMissingFiles() async {
-    appWebChannel.getSongFiles(songId: id, onSuccess: (files) async {
-      for(var fileInfo in files) {
-        String filename = fileInfo["filename"];
-        var id = FilenameUtils.nameOnly(filename);
-        var songFile = this.files.putIfAbsent(id, () => SongFile());
-        if(filename.endsWith(".json")) {
-          appWebChannel.downloadSongFile(song: this, filename: filename);
-          songFile.id = id;
-        }
-
-        songFile.mediaFilepath = PathUtils.join(path, filename);
-      }
-    });
+  Map<String, dynamic> toSqlInsertMap() {
+    return {
+      "id": id,
+      "title": jsonEncode(title),
+      "genres": jsonEncode(genres),
+      "artist_ids": jsonEncode(artistIds),
+      "album_id": albumId,
+      "created": created.toUtc().millisecondsSinceEpoch,
+      "modified": modified.toUtc().millisecondsSinceEpoch,
+      "released": released?.toUtc().millisecondsSinceEpoch,
+      "composer_ids": jsonEncode(composerIds),
+      "lyricist_ids": jsonEncode(lyricistIds),
+      "arranger_ids": jsonEncode(arrangerIds),
+      "producer_ids": jsonEncode(producerIds),
+      "track_number": trackNumber,
+      "disc_number": discNumber,
+      "archived": archived ? 1 : 0,
+      "description": description,
+      "files": jsonEncode(files.map((e) => e.toMap()).toList())
+    };
   }
-}
 
-extension MusicTitleExtension on Map<String, dynamic> {
-  String byContext(BuildContext context) {
-    return byLocaleCode(Localizations.localeOf(context).languageCode);
-  }
-
-  String byLocaleCode(String code) {
-    String value = this[code] ?? this["default"] ?? "";
-    if(value.isNotEmpty) {
-      return value;
-    }
-    else {
-      return "";
-    }
+  Map<String, dynamic> toJsonBody() {
+    return {
+      "id": id,
+      "title": title,
+      "genres": genres,
+      "artist_ids": artistIds,
+      "album_id": albumId,
+      "created": created.toUtc().millisecondsSinceEpoch,
+      "modified": modified.toUtc().millisecondsSinceEpoch,
+      "released": released?.toUtc().millisecondsSinceEpoch,
+      "composer_ids": composerIds,
+      "lyricist_ids": lyricistIds,
+      "arranger_ids": arrangerIds,
+      "producer_ids": producerIds,
+      "track_number": trackNumber,
+      "disc_number": discNumber,
+      "archived": archived,
+      "description": description,
+      "files": files.map((e) => e.toMap()).toList()
+    };
   }
 }

@@ -32,4 +32,17 @@ class ConnectedDevice {
 
     return jsonData;
   }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        other is ConnectedDevice &&
+            runtimeType == other.runtimeType &&
+            name == other.name &&
+            deviceType == other.deviceType;
+  }
+
+  @override
+  int get hashCode => name.hashCode ^ deviceType.hashCode;
+
 }

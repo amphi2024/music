@@ -1,93 +1,74 @@
-import 'package:amphi/models/app.dart';
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:music/providers/albums_provider.dart';
+import 'package:music/providers/fragment_provider.dart';
+import 'package:music/providers/playlists_provider.dart';
+import 'package:music/providers/providers.dart';
 import 'package:music/ui/components/item/album_grid_item.dart';
+import 'package:music/utils/fragment_scroll_listener.dart';
 
-import '../../models/app_state.dart';
 import '../../models/app_storage.dart';
+import '../../utils/screen_size.dart';
 import '../views/album_view.dart';
 import 'components/fragment_padding.dart';
 
-class AlbumsFragment extends StatefulWidget {
+class AlbumsFragment extends ConsumerStatefulWidget {
   const AlbumsFragment({super.key});
 
   @override
-  State<AlbumsFragment> createState() => _AlbumsFragmentState();
+  ConsumerState<AlbumsFragment> createState() => _AlbumsFragmentState();
 }
 
-class _AlbumsFragmentState extends State<AlbumsFragment> {
-  var scrollController = ScrollController();
-
-  @override
-  void dispose() {
-    scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    appState.setFragmentState = setState;
-    scrollController.addListener(() {
-      if(scrollController.offset > 60 && appState.selectedSongs == null) {
-        appState.setMainViewState(() {
-          appState.fragmentTitleMinimized = true;
-        });
-      }
-      else {
-        appState.setMainViewState(() {
-          appState.fragmentTitleMinimized = false;
-        });
-      }
-    });
-    appState.requestScrollToTop = () {
-      scrollController.animateTo(0, duration: Duration(milliseconds: 750), curve: Curves.easeOutQuint);
-    };
-    super.initState();
-  }
+class _AlbumsFragmentState extends ConsumerState<AlbumsFragment> with FragmentViewMixin {
 
   @override
   Widget build(BuildContext context) {
-    int axisCount = (MediaQuery.of(context).size.width / 250).toInt();
+    int axisCount = (MediaQuery
+        .of(context)
+        .size
+        .width / 250).toInt();
     if (axisCount < 2) {
       axisCount = 2;
     }
+
+    final idList = ref.watch(playlistsProvider).playlists.get("!ALBUMS").songs;
+    final albums = ref.watch(albumsProvider);
+
     return MasonryGridView.builder(
-      controller: scrollController,
-      padding: fragmentPadding(context),
+        controller: scrollController,
+        padding: fragmentPadding(context),
         gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(crossAxisCount: axisCount),
-        itemCount: appStorage.albumIdList.length,
+        itemCount: idList.length,
         itemBuilder: (context, index) {
-              String id = appStorage.albumIdList[index];
-              var album = appStorage.albums.get(id);
-            return AlbumGridItem(
-                      album: album,
-                      onPressed: () {
-                        if(App.isDesktop() || App.isWideScreen(context)) {
-                          appState.setMainViewState(() {
-                            appState.fragmentTitleShowing = false;
-                            appState.showingAlbumId = album.id;
-                            appState.fragmentIndex = 7;
-                          });
-                        }
-                        else {
-                          Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) => AlbumView(album: album),
-                              ));
-                        }
-                      },
-                    onLongPressed: () {
-                        showConfirmationDialog("@dialog_title_delete_album", () {
-                          setState(() {
-                            album.delete();
-                            appStorage.albums.remove(id);
-                            appStorage.albumIdList.remove(id);
-                          });
-                        });
-                    },
-                  );
-    });
+          final id = idList[index];
+          final album = albums.get(id);
+          return AlbumGridItem(
+            album: album,
+            onPressed: () {
+              if (isDesktopOrTablet(context)) {
+                ref.read(showingPlaylistIdProvider.notifier).set("!ALBUM,$id");
+                ref.read(fragmentStateProvider.notifier).setTitleShowing(false);
+              }
+              else {
+                Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => AlbumView(album: album),
+                    ));
+              }
+            },
+            onLongPressed: () {
+              showConfirmationDialog("@dialog_title_delete_album", () {
+                setState(() {
+                  album.delete();
+                  appStorage.albums.remove(id);
+                  appStorage.albumIdList.remove(id);
+                });
+              });
+            },
+          );
+        });
   }
 }

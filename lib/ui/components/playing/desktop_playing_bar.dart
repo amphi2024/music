@@ -1,50 +1,53 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/channels/app_method_channel.dart';
-import 'package:music/models/app_cache.dart';
-import 'package:music/models/app_state.dart';
-import 'package:music/models/music/song.dart';
-import 'package:music/models/player_service.dart';
+import 'package:music/providers/playing_state_provider.dart';
+import 'package:music/providers/providers.dart';
 import 'package:music/ui/components/image/album_cover.dart';
+import 'package:music/utils/localized_title.dart';
 
+import '../../../models/app_cache.dart';
+import '../../../providers/albums_provider.dart';
+import '../../../providers/artists_provider.dart';
 import 'desktop_play_controls.dart';
 
-class DesktopPlayingBar extends StatefulWidget {
-
-  final Song song;
-  const DesktopPlayingBar({super.key, required this.song});
+class DesktopPlayingBar extends ConsumerStatefulWidget {
+  const DesktopPlayingBar({super.key});
 
   @override
-  State<DesktopPlayingBar> createState() => _DesktopPlayingBarState();
+  ConsumerState<DesktopPlayingBar> createState() => _DesktopPlayingBarState();
 }
 
-class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
-
+class _DesktopPlayingBarState extends ConsumerState<DesktopPlayingBar> {
   @override
   Widget build(BuildContext context) {
-    final song = widget.song;
+    final song = ref.watch(playingSongsProvider.notifier).playingSong();
+    final album = ref.watch(albumsProvider).get(song.albumId);
+    final artists = ref.watch(artistsProvider).getAll(song.artistIds);
+    final volume = ref.watch(volumeProvider);
     final screenWidth = MediaQuery.of(context).size.width;
     double controlsPanelWidth = 750;
     double titleWidth = 250;
-    if(screenWidth <= 1450) {
+    if (screenWidth <= 1450) {
       controlsPanelWidth = 350;
     }
-    if(screenWidth < 900) {
+    if (screenWidth < 900) {
       titleWidth = 150;
       controlsPanelWidth = 250;
     }
 
     double height = 60;
 
-    if(Platform.isIOS || Platform.isAndroid) {
+    if (Platform.isIOS || Platform.isAndroid) {
       height = 70;
     }
 
     return AnimatedPositioned(
-      duration: Duration(milliseconds: 1000),
+        duration: Duration(milliseconds: 1000),
         curve: Curves.easeOutQuint,
-      left: 215,
+        left: 215,
         right: 15,
         bottom: 15 + MediaQuery.of(context).padding.bottom,
         child: AnimatedContainer(
@@ -72,7 +75,7 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: ClipRRect(borderRadius: BorderRadius.circular(10), child: AlbumCover(album: playerService.nowPlaying().album)),
+                      child: ClipRRect(borderRadius: BorderRadius.circular(10), child: AlbumCover(album: album)),
                     ),
                     Expanded(
                       child: Padding(
@@ -82,14 +85,14 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                                song.title.byContext(context),
+                              song.title.byContext(context),
                               maxLines: 1,
                               overflow: TextOverflow.visible,
                             ),
-                           Text(
-                               song.artist.name.byContext(context),
-                             textAlign: TextAlign.center,
-                           )
+                            Text(
+                              artists.map((e) => e.name.toLocalized()).join(),
+                              textAlign: TextAlign.center,
+                            )
                           ],
                         ),
                       ),
@@ -100,35 +103,39 @@ class _DesktopPlayingBarState extends State<DesktopPlayingBar> {
               SizedBox(
                 width: controlsPanelWidth,
                 height: height,
-                child: DesktopPlayControls(
-                  setState: setState,
-                ),
+                child: const DesktopPlayControls(),
               ),
               Visibility(
                 visible: screenWidth > 1000,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Icon( playerService.volume > 0.5 ? Icons.volume_up : playerService.volume > 0.1 ? Icons.volume_down : Icons.volume_mute ),
+                    Icon(volume > 0.5
+                        ? Icons.volume_up
+                        : volume > 0.1
+                            ? Icons.volume_down
+                            : Icons.volume_mute),
                     SizedBox(
                       width: 80,
                       child: Slider(
-                          max: 1,
-                          value: playerService.volume,
-                          onChanged: (value) {
-                            appCacheData.volume = value;
-                            appCacheData.save();
-                            appMethodChannel.setVolume(value);
-                            setState(() {
-                              playerService.volume = value;
-                            });
-                          }),
+                        min: 0,
+                        max: 1,
+                        value: volume,
+                        onChanged: (value) {
+                          appMethodChannel.setVolume(value);
+                          ref.read(volumeProvider.notifier).set(value);
+                        },
+                        onChangeEnd: (value) {
+                          appCacheData.volume = value;
+                          appCacheData.save();
+                        },
+                      ),
                     ),
-                    IconButton(onPressed: () {
-                      appState.setMainViewState(() {
-                        appState.floatingMenuShowing = !appState.floatingMenuShowing;
-                      });
-                    }, icon: Icon(Icons.menu)),
+                    IconButton(
+                        onPressed: () {
+                          ref.read(floatingMenuShowingProvider.notifier).set(!ref.watch(floatingMenuShowingProvider));
+                        },
+                        icon: Icon(Icons.menu)),
                   ],
                 ),
               ),

@@ -3,117 +3,76 @@ import 'dart:io';
 
 import 'package:amphi/utils/file_name_utils.dart';
 import 'package:amphi/utils/path_utils.dart';
-import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/music/lyrics.dart';
 
+import '../../utils/media_file_path.dart';
+
 class SongFile {
-  String infoFilepath = "";
-  String mediaFilepath = "";
+
+  String id;
+  String filename;
+  String format = "";
+  bool availableOnOffline = true;
   Lyrics lyrics = Lyrics();
-  Map<String, dynamic> data = {};
-  bool get mediaFileExists => mediaFilepath.isNotEmpty;
-  String get format => data["format"] ?? "flac";
-  set format(value) => data["format"] = value;
+  int? startsAt;
+  int? endsAt;
+  String? canvasId;
+  int? canvasStartsAt;
+  int? canvasEndsAt;
 
-  String id = "";
-  String songId = "";
+  SongFile.fromMap(String songId, Map<String, dynamic> data)
+      : id = data["id"],
+        filename = data["filename"] {
+    format = data["format"];
+    initLyrics(data["lyrics"]);
 
-  String get url {
-    final filename = PathUtils.basename(infoFilepath);
-    final nameOnly = FilenameUtils.nameOnly(filename);
-    return "${appWebChannel.serverAddress}/music/songs/${songId}/${nameOnly}.${format}";
+    availableOnOffline = File(songMediaFilePath(songId, filename)).existsSync();
   }
 
-  SongFile({
-    this.infoFilepath = "",
-    this.mediaFilepath = ""
-  });
+  SongFile({required this.id, required this.filename});
 
   static SongFile created({required String path, required File originalFile}) {
     var songInfoFilename = FilenameUtils.generatedFileName(".json", path);
     var songInfoFile = File(PathUtils.join(path, songInfoFilename));
-    var songInfo = {
-      "volume": 1.0
-    };
+    var songInfo = {"volume": 1.0};
     songInfoFile.writeAsStringSync(jsonEncode(songInfo));
 
     var songFilename = "${FilenameUtils.nameOnly(songInfoFilename)}.${FilenameUtils.extensionName(originalFile.path)}";
     var songFile = File(PathUtils.join(path, songFilename));
     songFile.writeAsBytesSync(originalFile.readAsBytesSync());
 
-    var result = SongFile(
-      infoFilepath: songInfoFile.path,
-      mediaFilepath: songFile.path
-    );
-    result.id = FilenameUtils.nameOnly(songFilename);
+    var result = SongFile(id: "", filename: "");
+    result.filename = FilenameUtils.nameOnly(songFilename);
     result.format = FilenameUtils.extensionName(songFile.path);
     return result;
   }
 
-  void initLyrics() {
-    var lyricsData = data["lyrics"];
-    if(lyricsData is Map<String, dynamic>) {
-      lyricsData.forEach((key, value) {
-        if(value is List<dynamic>) {
-          for(var line in value) {
-            if(line is Map<String, dynamic>) {
-              lyrics.data.get("default").add(LyricLine(
-                  startsAt: line["startsAt"],
-                  endsAt: line["endsAt"],
-                  text: line["text"]
-              ));
-            }
-            else {
-              lyrics.data.get("default").add(LyricLine(
-                  text: line.toString()
-              ));
+  void initLyrics(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      data.forEach((key, value) {
+        if (value is List<dynamic>) {
+          for (var line in value) {
+            if (line is Map<String, dynamic>) {
+              lyrics.data.get("default").add(LyricLine(startsAt: line["startsAt"], endsAt: line["endsAt"], text: line["text"]));
+            } else {
+              lyrics.data.get("default").add(LyricLine(text: line.toString()));
             }
           }
-        }
-        else {
-          lyrics.data.get("default").add(LyricLine(
-              text: lyricsData.toString()
-          ));
+        } else {
+          lyrics.data.get("default").add(LyricLine(text: data.toString()));
         }
       });
-
-
-    }
-    else {
-      lyrics.data.get("default").add(LyricLine(
-          text: lyricsData.toString()
-      ));
+    } else {
+      lyrics.data.get("default").add(LyricLine(text: data.toString()));
     }
   }
 
-  void getData() async {
-    var infoFilename = PathUtils.basename(infoFilepath);
-    id = FilenameUtils.nameOnly(infoFilename);
-    var infoFile = File(infoFilepath);
-    var jsonData = await infoFile.readAsString();
-
-    data = jsonDecode(jsonData);
-    initLyrics();
-  }
-
-  Future<void> save({bool upload = true}) async {
-    var infoFile = File(infoFilepath);
-    data["lyrics"] = lyrics.toMap();
-    await infoFile.writeAsString(jsonEncode(data));
-
-    if(upload) {
-      appWebChannel.uploadSongFile(songId: songId, filePath: infoFilepath);
-    }
-  }
-
-  @override
-  String toString() {
-    return """
-    {
-    info: ${infoFilepath},
-    media: ${mediaFilepath},
-    data: ${data}
-    }
-    """;
+  Map<String, dynamic> toMap() {
+    return {
+      "id": id,
+      "filename": filename,
+      "format": format,
+      "lyrics": lyrics.toMap()
+    };
   }
 }

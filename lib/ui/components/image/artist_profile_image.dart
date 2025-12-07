@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:music/models/music/artist.dart';
+import 'package:music/utils/media_file_path.dart';
 
 class ArtistProfileImage extends StatelessWidget {
 
@@ -11,12 +12,10 @@ class ArtistProfileImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var filePath = artist.profileImages.firstOrNull;
-    if(filePath != null) {
-      return AbsoluteArtistProfileImage(filePath: filePath);
+    if(artist.images.isNotEmpty) {
+      return AbsoluteArtistProfileImage(filePath: artistImagePath(artist.id, artist.images[artist.imageIndex]["filename"]));
     }
     else {
-      artist.downloadMissingFiles();
       return Image.asset("assets/images/music.png", fit: fit);
     }
   }
