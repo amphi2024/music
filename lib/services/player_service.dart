@@ -12,6 +12,7 @@ import 'package:music/providers/songs_provider.dart';
 import 'package:music/utils/localized_title.dart';
 import 'package:music/utils/media_file_path.dart';
 
+import '../models/app_storage.dart';
 import '../models/music/song.dart';
 import '../providers/playing_state_provider.dart';
 
@@ -21,7 +22,7 @@ Future<void> startPlay({required Song song, required String playlistId, bool? sh
   appCacheData.lastPlayedSongId = song.id;
   appCacheData.save();
 
-  await appMethodChannel.setMediaSource(song: song, playNow: playNow);
+  await setMediaSource(song: song, playNow: playNow, ref: ref);
 
   syncPlaylistState(ref);
 
@@ -86,7 +87,7 @@ Future<void> playAt(WidgetRef ref, int i) async {
     await appMethodChannel.pauseMusic();
   }
   ref.read(playingSongsProvider.notifier).updateTo(i);
-  await appMethodChannel.setMediaSource(song: playingSong(ref), playNow: ref.read(isPlayingProvider));
+  await setMediaSource(song: playingSong(ref), ref: ref, playNow: ref.read(isPlayingProvider));
   if(Platform.isAndroid || Platform.isIOS) {
     await syncMediaSourceToNative(ref);
   }
@@ -125,4 +126,18 @@ String playingSongId(WidgetRef ref) {
 
 Song playingSong(WidgetRef ref) {
   return ref.read(songsProvider).get(playingSongId(ref));
+}
+
+Future<void> setMediaSource({required Song song, required WidgetRef ref, String localeCode = "default", bool playNow = true}) async {
+  final artists = ref.read(artistsProvider).getAll(song.artistIds);
+  final album = ref.read(albumsProvider).get(song.albumId);
+  await appMethodChannel.invokeMethod("set_media_source", {
+    "path": songMediaFilePath(song.id, song.playingFile().filename),
+    "play_now": playNow,
+    "title": song.title.byLocaleCode(localeCode),
+    "artist": artists.map((e) => e.name.toLocalized()).join(),
+    "album_cover": album.coverIndex != null ? albumCoverPath(album.id, album.covers[album.coverIndex!]["filename"]) : "",
+    "url": "${appWebChannel.serverAddress}/music/songs/${song.id}/${song.playingFile().filename}",
+    "token": appStorage.selectedUser.token
+  });
 }

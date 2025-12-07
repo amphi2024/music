@@ -1,12 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/services.dart';
-import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/app_settings.dart';
-import 'package:music/models/app_storage.dart';
-import 'package:music/models/music/song.dart';
-import 'package:music/utils/localized_title.dart';
-import 'package:music/utils/media_file_path.dart';
 
 final appMethodChannel = AppMethodChannel.getInstance();
 
@@ -71,18 +66,6 @@ class AppMethodChannel extends MethodChannel {
 
   Future<void> setVolume(double volume) async {
     await invokeMethod("set_volume", {"volume": volume});
-  }
-
-  Future<void> setMediaSource({required Song song, String localeCode = "default", bool playNow = true}) async {
-    await invokeMethod("set_media_source", {
-      "path": songMediaFilePath(song.id, song.playingFile().filename),
-      "play_now": playNow,
-      "title": song.title.byLocaleCode(localeCode),
-      // "artist": song.artist.name.byLocaleCode(localeCode),
-      // "album_cover": song.album.covers.firstOrNull ?? "",
-      "url": "${appWebChannel.serverAddress}/music/songs/${song.id}/${song.playingFile().filename}",
-      "token": appStorage.selectedUser.token
-    });
   }
 
   Future<void> applyPlaybackPosition(int position) async {
