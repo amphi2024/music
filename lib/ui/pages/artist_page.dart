@@ -10,13 +10,13 @@ import 'package:music/ui/dialogs/edit_artist_dialog.dart';
 import 'package:music/utils/localized_title.dart';
 
 import '../fragments/components/floating_button.dart';
-import 'album_view.dart';
+import 'album_page.dart';
 
-class ArtistView extends ConsumerWidget {
+class ArtistPage extends ConsumerWidget {
 
   final Artist artist;
 
-  const ArtistView({super.key, required this.artist});
+  const ArtistPage({super.key, required this.artist});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -112,7 +112,7 @@ class ArtistView extends ConsumerWidget {
                         Navigator.push(
                             context,
                             CupertinoPageRoute(
-                              builder: (context) => AlbumView(album: album),
+                              builder: (context) => AlbumPage(album: album),
                             ));
                       });
                   },

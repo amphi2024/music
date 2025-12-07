@@ -7,7 +7,7 @@ import 'package:music/providers/fragment_provider.dart';
 import 'package:music/providers/playlists_provider.dart';
 import 'package:music/providers/providers.dart';
 import 'package:music/ui/components/item/artist_linear_item.dart';
-import 'package:music/ui/views/artist_view.dart';
+import 'package:music/ui/pages/artist_page.dart';
 import 'package:music/utils/fragment_scroll_listener.dart';
 
 import 'components/fragment_padding.dart';
@@ -41,7 +41,7 @@ class _ArtistsFragmentState extends ConsumerState<ArtistsFragment> with Fragment
                 ref.read(fragmentStateProvider.notifier).setState(titleMinimized: false, titleShowing: true);
               }
               else {
-                Navigator.push(context, CupertinoPageRoute(builder: (context) => ArtistView(artist: artist)));
+                Navigator.push(context, CupertinoPageRoute(builder: (context) => ArtistPage(artist: artist)));
               }
             },
             onLongPressed: () {

@@ -7,14 +7,14 @@ import 'package:music/ui/components/settings/server_settings_component.dart';
 
 import '../../channels/app_method_channel.dart';
 
-class SettingsView extends StatefulWidget {
-  const SettingsView({super.key});
+class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
 
   @override
-  State<SettingsView> createState() => _SettingsViewState();
+  State<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsViewState extends State<SettingsView> {
+class _SettingsPageState extends State<SettingsPage> {
 
   TextEditingController serverAddressController = TextEditingController(text: appSettings.serverAddress);
 

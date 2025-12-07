@@ -5,7 +5,7 @@ import 'package:music/providers/fragment_provider.dart';
 import 'package:music/providers/genres_provider.dart';
 import 'package:music/providers/providers.dart';
 import 'package:music/ui/components/item/genre_list_item.dart';
-import 'package:music/ui/views/genre_view.dart';
+import 'package:music/ui/pages/genre_page.dart';
 import 'package:music/utils/fragment_scroll_listener.dart';
 
 import 'components/fragment_padding.dart';
@@ -38,7 +38,7 @@ class _GenresFragmentState extends ConsumerState<GenresFragment> with FragmentVi
             ref.read(fragmentStateProvider.notifier).setState(titleMinimized: false, titleShowing: true);
           }
           else {
-            Navigator.push(context, CupertinoPageRoute(builder: (context) => GenreView(genre: genre)));
+            Navigator.push(context, CupertinoPageRoute(builder: (context) => GenrePage(genre: genre)));
           }
         });
       },

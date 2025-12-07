@@ -11,7 +11,7 @@ import 'package:music/utils/fragment_scroll_listener.dart';
 
 import '../../models/app_storage.dart';
 import '../../utils/screen_size.dart';
-import '../views/album_view.dart';
+import '../pages/album_page.dart';
 import 'components/fragment_padding.dart';
 
 class AlbumsFragment extends ConsumerStatefulWidget {
@@ -55,7 +55,7 @@ class _AlbumsFragmentState extends ConsumerState<AlbumsFragment> with FragmentVi
                 Navigator.push(
                     context,
                     CupertinoPageRoute(
-                      builder: (context) => AlbumView(album: album),
+                      builder: (context) => AlbumPage(album: album),
                     ));
               }
             },

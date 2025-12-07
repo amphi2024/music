@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:amphi/utils/try_json_decode.dart';
 import 'package:music/channels/app_web_channel.dart';
@@ -20,6 +21,8 @@ class Album {
   DateTime? deleted;
   DateTime? released;
   String? description;
+
+  int? coverIndex;
 
   Album(
       {required this.id,
@@ -45,7 +48,11 @@ class Album {
         modified = data.getDateTime("modified"),
         deleted = data.getNullableDateTime("deleted"),
         released = data.getNullableDateTime("released"),
-        description = data["description"];
+        description = data["description"] {
+    if(covers.isNotEmpty) {
+      coverIndex = Random().nextInt(covers.length);
+    }
+  }
 
   Future<void> save({bool upload = true}) async {
     if (id.isEmpty) {

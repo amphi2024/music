@@ -16,21 +16,21 @@ import 'package:music/ui/fragments/playlist_fragment.dart';
 import 'package:music/ui/fragments/genre_fragment.dart';
 import 'package:music/ui/fragments/songs_fragment.dart';
 
-import '../../../channels/app_method_channel.dart';
-import '../../../utils/fragment_title.dart';
-import '../../fragments/album_fragment.dart';
-import '../../fragments/albums_fragment.dart';
-import '../../fragments/artists_fragment.dart';
-import '../../fragments/genres_fragment.dart';
+import '../../channels/app_method_channel.dart';
+import '../../utils/fragment_title.dart';
+import '../fragments/album_fragment.dart';
+import '../fragments/albums_fragment.dart';
+import '../fragments/artists_fragment.dart';
+import '../fragments/genres_fragment.dart';
 
-class WideMainView extends ConsumerStatefulWidget {
-  const WideMainView({super.key});
+class WideMainPage extends ConsumerStatefulWidget {
+  const WideMainPage({super.key});
 
   @override
-  ConsumerState<WideMainView> createState() => _WideMainViewState();
+  ConsumerState<WideMainPage> createState() => _WideMainViewState();
 }
 
-class _WideMainViewState extends ConsumerState<WideMainView> {
+class _WideMainViewState extends ConsumerState<WideMainPage> {
   void maximizeOrRestore() {
     setState(() {
       appWindow.maximizeOrRestore();

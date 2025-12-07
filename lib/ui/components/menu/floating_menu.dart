@@ -9,8 +9,8 @@ import 'package:music/providers/providers.dart';
 import 'package:music/ui/components/account/account_button.dart';
 import 'package:music/ui/components/add_item_button.dart';
 import 'package:music/ui/components/menu/floating_menu_button.dart';
-import 'package:music/ui/views/playlist_view.dart';
-import 'package:music/ui/views/settings_view.dart';
+import 'package:music/ui/pages/playlist_page.dart';
+import 'package:music/ui/pages/settings_page.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class FloatingMenu extends ConsumerStatefulWidget {
@@ -108,7 +108,7 @@ class _FloatingMenuState extends ConsumerState<FloatingMenu> {
                   AddItemButton(),
                   IconButton(icon: Icon(Icons.settings), onPressed: () {
                     Navigator.push(context, CupertinoPageRoute(builder: (context) {
-                      return SettingsView();
+                      return SettingsPage();
                     },));
                   }),
                 ],

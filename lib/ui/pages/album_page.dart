@@ -10,10 +10,10 @@ import 'package:music/ui/fragments/components/floating_button.dart';
 import 'package:music/utils/localized_title.dart';
 import '../../providers/artists_provider.dart';
 
-class AlbumView extends ConsumerWidget {
+class AlbumPage extends ConsumerWidget {
   final Album album;
 
-  const AlbumView({super.key, required this.album});
+  const AlbumPage({super.key, required this.album});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

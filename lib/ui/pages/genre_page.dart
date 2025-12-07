@@ -7,10 +7,10 @@ import 'package:music/utils/localized_title.dart';
 import '../../providers/songs_provider.dart';
 import '../components/item/song_list_item.dart';
 
-class GenreView extends ConsumerWidget {
+class GenrePage extends ConsumerWidget {
   final Map<String, dynamic> genre;
 
-  const GenreView({super.key, required this.genre});
+  const GenrePage({super.key, required this.genre});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

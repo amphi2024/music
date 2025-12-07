@@ -48,7 +48,9 @@ class Artist {
         debut = data.getNullableDateTime("debut"),
         country = data["country"],
         description = data["description"] {
-    imageIndex = Random().nextInt(images.length);
+    if(images.isNotEmpty) {
+      imageIndex = Random().nextInt(images.length);
+    }
   }
 
   Future<void> save({bool upload = true}) async {
@@ -57,6 +59,10 @@ class Artist {
     }
     final database = await databaseHelper.database;
     await database.insert("artists", toSqlInsertMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+
+    if(images.isNotEmpty) {
+      imageIndex = Random().nextInt(images.length);
+    }
 
     if(upload) {
       appWebChannel.uploadArtist(artist: this);
