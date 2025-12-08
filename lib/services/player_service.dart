@@ -17,7 +17,6 @@ import '../models/music/song.dart';
 import '../providers/playing_state_provider.dart';
 
 Future<void> startPlay({required Song song, required String playlistId, bool? shuffle, bool playNow = true, required WidgetRef ref}) async {
-  appMethodChannel.setVolume(0);
   appCacheData.lastPlayedPlaylistId = playlistId;
   appCacheData.lastPlayedSongId = song.id;
   appCacheData.save();
