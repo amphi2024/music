@@ -40,13 +40,6 @@ void main() async {
   MediaKit.ensureInitialized();
   await appCacheData.getData();
   appStorage.initialize(() async {
-    for (final user in appStorage.users) {
-      if (user.storagePath.endsWith("TiYo07Tghf")) {
-        appStorage.selectedUser = user;
-        appStorage.settingsPath = "${user.storagePath}/settings.json";
-        appStorage.initPaths();
-      }
-    }
     await appSettings.getData();
     // appColors.getData();
 
