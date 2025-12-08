@@ -7,7 +7,14 @@ extension JsonValueExtractor on Map<String, dynamic> {
     if(value is String) {
       final decoded = tryJsonDecode(value, defaultValue: []);
       if (decoded is List<dynamic>) {
-        return decoded.map((e) => e as Map<String, dynamic>).toList();
+        return decoded.map((e) {
+          if(e is Map<String, dynamic>) {
+            return e;
+          }
+          else {
+            return <String, dynamic>{};
+          }
+        }).toList();
       }
     }
     return [];
