@@ -8,7 +8,6 @@ import 'package:music/models/music/lyrics.dart';
 import '../../utils/media_file_path.dart';
 
 class SongFile {
-
   String id;
   String filename;
   String format = "";
@@ -22,8 +21,8 @@ class SongFile {
 
   SongFile.fromMap(String songId, Map<String, dynamic> data)
       : id = data["id"],
-        filename = data["filename"] {
-    format = data["format"];
+        filename = data["filename"],
+        format = data["format"] ?? "" {
     initLyrics(data["lyrics"]);
 
     availableOnOffline = File(songMediaFilePath(songId, filename)).existsSync();
@@ -68,11 +67,6 @@ class SongFile {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      "id": id,
-      "filename": filename,
-      "format": format,
-      "lyrics": lyrics.toMap()
-    };
+    return {"id": id, "filename": filename, "format": format, "lyrics": lyrics.toMap()};
   }
 }
