@@ -26,10 +26,11 @@ Future<void> migrateSongs(Database db) async {
               if (songFileId != "info" && songFile is File) {
                 if (FilenameUtils.extensionName(songFile.path) == "json") {
                   var songFileMap = jsonDecode(await songFile.readAsString());
+                  final format = songFileMap["format"] ?? fileFormat(songFile);
                   files.add({
                     "id": songFileId,
-                    "filename": "$songFileId.${songFileMap["format"]}",
-                    "format": songFileMap["format"],
+                    "filename": "$songFileId.${format}",
+                    "format": format,
                     "lyrics": songFileMap["lyrics"]
                   });
                 }
@@ -38,7 +39,8 @@ Future<void> migrateSongs(Database db) async {
                   if(!await songFileInfo.exists()) {
                     files.add({
                       "id": songFileId,
-                      "filename": PathUtils.basename(songFile.path)
+                      "filename": PathUtils.basename(songFile.path),
+                      "format": PathUtils.extension(songFile.path)
                     });
                   }
                 }
@@ -58,11 +60,22 @@ Future<void> migrateSongs(Database db) async {
   await batch.commit();
 }
 
+String? fileFormat(File input) {
+  final nameOnly = PathUtils.basenameWithoutExtension(input.path);
+  for(var file in input.parent.listSync()) {
+    final fileExtension = FilenameUtils.extensionName(file.path);
+    if(file.path.contains(nameOnly) && fileExtension != "json") {
+      return fileExtension;
+    }
+  }
+  return null;
+}
+
 Map<String, dynamic> _parsedLegacySong(String id, Map<String, dynamic> map, List<Map<String, dynamic>> files) {
   return {
     "id": id,
     "title": jsonEncode(map["title"] ?? {}),
-    "genres": parsedLegacyListValue(map, "genre"),
+    "genres": map["genre"] is List<dynamic> ? jsonEncode(map["genre"]) : parsedLegacyListValue(map, "genre"),
     "artist_ids": parsedLegacyListValue(map, "artist"),
     "album_id": map["album"],
     "created": map["added"],
