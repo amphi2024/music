@@ -111,6 +111,7 @@ class PlaylistsNotifier extends Notifier<PlaylistsState> {
     });
 
     playlists["!SONGS"] = songsPlaylist;
+    playlists["!ARCHIVE"] = archivePlaylist;
 
     final artistsPlaylist = Playlist(id: "!ARTISTS");
     artists.forEach((id, artist) {
