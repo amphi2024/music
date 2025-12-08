@@ -31,7 +31,7 @@ class PlayingSongsNotifier extends Notifier<PlayingSongsState> {
   }
 
   String playingSongId() {
-    return state.songs[state.playingSongIndex];
+    return state.songs.elementAtOrNull(state.playingSongIndex) ?? "";
   }
 
   Song playingSong() {
