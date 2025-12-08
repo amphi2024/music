@@ -55,7 +55,9 @@ void main() async {
           playlistsProvider.overrideWithBuild((ref, notifier) => playlistsState),
           albumsProvider.overrideWithBuild((ref, notifier) => albums),
           artistsProvider.overrideWithBuild((ref, notifier) => artists),
-          genresProvider.overrideWithBuild((ref, notifier) => genres)
+          genresProvider.overrideWithBuild((ref, notifier) => genres),
+          volumeProvider.overrideWithBuild((ref, notifier) => appCacheData.volume),
+          playModeProvider.overrideWithBuild((ref, notifier) => appCacheData.playMode)
         ],
         child: MyApp(key: mainScreenKey)));
 
@@ -122,6 +124,9 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         appWebChannel.uploadBlocked = true;
       });
     }
+
+    appMethodChannel.setVolume(appCacheData.volume);
+
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Platform.isWindows || Platform.isLinux) {
