@@ -12,7 +12,7 @@ class RepeatIcon extends ConsumerWidget {
     final playMode = ref.watch(playModeProvider);
     return Icon(
       playMode == repeatOne ? Icons.repeat_one : Icons.repeat,
-      color: playMode == playOnce ? Theme.of(context).dividerColor : null,
+      color: playMode == playOnce ? Theme.of(context).iconTheme.color : Theme.of(context).highlightColor,
       size: size,
     );
   }

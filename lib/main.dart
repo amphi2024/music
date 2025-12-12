@@ -19,8 +19,8 @@ import 'package:music/providers/genres_provider.dart';
 import 'package:music/providers/playing_state_provider.dart';
 import 'package:music/providers/playlists_provider.dart';
 import 'package:music/providers/songs_provider.dart';
-import 'package:music/ui/pages/main_page.dart';
-import 'package:music/ui/pages/wide_main_page.dart';
+import 'package:music/ui/pages/main/main_page.dart';
+import 'package:music/ui/pages/main/wide_main_page.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'channels/app_method_channel.dart';

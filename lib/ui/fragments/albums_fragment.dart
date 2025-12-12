@@ -24,6 +24,12 @@ class AlbumsFragment extends ConsumerStatefulWidget {
 class _AlbumsFragmentState extends ConsumerState<AlbumsFragment> with FragmentViewMixin {
 
   @override
+  void initState() {
+    super.initState();
+    ref.read(playlistsProvider.notifier).preloadAlbumSongs();
+  }
+
+  @override
   Widget build(BuildContext context) {
     int axisCount = (MediaQuery
         .of(context)

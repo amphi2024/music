@@ -84,7 +84,7 @@ class _MobilePlayingQueueState extends ConsumerState<MobilePlayingQueue> {
                           ),
                         ),
                         IconButton(onPressed: () {
-                          toggleShuffle(ref);
+                          // toggleShuffle(ref);
                         }, icon: ShuffleIcon()),
                         IconButton(onPressed: () {
                           togglePlayMode(ref);

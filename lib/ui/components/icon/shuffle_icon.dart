@@ -12,10 +12,10 @@ class ShuffleIcon extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final shuffled = ref.watch(playingSongsProvider).shuffled;
     return Icon(
-      shuffled ? Icons.shuffle : Icons.shuffle,
-      color: shuffled ? null : Theme
+      shuffled ? Icons.shuffle_on : Icons.shuffle,
+      color: shuffled ? Theme.of(context).highlightColor : Theme
           .of(context)
-          .dividerColor,
+          .iconTheme.color,
       size: size,
     );
   }

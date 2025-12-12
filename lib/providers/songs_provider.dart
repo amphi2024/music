@@ -63,6 +63,14 @@ extension SortExDynamic on List<String> {
     sortSongsWithMap(sortOption: appCacheData.sortOption(playlistId), songs: songs, artists: artists, albums: albums);
   }
 
+  //TODO rename this with better name
+  void sortSongsWidgerRef(String playlistId, WidgetRef ref) {
+    final songs = ref.read(songsProvider);
+    final albums = ref.read(albumsProvider);
+    final artists = ref.read(artistsProvider);
+    sortSongsWithMap(sortOption: appCacheData.sortOption(playlistId), songs: songs, artists: artists, albums: albums);
+  }
+
   void sortSongsWithMap({required String sortOption, required Map<String, Song> songs, required Map<String, Album> albums, required Map<String, Artist> artists}) {
     switch(sortOption) {
       case SortOption.artist:

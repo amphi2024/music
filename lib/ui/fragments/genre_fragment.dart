@@ -3,76 +3,30 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/providers/genres_provider.dart';
 import 'package:music/providers/providers.dart';
 import 'package:music/ui/fragments/components/floating_button.dart';
-import 'package:music/utils/fragment_scroll_listener.dart';
 import 'package:music/utils/localized_title.dart';
 
-import '../../models/music/song.dart';
-import '../../providers/fragment_provider.dart';
 import '../../providers/songs_provider.dart';
 import '../components/item/song_list_item.dart';
 import 'components/fragment_padding.dart';
 
-class GenreFragment extends ConsumerStatefulWidget {
+class GenreFragment extends ConsumerWidget {
   const GenreFragment({super.key});
 
   @override
-  ConsumerState<GenreFragment> createState() => _GenreFragmentState();
-}
-
-class _GenreFragmentState extends ConsumerState<GenreFragment> with FragmentViewMixin {
-
-  late OverlayEntry overlayEntry;
-
-  @override
-  void dispose() {
-    overlayEntry.remove();
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final overlay = Overlay.of(context);
-      overlayEntry = OverlayEntry(
-        builder: (context) =>
-            Stack(
-              children: [
-                Positioned(
-                    left: 205,
-                    top: 5,
-                    child: IconButton(onPressed: () {
-                      ref.read(showingPlaylistIdProvider.notifier).set("!GENRES");
-                      ref.read(fragmentStateProvider.notifier).setState(titleMinimized: true, titleShowing: true);
-                    }, icon: Icon(Icons.arrow_back_ios_new, size: 15,))),
-              ],
-            ),
-      );
-      overlay.insert(overlayEntry);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    List<Song> songList = [];
-    final genreId = ref.watch(showingPlaylistIdProvider).split(",").last;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final genreId = ref
+        .watch(showingPlaylistIdProvider)
+        .split(",")
+        .last;
     final genres = ref.watch(genresProvider);
     final genre = genres[genreId] ?? {};
-    final genreName = genre["default"];
-    final playlistId = "!GENRE,${genreName}";
-    ref.watch(songsProvider).forEach((key, song) {
-      for (var genre in song.genres) {
-        if (genre.containsValue(genreName)) {
-          songList.add(song);
-        }
-      }
-    });
+    final playlist = showingPlaylist(ref);
+    final idList = playlist.songs;
+    final songs = ref.watch(songsProvider);
 
     return ListView.builder(
       padding: fragmentPadding(context),
-      controller: scrollController,
-      itemCount: songList.length + 2,
+      itemCount: idList.length + 2,
       itemBuilder: (context, index) {
         if (index == 0) {
           return Padding(
@@ -116,8 +70,9 @@ class _GenreFragmentState extends ConsumerState<GenreFragment> with FragmentView
           );
         }
         else {
-          var song = songList[index - 2];
-          return SongListItem(song: song, playlistId: playlistId);
+          final id = idList[index - 2];
+          final song = songs.get(id);
+          return SongListItem(song: song, playlistId: playlist.id);
         }
       },
     );

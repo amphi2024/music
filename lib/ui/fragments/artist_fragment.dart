@@ -8,68 +8,32 @@ import 'package:music/providers/songs_provider.dart';
 import 'package:music/ui/components/image/artist_profile_image.dart';
 import 'package:music/ui/dialogs/edit_artist_dialog.dart';
 import 'package:music/ui/fragments/components/floating_button.dart';
-import 'package:music/utils/fragment_scroll_listener.dart';
 import 'package:music/utils/localized_title.dart';
 
 import '../../models/app_storage.dart';
-import '../../providers/fragment_provider.dart';
 import '../components/image/album_cover.dart';
 import '../components/item/song_list_item.dart';
 import 'components/fragment_padding.dart';
 
-class ArtistFragment extends ConsumerStatefulWidget {
+class ArtistFragment extends ConsumerWidget {
   const ArtistFragment({super.key});
 
   @override
-  ConsumerState<ArtistFragment> createState() => _ArtistFragmentState();
-}
-
-class _ArtistFragmentState extends ConsumerState<ArtistFragment> with FragmentViewMixin {
-
-  late OverlayEntry overlayEntry;
-
-  @override
-  void dispose() {
-    overlayEntry.remove();
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final overlay = Overlay.of(context);
-      overlayEntry = OverlayEntry(
-        builder: (context) =>
-            Stack(
-              children: [
-                Positioned(
-                    left: 205,
-                    top: 5,
-                    child: IconButton(onPressed: () {
-                      ref.read(fragmentStateProvider.notifier).setState(titleShowing: true, titleMinimized: false);
-                      ref.read(showingPlaylistIdProvider.notifier).set("!ARTISTS");
-                    }, icon: Icon(Icons.arrow_back_ios_new, size: 15,))),
-              ],
-            ),
-      );
-      overlay.insert(overlayEntry);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final showingArtistId = ref.watch(showingPlaylistIdProvider).split(",").last;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final showingArtistId = ref
+        .watch(showingPlaylistIdProvider)
+        .split(",")
+        .last;
     final artists = ref.watch(artistsProvider);
     final artist = artists.get(showingArtistId);
     final String playlistId = "!ARTIST,${artist.id}";
-    final playlists = ref.watch(playlistsProvider).playlists;
+    final playlists = ref
+        .watch(playlistsProvider)
+        .playlists;
     final playlist = playlists.get(playlistId);
 
     return ListView.builder(
       padding: fragmentPadding(context),
-      controller: scrollController,
       itemCount: playlist.songs.length + 3,
       itemBuilder: (context, index) {
         if (index == 0) {
@@ -181,9 +145,9 @@ class _ArtistFragmentState extends ConsumerState<ArtistFragment> with FragmentVi
               ...albumPlaylist.songs.map((songId) {
                 final song = ref.watch(songsProvider).get(songId);
                 return SongListItem(
-                  song: song,
-                  playlistId: playlistId,
-                  coverStyle: CoverStyle.cover
+                    song: song,
+                    playlistId: playlistId,
+                    coverStyle: CoverStyle.cover
                 );
               }),
             ],

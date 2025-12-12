@@ -19,7 +19,7 @@ class PlayControls extends ConsumerWidget {
     final duration = ref.watch(durationProvider);
     final position = ref.watch(positionProvider);
     final isPlaying = ref.watch(isPlayingProvider);
-    final artist = ref.watch(artistsProvider).get(song.id);
+    final artists = ref.watch(artistsProvider).getAll(song.artistIds);
 
     return Column(
       children: [
@@ -36,7 +36,7 @@ class PlayControls extends ConsumerWidget {
             ),
             Center(
               child: Text(
-                artist.name.toLocalized(),
+                artists.map((e) => e.name.toLocalized()).join(),
                 style: textTheme.bodyMedium,
               ),
             ),
@@ -85,12 +85,12 @@ class PlayControls extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               IconButton(
-                  icon: Icon(Icons.fast_rewind, size: 45),
+                  icon: Icon(Icons.fast_rewind, size: 35),
                   onPressed: () {
                     playPrevious(ref);
                   }),
               IconButton(
-                  icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow, size: 60),
+                  icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow, size: 50),
                   onPressed: () {
                     if (isPlaying) {
                       appMethodChannel.pauseMusic();
@@ -103,7 +103,7 @@ class PlayControls extends ConsumerWidget {
               IconButton(
                   icon: Icon(
                     Icons.fast_forward,
-                    size: 45,
+                    size: 35,
                   ),
                   onPressed: () {
                     playNext(ref);

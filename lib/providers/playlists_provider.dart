@@ -9,6 +9,7 @@ import 'package:music/models/music/playlist.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/trash.dart';
 import 'package:music/providers/albums_provider.dart';
+import 'package:music/providers/artists_provider.dart';
 import 'package:music/providers/songs_provider.dart';
 
 class PlaylistsState {
@@ -33,7 +34,7 @@ class PlaylistsNotifier extends Notifier<PlaylistsState> {
         }
       });
       albumPlaylist.sort(ref);
-      state.playlists[albumId] = albumPlaylist;
+      state.playlists["!ALBUM,$albumId"] = albumPlaylist;
     }
   }
 
@@ -42,15 +43,15 @@ class PlaylistsNotifier extends Notifier<PlaylistsState> {
   }
 
   Future<void> preloadArtistAlbums() async {
-    for(final artistId in state.playlists.get("!ARTIST").songs) {
+    for(final artistId in state.playlists.get("!ARTISTS").songs) {
       final artistPlaylist = Playlist(id: "!ARTIST,$artistId");
       ref.read(albumsProvider).forEach((albumId, album) {
-        if(albumId == artistId) {
+        if(album.artistIds.contains(artistId)) {
           artistPlaylist.songs.add(albumId);
         }
       });
       artistPlaylist.sort(ref);
-      state.playlists[artistId] = artistPlaylist;
+      state.playlists["!ARTIST,$artistId"] = artistPlaylist;
     }
   }
 
@@ -150,14 +151,18 @@ class PlaylistsNotifier extends Notifier<PlaylistsState> {
     return PlaylistsState({}, [], Trash());
   }
 
-  void sortSongs(String playlistId, String sortOption) {
-    // final playlists = {...state.requireValue.playlists};
-    // final playlist = playlists.get(playlistId);
-    // playlist.songs.sortSongs(sortOption, ref.watch(songsProvider));
-    // playlists[playlistId] = playlist;
-    // final idList = [...state.requireValue.idList];
-    //
-    // state = AsyncValue.data(PlaylistsState(playlists, idList));
+  void sortItems(String playlistId, String sortOption) {
+    final playlists = {...state.playlists};
+    switch(playlistId) {
+      case "!ALBUMS":
+        playlists.get(playlistId).songs.sortAlbums(sortOption, albums: ref.read(albumsProvider), artists: ref.read(artistsProvider));
+      case "!ARTISTS":
+        playlists.get(playlistId).songs.sortArtists(sortOption, ref.read(artistsProvider));
+      default:
+        playlists.get(playlistId).sort(ref);
+        break;
+    }
+    state = PlaylistsState(playlists, [...state.idList], state.trash.copyWith());
   }
 
   void insertItem(String playlistId, String itemId) {

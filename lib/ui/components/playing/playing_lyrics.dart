@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/models/music/lyrics.dart';
@@ -21,9 +23,11 @@ class _PlayingLyricsState extends ConsumerState<PlayingLyrics> {
   double opacity = 0;
   bool following = true;
   final scrollController = ItemScrollController();
+  Timer? timer;
 
   @override
   void dispose() {
+    timer?.cancel();
     super.dispose();
   }
 
@@ -34,9 +38,10 @@ class _PlayingLyricsState extends ConsumerState<PlayingLyrics> {
       setState(() {
         opacity = 0.5;
       });
-      ref.listen(positionProvider, (prev, position) {
-        scrollToCurrentLyric(ref: ref, position: position, scrollController: scrollController);
-      });
+      // timer = Timer.periodic(const Duration(milliseconds: 500), (d) {
+      //
+      // });
+
     });
   }
 
@@ -47,6 +52,9 @@ class _PlayingLyricsState extends ConsumerState<PlayingLyrics> {
     final List<LyricLine> lines = lyrics.getLinesByLocale(context);
     final position = ref.watch(positionProvider);
     final duration = ref.watch(durationProvider);
+    ref.listen(positionProvider, (prev, position) {
+      scrollToCurrentLyric(ref: ref, position: position, scrollController: scrollController);
+    });
 
     return PopScope(
       onPopInvokedWithResult: (didPop, result) {

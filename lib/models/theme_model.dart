@@ -103,12 +103,6 @@ class ThemeModel {
                   color: colors.text,
                   fontSize: 20,
                   fontWeight: FontWeight.bold))),
-      // scrollbarTheme: ScrollbarThemeData(
-      //   trackColor: WidgetStateColor.transparent,
-      //   thumbColor: WidgetStatePropertyAll(
-      //     Colors.red
-      //   )
-      // ),
       sliderTheme: SliderThemeData(
           disabledActiveTrackColor: colors.accent,
           trackHeight: 5,
@@ -117,7 +111,7 @@ class ThemeModel {
           overlayShape: SliderComponentShape.noOverlay,
           trackShape: CustomSliderTrackShape()
       ),
-      dividerColor: inactiveGray,
+      dividerColor: Color.fromARGB(60, 153, 153, 153),
       dropdownMenuTheme: DropdownMenuThemeData(
           textStyle: TextStyle(
               color: colors.text, fontSize: 15
@@ -132,13 +126,14 @@ class ThemeModel {
       ),
       iconButtonTheme: IconButtonThemeData(
           style: ButtonStyle(
+              mouseCursor: WidgetStateProperty.all(MouseCursor.defer),
               surfaceTintColor: WidgetStateProperty.all(colors.background))),
       shadowColor:
       colors.background.green + colors.background.blue + colors.background.red >
           381
           ? Colors.grey.withValues(alpha: 0.5)
           : Colors.black.withValues(alpha: 0.5),
-      iconTheme: IconThemeData(color: colors.accent, size: 20),
+      iconTheme: IconThemeData(color: isDesktopOrTablet(context) ? colors.text.soften(brightness) : colors.accent, size: 20),
       checkboxTheme: CheckboxThemeData(
         checkColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
@@ -191,7 +186,7 @@ class ThemeModel {
         onSurface: colors.text,
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: colors.card,
+          backgroundColor: Colors.white,
           focusColor: colors.accent,
           iconSize: 35),
       textTheme: TextTheme(

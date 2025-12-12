@@ -27,6 +27,12 @@ class AppCacheData extends AppCacheDataCore {
     set volume(value) => data["volume"] = value;
     double get volume => data["volume"] ?? 0.5;
 
+    set sidebarWidth(double value) => data["sidebarWidth"] = value;
+    double get sidebarWidth => data["sidebarWidth"] ?? 200;
+
+    set nowPlayingPanelWidth(double value) => data["nowPlayingPanelWidth"] = value;
+    double get nowPlayingPanelWidth => data["nowPlayingPanelWidth"] ?? 300;
+
     String sortOption(String playlistId) {
         var dirName = PathUtils.basename(appStorage.selectedUser.storagePath);
         if(data["sortOption"]?[dirName] is Map) {

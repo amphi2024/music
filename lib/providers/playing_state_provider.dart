@@ -26,8 +26,7 @@ class PlayingSongsNotifier extends Notifier<PlayingSongsState> {
   }
 
   void setShuffled(bool value) {
-    if (value) {
-    } else {}
+    state = PlayingSongsState(playlistId: state.playlistId, songs: [...state.songs], shuffled: value, playingSongIndex: state.playingSongIndex);
   }
 
   String playingSongId() {

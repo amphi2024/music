@@ -45,53 +45,52 @@ class FragmentTitle extends ConsumerWidget {
 
     return Container(
       height: height,
-      decoration: BoxDecoration(color: Theme
-          .of(context)
-          .scaffoldBackgroundColor
+      decoration: BoxDecoration(color: themeData
+          .cardColor
           .withAlpha(125)),
       child: Padding(
         padding: padding,
         child: Stack(
           children: [
-            AnimatedOpacity(
-              opacity: fragmentTitleShowing ? 1 : 0,
-              curve: Curves.easeOutQuint,
-              duration: const Duration(milliseconds: 750),
-              child: AnimatedAlign(
-                alignment: fragmentTitleMinimized ? Alignment.center : Alignment.centerLeft,
-                curve: Curves.easeOutQuint,
-                duration: const Duration(milliseconds: 750),
-                child: selectedSongs == null
-                    ? AnimatedScale(
-                    scale: fragmentTitleMinimized ? scaleValue : 1,
-                    curve: Curves.easeOutQuint,
-                    duration: const Duration(milliseconds: 750),
-                    child: Text(title, style: Theme
-                        .of(context)
-                        .textTheme
-                        .headlineMedium))
-                    : IconButton(
-                    onPressed: () {
-                      ref.read(selectedItemsProvider.notifier).endSelection();
-                    },
-                    icon: Icon(Icons.check)),
-              ),
-            ),
+            // AnimatedOpacity(
+            //   opacity: fragmentTitleShowing ? 1 : 0,
+            //   curve: Curves.easeOutQuint,
+            //   duration: const Duration(milliseconds: 750),
+            //   child: AnimatedAlign(
+            //     alignment: fragmentTitleMinimized ? Alignment.center : Alignment.centerLeft,
+            //     curve: Curves.easeOutQuint,
+            //     duration: const Duration(milliseconds: 750),
+            //     child: selectedSongs == null
+            //         ? AnimatedScale(
+            //         scale: fragmentTitleMinimized ? scaleValue : 1,
+            //         curve: Curves.easeOutQuint,
+            //         duration: const Duration(milliseconds: 750),
+            //         child: Text(title, style: Theme
+            //             .of(context)
+            //             .textTheme
+            //             .headlineMedium))
+            //         : IconButton(
+            //         onPressed: () {
+            //           ref.read(selectedItemsProvider.notifier).endSelection();
+            //         },
+            //         icon: Icon(Icons.check)),
+            //   ),
+            // ),
             Align(
               alignment: Alignment.centerRight,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Visibility(visible: App.isDesktop() || App.isWideScreen(context), child: AccountButton()),
+                  // Visibility(visible: App.isDesktop() || App.isWideScreen(context), child: AccountButton()),
                   Visibility(visible: App.isDesktop() || App.isWideScreen(context), child: AddItemButton()),
-                  Visibility(
-                    visible: App.isDesktop() || App.isWideScreen(context),
-                    child: IconButton(
-                        onPressed: () {
-                          showDialog(context: context, builder: (context) => SettingsDialog());
-                        },
-                        icon: Icon(Icons.settings)),
-                  ),
+                  // Visibility(
+                  //   visible: App.isDesktop() || App.isWideScreen(context),
+                  //   child: IconButton(
+                  //       onPressed: () {
+                  //         showDialog(context: context, builder: (context) => SettingsDialog());
+                  //       },
+                  //       icon: Icon(Icons.settings)),
+                  // ),
                   PopupMenuButton(
                       itemBuilder: (context) {
                         final sortOption = appCacheData.sortOption(ref.watch(showingPlaylistIdProvider));
@@ -176,7 +175,7 @@ class FragmentTitle extends ConsumerWidget {
 }
 
 void sortListByOption({required String playlistId, required WidgetRef ref, required String sortOption}) {
-  ref.read(playlistsProvider.notifier).sortSongs(playlistId, sortOption);
+  ref.read(playlistsProvider.notifier).sortItems(playlistId, sortOption);
   appCacheData.setSortOption(sortOption: sortOption, playlistId: playlistId);
   appCacheData.save();
 }
