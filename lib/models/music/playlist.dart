@@ -51,7 +51,7 @@ class Playlist {
       id = await generatedPlaylistId();
     }
     final database = await databaseHelper.database;
-    await database.insert("playlists", toJsonBody(), conflictAlgorithm: ConflictAlgorithm.replace);
+    await database.insert("playlists", toSqlInsertMap(), conflictAlgorithm: ConflictAlgorithm.replace);
 
     if (upload) {
       appWebChannel.uploadPlaylist(playlist: this);

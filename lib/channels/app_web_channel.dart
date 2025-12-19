@@ -69,7 +69,7 @@ class AppWebChannel extends AppWebChannelCore {
     });
   }
 
-  Future<void> downloadTheme({required String filename, required void Function(ThemeModel) onSuccess, void Function()? onFailed}) async {
+  Future<void> downloadTheme({required String id, required void Function(ThemeModel) onSuccess, void Function()? onFailed}) async {
 
   }
 
@@ -87,7 +87,7 @@ class AppWebChannel extends AppWebChannelCore {
 
   Future<void> downloadArtist({required String id, required void Function(Artist artist) onSuccess, void Function()? onFailed}) async {
     await downloadJson(url: "$serverAddress/music/artists/${id}", onSuccess: (data) {
-      onSuccess(Artist.fromMap(data));
+     onSuccess(Artist.fromMap(data));
     }, onFailed: onFailed);
   }
 
@@ -210,7 +210,7 @@ class AppWebChannel extends AppWebChannelCore {
   Future<void> downloadSongFile({required String songId, required String filename, void Function()? onSuccess, void Function(int?)? onFailed, void Function(int received, int total)? onProgress}) async {
     final file = File(songMediaFilePath(songId, filename));
     if (!await file.parent.exists()) {
-      file.parent.create(recursive: true);
+      await file.parent.create(recursive: true);
     }
     await downloadFile(url: "$serverAddress/music/songs/${songId}/files/${filename}", filePath: file.path, onSuccess: onSuccess, onProgress: onProgress, onFailed: onFailed);
   }
