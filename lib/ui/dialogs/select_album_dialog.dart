@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:music/models/app_storage.dart';
-import 'package:music/models/music/album.dart';
+import 'package:music/providers/albums_provider.dart';
 import 'package:music/providers/artists_provider.dart';
+import 'package:music/ui/components/item/album_grid_item.dart';
 import 'package:music/utils/localized_title.dart';
 
-import '../components/image/album_cover.dart';
+import '../../providers/playlists_provider.dart';
+import '../components/search_bar.dart';
 
 class SelectAlbumDialog extends ConsumerStatefulWidget {
-  final String excepting;
   final void Function(String) onSelected;
 
-  const SelectAlbumDialog({super.key, required this.excepting, required this.onSelected});
+  const SelectAlbumDialog({super.key, required this.onSelected});
 
   @override
   ConsumerState<SelectAlbumDialog> createState() => _SelectAlbumDialogState();
@@ -20,17 +20,7 @@ class SelectAlbumDialog extends ConsumerStatefulWidget {
 
 class _SelectAlbumDialogState extends ConsumerState<SelectAlbumDialog> {
 
-  List<Album> albums = [];
-
-  @override
-  void initState() {
-    appStorage.albums.forEach((id, album) {
-      if (widget.excepting != id) {
-        albums.add(album);
-      }
-    });
-    super.initState();
-  }
+  String searchKeyword = "";
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +31,20 @@ class _SelectAlbumDialogState extends ConsumerState<SelectAlbumDialog> {
         .width / 250).toInt();
     if (axisCount < 2) {
       axisCount = 2;
+    }
+
+    final albums = ref.watch(albumsProvider);
+    var idList = [...ref
+        .watch(playlistsProvider)
+        .playlists
+        .get("!ALBUMS")
+        .songs];
+    if(searchKeyword.isNotEmpty) {
+      idList = idList.where((id) {
+        final album = albums.get(id);
+        final artists = ref.read(artistsProvider).getAll(album.artistIds);
+        return albums.get(id).title.toLocalized().toLowerCase().contains(searchKeyword.toLowerCase()) || artists.localizedName().toLowerCase().contains(searchKeyword.toLowerCase());
+      }).toList();
     }
     return Dialog(
       child: ConstrainedBox(
@@ -54,42 +58,39 @@ class _SelectAlbumDialogState extends ConsumerState<SelectAlbumDialog> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            IconButton(onPressed: () {
-              Navigator.pop(context);
-            }, icon: Icon(Icons.cancel_outlined)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 300,
+                  height: 50,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: OutlinedSearchBar(
+                      onChanged: (text) {
+                        setState(() {
+                          searchKeyword = text;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+                IconButton(onPressed: () {
+                  Navigator.pop(context);
+                }, icon: Icon(Icons.cancel_outlined)),
+              ],
+            ),
             Expanded(child: MasonryGridView.builder(
-                itemCount: albums.length,
+                itemCount: idList.length,
                 gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: axisCount),
                 itemBuilder: (context, index) {
-                  var album = albums[index];
-                  final artist = ref.watch(artistsProvider).get(album.id);
-                  return GestureDetector(
-                    onTap: () {
-                      widget.onSelected(album.id);
-                      Navigator.pop(context);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 15),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(15),
-                              child: AlbumCover(album: album),
-                            ),
-                          ),
-                          Text(
-                              album.title.byContext(context)
-                          ),
-                          Text(
-                              artist.name.byContext(context)
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
+                  final id = idList[index];
+                  final album = albums.get(id);
+                  return AlbumGridItem(album: album, onPressed: () {
+                        widget.onSelected(id);
+                        Navigator.pop(context);
+                  });
                 }))
           ],
         ),
