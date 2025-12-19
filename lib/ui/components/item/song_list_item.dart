@@ -3,15 +3,21 @@ import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/channels/app_web_channel.dart';
+import 'package:music/models/app_settings.dart';
 import 'package:music/models/music/song.dart';
+import 'package:music/models/transfer_state.dart';
 import 'package:music/providers/playing_state_provider.dart';
 import 'package:music/providers/playlists_provider.dart';
 import 'package:music/providers/providers.dart';
 import 'package:music/providers/songs_provider.dart';
+import 'package:music/providers/transfers_provider.dart';
 import 'package:music/ui/components/select_playlist.dart';
 import 'package:music/ui/dialogs/edit_song_info_dialog.dart';
+import 'package:music/ui/dialogs/song_detail_dialog.dart';
 import 'package:music/utils/localized_title.dart';
 import 'package:music/utils/screen_size.dart';
+import 'package:music/utils/toast.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 
 import '../../../providers/albums_provider.dart';
 import '../../../providers/artists_provider.dart';
@@ -36,6 +42,7 @@ class SongListItem extends ConsumerWidget {
     final album = ref.watch(albumsProvider).get(song.albumId);
     final artists = ref.watch(artistsProvider).getAll(song.artistIds);
     final selected = selectedSongs?.contains(song.id) == true;
+    final downloadingStates = ref.watch(transfersNotifier)[song.id];
 
     final widget = Material(
       color: selected ? Theme.of(context).highlightColor.withAlpha(150) : Colors.transparent,
@@ -143,25 +150,48 @@ class SongListItem extends ConsumerWidget {
                           )
                       ),
                       Visibility(
-                          visible: !song.availableOnOffline(),
+                          visible: !song.availableOnOffline() && downloadingStates == null,
                           child: IconButton(onPressed: () async {
-                            for(final songFile in song.files) {
+                            for(var i = 0 ; i < song.files.length; i++) {
+                              final songFile = song.files[i];
                               appWebChannel.downloadSongFile(songId: song.id, filename: songFile.filename, onProgress: (received, total) {
-
+                                ref.read(transfersNotifier.notifier).updateTransferProgress(TransferState(songId: song.id, fileId: songFile.id, transferredBytes: received, totalBytes: total));
+                              }, onSuccess: () {
+                                ref.read(transfersNotifier.notifier).markTransferCompleted(songId: song.id, fileId: songFile.id);
+                                song.files[i].availableOnOffline = true;
+                                ref.read(songsProvider.notifier).insertSong(song);
                               });
                             }
                           }, icon: Icon(
                             Icons.arrow_downward_outlined,
                             size: 13,
                           ))),
-                      // TODO Show uploading/downloading state
+                      if(downloadingStates != null) ... () {
+                        final List<Widget> children = [];
+                        downloadingStates.forEach((key, element) {
+                          children.add(CircularPercentIndicator(
+                              radius: 10,
+                              lineWidth: 5,
+                              animation: false,
+                              percent: (element.transferredBytes / element.totalBytes).toDouble(),
+                              progressColor: Theme.of(context).highlightColor));
+                        });
+                        return children;
+                      } (),
                       PopupMenuButton(
                         icon: Icon(Icons.more_vert),
                         itemBuilder: (context) {
                           List<PopupMenuItem> list = [
                             PopupMenuItem(child: Text(AppLocalizations.of(context).get("@remove_download")), onTap: () async {
-                              await song.removeDownload();
-                              ref.read(songsProvider.notifier).insertSong(song);
+                              if(appSettings.useOwnServer) {
+                                // TODO: prevent deleting files before upload is finished
+                                await song.removeDownload();
+                                ref.read(songsProvider.notifier).insertSong(song);
+                              }
+                              else {
+                                //TODO: localize
+                                showToast(context, "?");
+                              }
                             }),
                             PopupMenuItem(child: Text(AppLocalizations.of(context).get("@add_to_playlist")), onTap: () {
                               if (isDesktopOrTablet(context)) {
@@ -213,9 +243,17 @@ class SongListItem extends ConsumerWidget {
                                 });
                               }
                             }),
+                            //TODO localize details
+                            PopupMenuItem(child: Text("Details"), onTap: () {
+                              showDialog(
+                                  context: context, builder: (context) {
+                                return SongDetailDialog(song: song);
+                              });
+                            }),
                             PopupMenuItem(child: Text(AppLocalizations.of(context).get("@edit_song_info")), onTap: () {
-                              showDialog(context: context, builder: (context) {
-                                return EditSongInfoDialog(song: song);
+                              showDialog(
+                                  context: context, builder: (context) {
+                                return EditSongInfoDialog(song: song.clone());
                               });
                             }),
                             PopupMenuItem(child: Text(AppLocalizations.of(context).get("@move_to_archive")), onTap: () {
@@ -228,28 +266,24 @@ class SongListItem extends ConsumerWidget {
 
                           if (playlistId != "!SONGS") {
                             list.add(PopupMenuItem(child: Text(AppLocalizations.of(context).get("@remove_from_playlist")), onTap: () {
-                              // appState.setFragmentState(() {
-                              //   appStorage.playlists
-                              //       .get(playlistId)
-                              //       .songs
-                              //       .remove(song.id);
-                              // });
-                              // appStorage.playlists.get(playlistId).save();
+                              final playlist = ref.read(playlistsProvider).playlists.get(playlistId);
+                              playlist.songs.remove(song.id);
+                              playlist.save();
+                              ref.read(playlistsProvider.notifier).removeItem(playlistId, song.id);
                             }));
                           }
 
-                          list.add(PopupMenuItem(child: Text(AppLocalizations.of(context).get("@delete")), onTap: () {
+                          //TODO: localize
+                          list.add(PopupMenuItem(child: Text("move to trash"), onTap: () {
                             showDialog(
                                 context: context,
                                 builder: (context) {
                                   return ConfirmationDialog(
-                                    title: AppLocalizations.of(context).get("@dialog_title_delete_song"),
+                                    title: "move to trash?",
                                     onConfirmed: () {
-                                      song.delete();
-                                      // appState.setFragmentState(() {
-                                      //   ref.watch(songsProvider).remove(song.id);
-                                      //   appStorage.songIdList.remove(song.id);
-                                      // });
+                                      song.deleted = DateTime.now();
+                                      song.save();
+                                      ref.read(playlistsProvider.notifier).notifySongUpdate(song);
                                     },
                                   );
                                 });

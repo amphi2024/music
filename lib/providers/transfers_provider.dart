@@ -2,22 +2,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/transfer_state.dart';
 
-class TransfersNotifier extends Notifier<Set<TransferState>> {
+class TransfersNotifier extends Notifier<Map<String, Map<String, TransferState>>> {
   @override
-  Set<TransferState> build() {
+  Map<String, Map<String, TransferState>> build() {
     return {};
   }
 
   void updateTransferProgress(TransferState transferState) {
-    state = {...state, transferState};
+    final transfers = {...state};
+    transfers.putIfAbsent(transferState.songId, () => {})[transferState.fileId] = transferState;
+    state = transfers;
   }
 
   void markTransferCompleted({required String songId, required String fileId}) {
     final transfers = {...state};
-    transfers.removeWhere((element) => element.songId == songId && element.fileId == fileId);
+    transfers[songId]?.remove(fileId);
     state = transfers;
   }
 
 }
 
-final transfersNotifier = NotifierProvider<TransfersNotifier, Set<TransferState>>(TransfersNotifier.new);
+final transfersNotifier = NotifierProvider<TransfersNotifier, Map<String, Map<String, TransferState>>>(TransfersNotifier.new);
