@@ -34,12 +34,10 @@ class _PlayingBarState extends ConsumerState<PlayingBar> {
     final playingBarExpanded = ref.watch(playingBarExpandedProvider);
     final playingBarShowing = ref.watch(playingBarShowingProvider);
 
-    // final song = ref.watch(playingSongsProvider.notifier).playingSong();
     final song = ref.watch(songsProvider).get(playingSongId(ref));
-    print(song.title);
     final isPlaying = ref.watch(isPlayingProvider);
-    final album = ref.watch(albumsProvider).get(song.id);
-    final artist = ref.watch(artistsProvider).get(song.id);
+    final album = ref.watch(albumsProvider).get(song.albumId);
+    final artists = ref.watch(artistsProvider).getAll(song.artistIds);
 
     return AnimatedPositioned(
         left: playingBarExpanded ? 0 : 15,
@@ -115,7 +113,7 @@ class _PlayingBarState extends ConsumerState<PlayingBar> {
                                     maxLines: 2,
                                   ),
                                   Text(
-                                    artist.name.toLocalized(),
+                                    artists.localizedName(),
                                     style: Theme.of(context).textTheme.titleMedium,
                                   )
                                 ],
