@@ -27,7 +27,7 @@ class PlayingBarExpandedNotifier extends Notifier<bool> {
   }
 }
 
-final playingBarExpandedProvider = NotifierProvider(PlayingBarExpandedNotifier.new);
+final playingBarExpandedProvider = NotifierProvider<PlayingBarExpandedNotifier, bool>(PlayingBarExpandedNotifier.new);
 
 class SelectedItemsNotifier extends Notifier<List<String>?> {
 
