@@ -1,4 +1,5 @@
-import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -9,7 +10,6 @@ import 'package:music/providers/providers.dart';
 import 'package:music/ui/components/item/album_grid_item.dart';
 import 'package:music/utils/fragment_scroll_listener.dart';
 
-import '../../models/app_storage.dart';
 import '../../utils/screen_size.dart';
 import '../pages/album_page.dart';
 import 'components/fragment_padding.dart';
@@ -66,13 +66,9 @@ class _AlbumsFragmentState extends ConsumerState<AlbumsFragment> with FragmentVi
               }
             },
             onLongPressed: () {
-              showConfirmationDialog("@dialog_title_delete_album", () {
-                setState(() {
-                  album.delete();
-                  appStorage.albums.remove(id);
-                  appStorage.albumIdList.remove(id);
-                });
-              });
+              if(Platform.isAndroid || Platform.isIOS) {
+                ref.read(selectedItemsProvider.notifier).startSelection();
+              }
             },
           );
         });
