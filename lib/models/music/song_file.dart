@@ -10,6 +10,7 @@ import '../../utils/media_file_path.dart';
 class SongFile {
   String id;
   String filename;
+  String title;
   String format = "";
   bool availableOnOffline = true;
   Lyrics lyrics = Lyrics();
@@ -22,13 +23,14 @@ class SongFile {
   SongFile.fromMap(String songId, Map<String, dynamic> data)
       : id = data["id"],
         filename = data["filename"],
+  title = data["title"] ?? "",
         format = data["format"] ?? "" {
     initLyrics(data["lyrics"]);
 
     availableOnOffline = File(songMediaFilePath(songId, filename)).existsSync();
   }
 
-  SongFile({required this.id, required this.filename});
+  SongFile({required this.id, required this.filename, this.title = ""}) : format = filename.split(".").last;
 
   static SongFile created({required String path, required File originalFile}) {
     var songInfoFilename = FilenameUtils.generatedFileName(".json", path);
@@ -67,6 +69,6 @@ class SongFile {
   }
 
   Map<String, dynamic> toMap() {
-    return {"id": id, "filename": filename, "format": format, "lyrics": lyrics.toMap()};
+    return {"id": id, "filename": filename, "format": format, "lyrics": lyrics.toMap(), "title": title};
   }
 }
