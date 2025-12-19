@@ -177,51 +177,166 @@ class PlaylistsNotifier extends Notifier<PlaylistsState> {
   }
 
   void removeItem(String playlistId, String itemId) {
+    final playlists = {...state.playlists};
+    final idList = [...state.idList];
+    final trash = state.trash.copyWith();
+    final playlist = playlists.get(playlistId);
+    playlist.songs.remove(itemId);
 
+    state = PlaylistsState(playlists, idList, trash);
   }
 
   void notifySongUpdate(Song song) {
     final playlists = {...state.playlists};
     final idList = [...state.idList];
     final trash = state.trash.copyWith();
-
     if(song.deleted != null) {
-      final playlist = playlists.get("!SONGS");
-      playlist.songs.remove(song.id);
-      playlists["!SONGS"] = playlist;
+      playlists["!SONGS"]!.songs.remove(song.id);
+      playlists["!ARCHIVE"]!.songs.remove(song.id);
       trash.songs.add(song.id);
       trash.sort(ref);
+      state = PlaylistsState(playlists, idList, trash);
+      return;
     }
 
     if(song.archived) {
-      final playlist = playlists.get("!ARCHIVE");
-      playlist.songs.add(song.id);
-      playlist.sort(ref);
+      final archivePlaylist = playlists.get("!ARCHIVE");
+      if(!archivePlaylist.songs.contains(song.id)) {
+        archivePlaylist.songs.add(song.id);
+        archivePlaylist.sort(ref);
+      }
+
+      final songsPlaylist = playlists.get("!SONGS");
+      songsPlaylist.songs.remove(song.id);
+
+      playlists["!ARCHIVE"] = archivePlaylist;
+      playlists["!SONGS"] = songsPlaylist;
     }
-    //TODO implement
+    else {
+      final songsPlaylist = playlists.get("!SONGS");
+      if(!songsPlaylist.songs.contains(song.id)) {
+        songsPlaylist.songs.add(song.id);
+        songsPlaylist.sort(ref);
+      }
+
+      final archivePlaylist = playlists.get("!ARCHIVE");
+      archivePlaylist.songs.remove(song.id);
+
+      playlists["!SONGS"] = songsPlaylist;
+      playlists["!ARCHIVE"] = archivePlaylist;
+    }
 
     state = PlaylistsState(playlists, idList, trash);
   }
 
   void notifyAlbumUpdate(Album album) {
-    //TODO implement
+    final playlists = {...state.playlists};
+    final idList = [...state.idList];
+    final trash = state.trash.copyWith();
+
+    if(album.deleted != null) {
+      playlists["!ALBUMS"]!.songs.remove(album.id);
+      trash.albums.add(album.id);
+      trash.sort(ref);
+      state = PlaylistsState(playlists, idList, trash);
+      return;
+    }
+
+    final albumsPlaylist = playlists.get("!ALBUMS");
+    if(!albumsPlaylist.songs.contains(album.id)) {
+      albumsPlaylist.songs.add(album.id);
+      albumsPlaylist.sort(ref);
+    }
+
+    state = PlaylistsState(playlists, idList, trash);
   }
 
   void notifyArtistUpdate(Artist artist) {
-    //TODO implement
+    final playlists = {...state.playlists};
+    final idList = [...state.idList];
+    final trash = state.trash.copyWith();
+
+    if(artist.deleted != null) {
+      playlists["!ARTISTS"]!.songs.remove(artist.id);
+      trash.artists.add(artist.id);
+      trash.sort(ref);
+      state = PlaylistsState(playlists, idList, trash);
+      return;
+    }
+
+    final artistsPlaylist = playlists.get("!ARTISTS");
+    if(!artistsPlaylist.songs.contains(artist.id)) {
+      artistsPlaylist.songs.add(artist.id);
+      artistsPlaylist.sort(ref);
+    }
+
+    state = PlaylistsState(playlists, idList, trash);
   }
 
   void insertPlaylist(Playlist playlist) {
-    //TODO implement
+    final playlists = {...state.playlists};
+    final idList = [...state.idList];
+    final trash = state.trash.copyWith();
+
+    if(playlist.deleted != null) {
+      idList.remove(playlist.id);
+      trash.playlists.add(playlist.id);
+      trash.sort(ref);
+      state = PlaylistsState(playlists, idList, trash);
+      return;
+    }
+
+    playlists[playlist.id] = playlist;
+    trash.playlists.remove(playlist.id);
+
+    state = PlaylistsState(playlists, idList, trash);
   }
 
-  void deleteSong(String id) {}
+  void deleteSong(String id) {
+    final playlists = {...state.playlists};
+    final idList = [...state.idList];
+    final trash = state.trash.copyWith();
 
-  void deleteAlbum(String id) {}
+    playlists["!SONGS"]!.songs.remove(id);
+    playlists["!ARCHIVE"]!.songs.remove(id);
+    trash.songs.remove(id);
 
-  void deleteArtist(String id) {}
+    state = PlaylistsState(playlists, idList, trash);
+  }
 
-  void deletePlaylist(String id) {}
+  void deleteAlbum(String id) {
+    final playlists = {...state.playlists};
+    final idList = [...state.idList];
+    final trash = state.trash.copyWith();
+
+    playlists["!ALBUMS"]!.songs.remove(id);
+    trash.albums.remove(id);
+
+    state = PlaylistsState(playlists, idList, trash);
+  }
+
+  void deleteArtist(String id) {
+    final playlists = {...state.playlists};
+    final idList = [...state.idList];
+    final trash = state.trash.copyWith();
+
+    playlists["!ARTISTS"]!.songs.remove(id);
+    trash.artists.remove(id);
+
+    state = PlaylistsState(playlists, idList, trash);
+  }
+
+  void deletePlaylist(String id) {
+    final playlists = {...state.playlists};
+    final idList = [...state.idList];
+    final trash = state.trash.copyWith();
+
+    playlists.remove(id);
+    idList.remove(id);
+    trash.playlists.remove(id);
+
+    state = PlaylistsState(playlists, idList, trash);
+  }
 
   void movePlaylistToTrash(String playlistId) {
     final playlists = {...state.playlists};
@@ -235,6 +350,29 @@ class PlaylistsNotifier extends Notifier<PlaylistsState> {
     state = PlaylistsState(playlists, idList, trash);
   }
 
+  void moveToArchive(List<String> items) {
+    final playlists = {...state.playlists};
+    final idList = [...state.idList];
+    final trash = state.trash.copyWith();
+    playlists["!ARCHIVE"]!.songs.addAll(items);
+    playlists["!ARCHIVE"]!.sort(ref);
+
+    playlists["!SONGS"]!.songs.removeWhere((id) => items.contains(id));
+
+    state = PlaylistsState(playlists, idList, trash);
+  }
+
+  void restoreFromArchive(List<String> items) {
+    final playlists = {...state.playlists};
+    final idList = [...state.idList];
+    final trash = state.trash.copyWith();
+    playlists["!SONGS"]!.songs.addAll(items);
+    playlists["!SONGS"]!.sort(ref);
+
+    playlists["!ARCHIVE"]!.songs.removeWhere((id) => items.contains(id));
+
+    state = PlaylistsState(playlists, idList, trash);
+  }
 }
 
 final playlistsProvider = NotifierProvider<PlaylistsNotifier, PlaylistsState>(PlaylistsNotifier.new);
@@ -247,7 +385,6 @@ extension PlaylistsEx on Map<String, Playlist> {
     }
     else {
       var playlist = Playlist(id: "");
-      // playlist.path = PathUtils.join(appStorage.playlistsPath, id);
       playlist.id = id;
       return playlist;
     }
