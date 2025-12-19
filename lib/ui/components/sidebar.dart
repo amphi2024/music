@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:amphi/models/app_localizations.dart';
+import 'package:amphi/widgets/account/account_button.dart';
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:amphi/widgets/move_window_button_or_spacer.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
@@ -11,8 +12,10 @@ import 'package:music/providers/fragment_provider.dart';
 import 'package:music/providers/playlists_provider.dart';
 import 'package:music/providers/providers.dart';
 import 'package:music/providers/songs_provider.dart';
-import 'package:music/ui/components/account/account_button.dart';
 
+import '../../channels/app_web_channel.dart';
+import '../../models/app_storage.dart';
+import '../../utils/account_utils.dart';
 import '../dialogs/settings_dialog.dart';
 
 class Sidebar extends ConsumerWidget {
@@ -33,7 +36,23 @@ class Sidebar extends ConsumerWidget {
                 SizedBox(
                   height: 55,
                   child: Row(
-                    children: [const Expanded(child: MoveWindowOrSpacer()), AccountButton()],
+                    children: [const Expanded(child: MoveWindowOrSpacer()), AccountButton(
+                      appCacheData: appCacheData,
+                      onLoggedIn: ({required id, required token, required username}) {
+                        onLoggedIn(id: id, token: token, username: username, context: context, ref: ref);
+                      },
+                      iconSize: 25,
+                      profileIconSize: 20,
+                      wideScreenIconSize: 25,
+                      wideScreenProfileIconSize: 20,
+                      appWebChannel: appWebChannel,
+                      appStorage: appStorage,
+                      onUserRemoved: () {},
+                      onUserAdded: () {},
+                      onUsernameChanged: () {},
+                      onSelectedUserChanged: (user) {},
+                      setAndroidNavigationBarColor: () {},
+                    )],
                   ),
                 ),
                 Expanded(
@@ -89,18 +108,35 @@ List<Widget> _menuItems({required WidgetRef ref, required BuildContext context})
   final showingPlaylistId = ref.watch(showingPlaylistIdProvider);
   List<Widget> children = [
     _MenuHeader(text: AppLocalizations.of(context).get("@library")),
-    _MenuItem(
-        focused: showingPlaylistId == "!SONGS",
-        title: AppLocalizations.of(context).get("@songs"),
-        icon: Icons.music_note,
-        onPressed: () {
-          ref.read(playlistsProvider.notifier).releaseAlbumSongs();
-          ref.read(showingPlaylistIdProvider.notifier).set("!SONGS");
-          ref.read(fragmentStateProvider.notifier).setState(titleMinimized: false, titleShowing: true);
-          if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-            saveWindowSize();
-          }
-        }),
+    DragTarget<List<String>>(
+      onAcceptWithDetails: (details) {
+        if(showingPlaylistId != "!ARCHIVE") {
+          return;
+        }
+        final selectedSongs = details.data;
+        final songs = ref.read(songsProvider);
+        for(var id in selectedSongs) {
+          final song = songs.get(id);
+          song.archived = false;
+          song.save();
+        }
+        ref.read(playlistsProvider.notifier).restoreFromArchive(selectedSongs);
+      },
+      builder: (context, candidateData, rejectedData) {
+        return _MenuItem(
+            focused: showingPlaylistId == "!SONGS",
+            title: AppLocalizations.of(context).get("@songs"),
+            icon: Icons.music_note,
+            onPressed: () {
+              ref.read(playlistsProvider.notifier).releaseAlbumSongs();
+              ref.read(showingPlaylistIdProvider.notifier).set("!SONGS");
+              ref.read(fragmentStateProvider.notifier).setState(titleMinimized: false, titleShowing: true);
+              if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+                saveWindowSize();
+              }
+            });
+      },
+    ),
     _MenuItem(
         focused: showingPlaylistId == "!ARTISTS",
         title: AppLocalizations.of(context).get("@artists"),
@@ -136,17 +172,34 @@ List<Widget> _menuItems({required WidgetRef ref, required BuildContext context})
             saveWindowSize();
           }
         }),
-    _MenuItem(
-        focused: showingPlaylistId == "!ARCHIVE",
-        title: AppLocalizations.of(context).get("@archive"),
-        icon: Icons.archive,
-        onPressed: () {
-          ref.read(showingPlaylistIdProvider.notifier).set("!ARCHIVE");
-          ref.read(fragmentStateProvider.notifier).setState(titleMinimized: false, titleShowing: true);
-          if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-            saveWindowSize();
-          }
-        }),
+    DragTarget<List<String>>(
+      onAcceptWithDetails: (details) {
+        if(showingPlaylistId == "!ARCHIVE") {
+          return;
+        }
+        final selectedSongs = details.data;
+        final songs = ref.read(songsProvider);
+        for(var id in selectedSongs) {
+          final song = songs.get(id);
+          song.archived = true;
+          song.save();
+        }
+        ref.read(playlistsProvider.notifier).moveToArchive(selectedSongs);
+      },
+      builder: (context, candidateData, rejectedData) {
+        return _MenuItem(
+            focused: showingPlaylistId == "!ARCHIVE",
+            title: AppLocalizations.of(context).get("@archive"),
+            icon: Icons.archive,
+            onPressed: () {
+              ref.read(showingPlaylistIdProvider.notifier).set("!ARCHIVE");
+              ref.read(fragmentStateProvider.notifier).setState(titleMinimized: false, titleShowing: true);
+              if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+                saveWindowSize();
+              }
+            });
+      },
+    ),
     _MenuHeader(text: AppLocalizations.of(context).get("@playlists")),
   ];
 
