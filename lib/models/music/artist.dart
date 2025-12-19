@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:amphi/utils/try_json_decode.dart';
 import 'package:music/channels/app_web_channel.dart';
 import 'package:music/database/database_helper.dart';
 import 'package:music/utils/generated_id.dart';
@@ -39,7 +38,7 @@ class Artist {
 
   Artist.fromMap(Map<String, dynamic> data)
       : id = data["id"],
-        name = tryJsonDecode(data["name"], defaultValue: {"default": data["name"].toString()}) as Map<String, dynamic>,
+        name = data.getMap("name"),
         members = data.getMapList("members").map((e) => Member.fromMap(e)).toList(),
         images = data.getMapList("images"),
         created = data.getDateTime("created"),

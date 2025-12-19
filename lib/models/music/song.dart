@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:amphi/utils/try_json_decode.dart';
 import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/music/song_file.dart';
 import 'package:music/utils/generated_id.dart';
@@ -59,7 +58,7 @@ class Song {
   Song.fromMap(Map<String, dynamic> data)
       : id = data["id"],
         archived = data["archived"] == 1,
-        title = tryJsonDecode(data["title"], defaultValue: {"default": data["title"].toString()}) as Map<String, dynamic>,
+        title = data.getMap("title"),
         genres = data.getMapList("genres"),
         artistIds = data.getStringList("artist_ids"),
         albumId = data["album_id"] ?? "",
@@ -168,5 +167,9 @@ class Song {
       "description": description,
       "files": files.map((e) => e.toMap()).toList()
     };
+  }
+
+  Song clone() {
+    return Song.fromMap(toSqlInsertMap());
   }
 }

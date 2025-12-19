@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:amphi/utils/try_json_decode.dart';
 import 'package:music/channels/app_web_channel.dart';
 import 'package:music/database/database_helper.dart';
 import 'package:music/utils/generated_id.dart';
@@ -40,7 +39,7 @@ class Album {
 
   Album.fromMap(Map<String, dynamic> data)
       : id = data["id"],
-        title = tryJsonDecode(data["title"], defaultValue: {"default": data["title"]}),
+        title = data.getMap("title"),
         covers = data.getMapList("covers"),
         genres = data.getMapList("genres"),
         artistIds = data.getStringList("artist_ids"),
@@ -84,7 +83,7 @@ class Album {
   Map<String, dynamic> toSqlInsertMap() {
     return {
       "id": id,
-      "title": title,
+      "title": jsonEncode(title),
       "genres": jsonEncode(genres),
       "artist_ids": jsonEncode(artistIds),
       "covers": jsonEncode(covers),
