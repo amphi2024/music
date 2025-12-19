@@ -39,8 +39,11 @@ Future<void> syncMediaSourceToNative(WidgetRef ref) async {
 
 Future<void> playNext(WidgetRef ref) async {
   ref.read(playingSongsProvider.notifier).updateToNextSong();
-  appCacheData.lastPlayedSongId = playingSongId(ref);
+  final song = playingSong(ref);
+  appCacheData.lastPlayedSongId = song.id;
   appCacheData.save();
+  
+  setMediaSource(song: playingSong(ref), ref: ref, playNow: ref.read(isPlayingProvider));
 
   if (Platform.isAndroid || Platform.isIOS) {
     await syncMediaSourceToNative(ref);
@@ -76,8 +79,11 @@ void toggleShuffle(WidgetRef ref) {
 
 Future<void> playPrevious(WidgetRef ref) async {
   ref.read(playingSongsProvider.notifier).updateToPreviousSong();
-  appCacheData.lastPlayedSongId = playingSongId(ref);
+  final song = playingSong(ref);
+  appCacheData.lastPlayedSongId = song.id;
   appCacheData.save();
+
+  setMediaSource(song: playingSong(ref), ref: ref, playNow: ref.read(isPlayingProvider));
 
   if (Platform.isAndroid || Platform.isIOS) {
     await syncMediaSourceToNative(ref);
@@ -139,7 +145,7 @@ Future<void> setMediaSource({required Song song, required WidgetRef ref, String 
     "title": song.title.byLocaleCode(localeCode),
     "artist": artists.map((e) => e.name.toLocalized()).join(),
     "album_cover": album.coverIndex != null ? albumCoverPath(album.id, album.covers[album.coverIndex!]["filename"]) : "",
-    "url": "${appWebChannel.serverAddress}/music/songs/${song.id}/${song.playingFile().filename}",
+    "url": "${appWebChannel.serverAddress}/music/songs/${song.id}/files/${song.playingFile().filename}",
     "token": appStorage.selectedUser.token
   });
 }
