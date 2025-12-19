@@ -10,6 +10,9 @@ import 'migration_common.dart';
 Future<void> migrateArtists(Database db) async {
   final batch = db.batch();
     var directory = Directory(PathUtils.join(appStorage.selectedUser.storagePath, "artists"));
+  if(!await directory.exists()) {
+    return;
+  }
     for (var subDirectory in directory.listSync()) {
       if (subDirectory is Directory) {
         for (var artistDirectory in subDirectory.listSync()) {
