@@ -10,7 +10,6 @@ import 'package:music/ui/dialogs/edit_artist_dialog.dart';
 import 'package:music/ui/fragments/components/floating_button.dart';
 import 'package:music/utils/localized_title.dart';
 
-import '../../models/app_storage.dart';
 import '../components/image/album_cover.dart';
 import '../components/item/song_list_item.dart';
 import 'components/fragment_padding.dart';
@@ -25,6 +24,7 @@ class ArtistFragment extends ConsumerWidget {
         .split(",")
         .last;
     final artists = ref.watch(artistsProvider);
+    final albums = ref.watch(albumsProvider);
     final artist = artists.get(showingArtistId);
     final String playlistId = "!ARTIST,${artist.id}";
     final playlists = ref
@@ -73,6 +73,7 @@ class ArtistFragment extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               FloatingButton(icon: Icons.play_arrow, onPressed: () {
+                // TODO: implement
                 // var albumId = artist.albums.firstOrNull;
                 // if (albumId != null) {
                 //   var songId = appStorage.albums
@@ -92,6 +93,7 @@ class ArtistFragment extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 15.0),
                 child: FloatingButton(icon: Icons.shuffle, onPressed: () {
+                  // TODO: implement
                   // var albumId = artist.albums.firstOrNull;
                   // if (albumId != null) {
                   //   var songId = appStorage.albums
@@ -112,8 +114,8 @@ class ArtistFragment extends ConsumerWidget {
         }
         else {
           final albumId = playlist.songs[index - 3];
-          final album = appStorage.albums.get(albumId);
-          final albumPlaylist = playlists.get("!ALBUM,$album");
+          final album = albums.get(albumId);
+          final albumPlaylist = playlists.get("!ALBUM,$albumId");
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
