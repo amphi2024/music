@@ -45,9 +45,7 @@ class Lyrics {
     return map;
   }
 
-  static Future<Lyrics> fromSelectedFile(String localeCode) async {
-    Lyrics lyrics = Lyrics();
-
+  static Future<Lyrics?> fromSelectedFile(String localeCode) async {
     var result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ["lrc"], allowMultiple: false);
     var selectedFiles = result?.files;
     if(selectedFiles != null) {
@@ -57,7 +55,7 @@ class Lyrics {
         return fromFile(File(filePath), localeCode);
       }
     }
-    return lyrics;
+    return null;
   }
 
   static Lyrics fromFile(File file, String localeCode) {

@@ -84,19 +84,13 @@ class _LyricsEditorState extends State<LyricsEditor> {
                         ),
                       ),
                     ),
-                    GestureDetector(
-                      onLongPress: () {
-                        showDialog(context: context, builder: (context) => ConfirmationDialog(title: AppLocalizations.of(context).get("@dialog_title_delete_lyric"), onConfirmed: () {
-                          setState(() {
-                            widget.lyricsEditingController.lyrics.data.get("default").removeAt(index);
-                          });
-                        }));
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: const Icon(Icons.drag_handle),
-                      ),
-                    ),
+                    IconButton(onPressed: () {
+                      showDialog(context: context, builder: (context) => ConfirmationDialog(title: AppLocalizations.of(context).get("@dialog_title_delete_lyric"), onConfirmed: () {
+                        setState(() {
+                          widget.lyricsEditingController.lyrics.data.get("default").removeAt(index);
+                        });
+                      }));
+                    }, icon: Icon(Icons.remove))
                   ],
                 ),
                 Row(

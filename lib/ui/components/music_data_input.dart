@@ -71,7 +71,7 @@ class _MusicDataInputState extends State<MusicDataInput> {
                     localeNames[key]!,
                     maxLines: 3,
                   ),
-                ) : Icon(Icons.circle),
+                ) : Icon(Icons.circle, color: Theme.of(context).highlightColor),
               ),
             ),
             Expanded(
@@ -99,7 +99,7 @@ class _MusicDataInputState extends State<MusicDataInput> {
       }
     });
 
-    children.add(PopupMenuButton(icon: Icon(Icons.add_circle_outline),
+    children.add(PopupMenuButton(icon: Icon(Icons.add_circle_outline, color: Theme.of(context).highlightColor),
         itemBuilder: (context) {
       return popupMenuItems(context, (localeCode) {
         setState(() {
@@ -126,7 +126,7 @@ class _MusicDataInputState extends State<MusicDataInput> {
                       "Default",
                       maxLines: 3,
                     ),
-                  ) : Icon(Icons.circle),
+                  ) : Icon(Icons.circle, color: Theme.of(context).highlightColor),
               ),
             ),
             Expanded(child: TextField(

@@ -6,62 +6,84 @@ import 'package:music/ui/components/music_data_input.dart';
 import 'package:music/utils/localized_title.dart';
 
 class EditMusicGenre extends ConsumerStatefulWidget {
-  final List<dynamic> genre;
-
-  const EditMusicGenre({super.key, required this.genre});
+  final List<Map<String, dynamic>> genres;
+  const EditMusicGenre({super.key, required this.genres});
 
   @override
   ConsumerState<EditMusicGenre> createState() => _EditMusicGenreState();
 }
 
 class _EditMusicGenreState extends ConsumerState<EditMusicGenre> {
+
+  final controller = ScrollController();
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final genres = ref.watch(genresProvider);
     List<Widget> children = [];
 
-    for (int i = 0; i < widget.genre.length; i++) {
-      var genre = widget.genre[i];
-      if (genre is Map<String, dynamic>) {
-        children.add(ListView(
+    for (int i = 0; i < widget.genres.length; i++) {
+      var genre = widget.genres[i];
+      children.add(SizedBox(
+        width: 200,
+        child: ListView(
           children: [
             MusicDataInput(data: genre),
-            IconButton(
-                onPressed: () {
-                  setState(() {
-                    widget.genre.removeAt(i);
-                    i--;
-                  });
-                },
-                icon: Icon(Icons.cancel_outlined))
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                    onPressed: () {
+                      setState(() {
+                        widget.genres.removeAt(i);
+                        i--;
+                      });
+                    },
+                    icon: Icon(Icons.cancel_outlined)),
+              ],
+            )
           ],
-        ));
-      }
-    }
+        ),
+      ));
+        }
 
     final genreList = _getGenreList(context, genres);
 
-    children.add(Center(
-      child: PopupMenuButton(
-          icon: Icon(Icons.add_circle_outline),
-          itemBuilder: (context) {
-            return List.generate(genreList.length, (index) {
-              return PopupMenuItem(child: Text(genreList[index].byContext(context)),
-                onTap: () {
-                  setState(() {
-                    widget.genre.add(genreList[index]);
-                  });
-                },
-              );
-            });
-          }),
+    children.add(Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        PopupMenuButton(
+            icon: Icon(Icons.add_circle_outline),
+            itemBuilder: (context) {
+              return List.generate(genreList.length, (index) {
+                return PopupMenuItem(child: Text(genreList[index].byContext(context)),
+                  onTap: () {
+                    setState(() {
+                      widget.genres.add(genreList[index]);
+                    });
+                  },
+                );
+              });
+            }),
+      ],
     )
     );
 
     return SizedBox(
-      height: 250,
-      child: PageView(
-        children: children,
+      height: 100,
+      child: Scrollbar(
+        controller: controller,
+        child: ListView(
+          controller: controller,
+          scrollDirection: Axis.horizontal,
+          children: children,
+        ),
       ),
     );
   }
