@@ -61,6 +61,12 @@ extension ArtistsEx on Map<String, Artist> {
   }
 }
 
+extension ArtistsName on List<Artist> {
+  String localizedName() {
+    return map((e) => e.name.toLocalized()).join(", ");
+  }
+}
+
 extension SortEx on List<String> {
   void sortArtists(String sortOption, Map<String, Artist> map) {
     switch(sortOption) {
