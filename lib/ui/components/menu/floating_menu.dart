@@ -1,17 +1,22 @@
 import 'package:amphi/models/app_localizations.dart';
+import 'package:amphi/widgets/account/account_button.dart';
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music/channels/app_web_channel.dart';
+import 'package:music/models/app_cache.dart';
+import 'package:music/models/app_storage.dart';
 import 'package:music/providers/fragment_provider.dart';
 import 'package:music/providers/playlists_provider.dart';
 import 'package:music/providers/providers.dart';
-import 'package:music/ui/components/account/account_button.dart';
 import 'package:music/ui/components/add_item_button.dart';
 import 'package:music/ui/components/menu/floating_menu_button.dart';
 import 'package:music/ui/pages/playlist_page.dart';
 import 'package:music/ui/pages/settings_page.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
+import '../../../utils/account_utils.dart';
 
 class FloatingMenu extends ConsumerStatefulWidget {
   final bool showing;
@@ -24,7 +29,6 @@ class FloatingMenu extends ConsumerStatefulWidget {
 }
 
 class _FloatingMenuState extends ConsumerState<FloatingMenu> {
-
   var pageController = PageController();
 
   @override
@@ -36,10 +40,7 @@ class _FloatingMenuState extends ConsumerState<FloatingMenu> {
   @override
   Widget build(BuildContext context) {
     final double height = 350;
-    final screenHeight = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final screenHeight = MediaQuery.of(context).size.height;
     double verticalPadding = (screenHeight - height) / 2;
 
     return AnimatedPositioned(
@@ -56,21 +57,14 @@ class _FloatingMenuState extends ConsumerState<FloatingMenu> {
         child: Container(
           width: 250,
           height: height,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15),
-              color: Theme
-                  .of(context)
-                  .cardColor,
-              boxShadow: [
-                BoxShadow(
-                  color: Theme
-                      .of(context)
-                      .shadowColor,
-                  spreadRadius: 3,
-                  blurRadius: 5,
-                  offset: const Offset(0, 3),
-                ),
-              ]),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(15), color: Theme.of(context).cardColor, boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).shadowColor,
+              spreadRadius: 3,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ]),
           child: Column(
             children: [
               Expanded(
@@ -86,14 +80,11 @@ class _FloatingMenuState extends ConsumerState<FloatingMenu> {
                 ),
               ),
               SmoothPageIndicator(
-                controller: pageController, count: 2,
+                controller: pageController,
+                count: 2,
                 effect: WormEffect(
-                  dotColor: Theme
-                      .of(context)
-                      .dividerColor,
-                  activeDotColor: Theme
-                      .of(context)
-                      .highlightColor,
+                  dotColor: Theme.of(context).dividerColor,
+                  activeDotColor: Theme.of(context).highlightColor,
                   dotHeight: 15,
                   dotWidth: 15,
                 ),
@@ -104,13 +95,33 @@ class _FloatingMenuState extends ConsumerState<FloatingMenu> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  AccountButton(),
+                  AccountButton(
+                    appCacheData: appCacheData,
+                    onLoggedIn: ({required id, required token, required username}) {
+                      onLoggedIn(id: id, token: token, username: username, context: context, ref: ref);
+                    },
+                    iconSize: 20,
+                    profileIconSize: 15,
+                    wideScreenIconSize: 15,
+                    wideScreenProfileIconSize: 15,
+                    appWebChannel: appWebChannel,
+                    appStorage: appStorage,
+                    onUserRemoved: () {},
+                    onUserAdded: () {},
+                    onUsernameChanged: () {},
+                    onSelectedUserChanged: (user) {},
+                    setAndroidNavigationBarColor: () {},
+                  ),
                   AddItemButton(),
-                  IconButton(icon: Icon(Icons.settings), onPressed: () {
-                    Navigator.push(context, CupertinoPageRoute(builder: (context) {
-                      return SettingsPage();
-                    },));
-                  }),
+                  IconButton(
+                      icon: Icon(Icons.settings),
+                      onPressed: () {
+                        Navigator.push(context, CupertinoPageRoute(
+                          builder: (context) {
+                            return SettingsPage();
+                          },
+                        ));
+                      }),
                 ],
               )
             ],
@@ -179,15 +190,19 @@ class _Playlists extends ConsumerWidget {
             icon: Icons.playlist_play,
             label: playlist.title,
             onLongPressed: () {
-              showDialog(context: context, builder: (context) {
-                return ConfirmationDialog(title: AppLocalizations.of(context).get("@dialog_title_delete_playlist"), onConfirmed: () {
-                  // appState.setState(() {
-                  //   playlist.delete();
-                  //   appStorage.playlists.remove(playlist.id);
-                  //   appStorage.playlistIdList.remove(playlist.id);
-                  // });
-                });
-              });
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return ConfirmationDialog(
+                        title: AppLocalizations.of(context).get("@dialog_title_delete_playlist"),
+                        onConfirmed: () {
+                          // appState.setState(() {
+                          //   playlist.delete();
+                          //   appStorage.playlists.remove(playlist.id);
+                          //   appStorage.playlistIdList.remove(playlist.id);
+                          // });
+                        });
+                  });
             },
             onPressed: () {
               Navigator.push(context, CupertinoPageRoute(builder: (context) => PlaylistView(playlist: playlist)));
