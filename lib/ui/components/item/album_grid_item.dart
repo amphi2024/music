@@ -17,7 +17,7 @@ class AlbumGridItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final artist = ref.watch(artistsProvider).get(album.id);
+    final artists = ref.watch(artistsProvider).getAll(album.artistIds);
     return GestureDetector(
       onTap: onPressed,
       onLongPress: onLongPressed,
@@ -46,7 +46,7 @@ class AlbumGridItem extends ConsumerWidget {
             Visibility(
               visible: showArtistName,
               child: Text(
-                  artist.name.byContext(context)
+                  artists.map((e) => e.name.toLocalized()).join()
               ),
             ),
           ],
