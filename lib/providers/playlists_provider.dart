@@ -25,39 +25,7 @@ class PlaylistsState {
 
 class PlaylistsNotifier extends Notifier<PlaylistsState> {
 
-  Future<void> preloadAlbumSongs() async {
-    for(final albumId in state.playlists.get("!ALBUMS").songs) {
-      final albumPlaylist = Playlist(id: "!ALBUM,$albumId");
-      ref.read(songsProvider).forEach((songId, song) {
-        if(song.albumId == albumId) {
-          albumPlaylist.songs.add(song.id);
-        }
-      });
-      albumPlaylist.sort(ref);
-      state.playlists["!ALBUM,$albumId"] = albumPlaylist;
-    }
-  }
-
-  Future<void> releaseAlbumSongs() async {
-    state.playlists.removeWhere((id, playlist) => id.startsWith("!ALBUM,"));
-  }
-
-  Future<void> preloadArtistAlbums() async {
-    for(final artistId in state.playlists.get("!ARTISTS").songs) {
-      final artistPlaylist = Playlist(id: "!ARTIST,$artistId");
-      ref.read(albumsProvider).forEach((albumId, album) {
-        if(album.artistIds.contains(artistId)) {
-          artistPlaylist.songs.add(albumId);
-        }
-      });
-      artistPlaylist.sort(ref);
-      state.playlists["!ARTIST,$artistId"] = artistPlaylist;
-    }
-  }
-
-  Future<void> releaseArtistAlbums() async {
-    state.playlists.removeWhere((id, playlist) => id.startsWith("!ARTIST,"));
-  }
+  //TODO: sync artist albums or album songs when applying updates
 
   Future<void> preloadGenreSongs(Map<String, dynamic> genre) async {
     final genreName = genre["default"]!;
@@ -107,6 +75,7 @@ class PlaylistsNotifier extends Notifier<PlaylistsState> {
         archivePlaylist.songs.add(id);
       }
       else {
+        playlists.putIfAbsent("!ALBUM,${song.albumId}", () => Playlist(id: "!ALBUM,${song.albumId}")).songs.add(song.id);
         songsPlaylist.songs.add(id);
       }
     });
@@ -133,14 +102,17 @@ class PlaylistsNotifier extends Notifier<PlaylistsState> {
       }
       else {
         albumsPlaylist.songs.add(id);
+        for(var artistId in album.artistIds) {
+          playlists.putIfAbsent("!ARTIST,${artistId}", () => Playlist(id: "!ARTIST,${artistId}")).songs.add(id);
+        }
       }
     });
 
     playlists["!ALBUMS"] = albumsPlaylist;
     songsPlaylist.songs.sortSongsWithMap(sortOption: appCacheData.sortOption("!SONGS"), songs: songs, albums: albums, artists: artists);
-    artistsPlaylist.songs.sortSongsWithMap(sortOption: appCacheData.sortOption("!ARTISTS"), songs: songs, albums: albums, artists: artists);
-    albumsPlaylist.songs.sortSongsWithMap(sortOption: appCacheData.sortOption("!ALBUMS"), songs: songs, albums: albums, artists: artists);
-    archivePlaylist.songs.sortSongsWithMap(sortOption: appCacheData.sortOption("!ALBUMS"), songs: songs, albums: albums, artists: artists);
+    artistsPlaylist.songs.sortArtists(appCacheData.sortOption("!ARTISTS"), artists);
+    albumsPlaylist.songs.sortAlbums(appCacheData.sortOption("!ALBUMS"), albums: albums, artists: artists);
+    archivePlaylist.songs.sortSongsWithMap(sortOption: appCacheData.sortOption("!ARCHIVE"), songs: songs, albums: albums, artists: artists);
     trash.sortWithMap(songs: songs, albums: albums, artists: artists);
 
     return PlaylistsState(playlists, idList, trash);

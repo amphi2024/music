@@ -22,12 +22,6 @@ class ArtistsFragment extends ConsumerStatefulWidget {
 class _ArtistsFragmentState extends ConsumerState<ArtistsFragment> with FragmentViewMixin {
 
   @override
-  void initState() {
-    super.initState();
-    ref.read(playlistsProvider.notifier).preloadArtistAlbums();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final idList = ref.watch(playlistsProvider).playlists.get("!ARTISTS").songs;
     final artists = ref.watch(artistsProvider);
