@@ -64,15 +64,15 @@ extension SortEx on List<String> {
     switch(sortOption) {
       case SortOption.artist:
         sort((a, b) {
-          var aTitle = artists.get(a).name.toLocalized().toLowerCase();
-          var bTitle = artists.get(b).name.toLocalized().toLowerCase();
+          var aTitle = artists.getAll(albums.get(a).artistIds).localizedName().toLowerCase();
+          var bTitle = artists.getAll(albums.get(b).artistIds).localizedName().toLowerCase();
           return aTitle.compareTo(bTitle);
         });
         break;
       case SortOption.artistDescending:
         sort((a, b) {
-          var aTitle = artists.get(a).name.toLocalized().toLowerCase();
-          var bTitle = artists.get(b).name.toLocalized().toLowerCase();
+          var aTitle = artists.getAll(albums.get(a).artistIds).localizedName().toLowerCase();
+          var bTitle = artists.getAll(albums.get(b).artistIds).localizedName().toLowerCase();
           return bTitle.compareTo(aTitle);
         });
         break;
