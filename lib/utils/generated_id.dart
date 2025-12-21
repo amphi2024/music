@@ -21,9 +21,9 @@ Future<String> _generatedId(String table) async {
 }
 
 Future<String> generatedSongId() => _generatedId("songs");
-Future<String> generatedAlbumId() => _generatedId("album");
-Future<String> generatedArtistId() => _generatedId("artist");
-Future<String> generatedPlaylistId() => _generatedId("playlist");
+Future<String> generatedAlbumId() => _generatedId("albums");
+Future<String> generatedArtistId() => _generatedId("artists");
+Future<String> generatedPlaylistId() => _generatedId("playlists");
 Future<String> generatedThemeId() => _generatedId("themes");
 
 String generatedSongFileId(Song song) {
