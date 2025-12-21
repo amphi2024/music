@@ -289,6 +289,11 @@ class PlaylistsNotifier extends Notifier<PlaylistsState> {
     playlists[playlist.id] = playlist;
     trash.playlists.remove(playlist.id);
 
+    if(!idList.contains(playlist.id)) {
+      idList.add(playlist.id);
+      idList.sortPlaylistList(playlists);
+    }
+
     state = PlaylistsState(playlists, idList, trash);
   }
 
