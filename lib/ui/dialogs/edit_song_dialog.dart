@@ -19,15 +19,15 @@ import 'package:music/utils/media_file_path.dart';
 import '../../providers/albums_provider.dart';
 import '../../providers/artists_provider.dart';
 
-class EditSongInfoDialog extends ConsumerStatefulWidget {
+class EditSongDialog extends ConsumerStatefulWidget {
   final Song song;
-  const EditSongInfoDialog({super.key, required this.song});
+  const EditSongDialog({super.key, required this.song});
 
   @override
-  ConsumerState<EditSongInfoDialog> createState() => _EditSongInfoDialogState();
+  ConsumerState<EditSongDialog> createState() => _EditSongInfoDialogState();
 }
 
-class _EditSongInfoDialogState extends ConsumerState<EditSongInfoDialog> {
+class _EditSongInfoDialogState extends ConsumerState<EditSongDialog> {
   late final trackNumberController =
   TextEditingController(text: song.trackNumber.toString());
   late final discNumberController =
