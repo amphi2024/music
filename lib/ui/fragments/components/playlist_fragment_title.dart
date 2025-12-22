@@ -1,9 +1,12 @@
+import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/models/music/playlist.dart';
 import 'package:music/ui/components/playlist_thumbnail.dart';
 import 'package:music/ui/dialogs/edit_playlist_dialog.dart';
 import 'package:music/ui/fragments/components/floating_button.dart';
+
+import '../../../providers/playlists_provider.dart';
 
 class PlaylistFragmentTitle extends ConsumerWidget {
 
@@ -49,6 +52,7 @@ class PlaylistFragmentTitle extends ConsumerWidget {
                         children: [
                           FloatingButton(icon: Icons.play_arrow, onPressed: () {
                             if (playlist.songs.isNotEmpty) {
+                              //TODO: implement
                               // appState.setState(() {
                               //   var id = playlist.songs[0];
                               //   var song = ref.watch(songsProvider).get(id);
@@ -61,6 +65,7 @@ class PlaylistFragmentTitle extends ConsumerWidget {
                           Padding(
                             padding: const EdgeInsets.only(left: 15.0),
                             child: FloatingButton(icon: Icons.shuffle, onPressed: () {
+                              //TODO: implement
                               // if (playlist.songs.isNotEmpty) {
                               //                               //   var index = Random().nextInt(playlist.songs.length);
                               //                               //   var id = playlist.songs[index];
@@ -76,6 +81,33 @@ class PlaylistFragmentTitle extends ConsumerWidget {
                       ),
                     ],
                   ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    PopupMenuButton(itemBuilder: (context) {
+                      return [
+                        //TODO: localize
+                        PopupMenuItem(child: Text("edit"), onTap: () {
+                          showDialog(context: context, builder: (context) =>
+                              EditPlaylistDialog(
+                                  playlist: playlist, ref: ref));
+                        }),
+                        PopupMenuItem(child: Text("move to trash"), onTap: () {
+                          showDialog(context: context, builder: (context) {
+                            return ConfirmationDialog(
+                              title: "?",
+                              onConfirmed: () {
+                                playlist.deleted = DateTime.now();
+                                playlist.save();
+                                ref.read(playlistsProvider.notifier).insertPlaylist(playlist);
+                              },
+                            );
+                          });
+                        })
+                      ];
+                    })
+                  ],
                 )
               ],
             ),
