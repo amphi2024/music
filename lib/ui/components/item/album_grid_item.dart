@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/models/music/album.dart';
@@ -18,38 +17,44 @@ class AlbumGridItem extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final artists = ref.watch(artistsProvider).getAll(album.artistIds);
-    return GestureDetector(
-      onTap: onPressed,
-      onLongPress: onLongPressed,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(bottom: 15),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: AlbumCover(album: album),
-              ),
-            ),
-            SizedBox(
-              height: 70,
-              child: Text(
-                album.title.byContext(context),
-                maxLines: 3,
-                style: TextStyle(
-                    fontWeight: FontWeight.bold
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(15),
+      child: InkWell(
+        mouseCursor: SystemMouseCursors.basic,
+        borderRadius: BorderRadius.circular(15),
+        onTap: onPressed,
+        onLongPress: onLongPressed,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 15),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: AlbumCover(album: album),
                 ),
-                textAlign: TextAlign.center,
               ),
-            ),
-            Visibility(
-              visible: showArtistName,
-              child: Text(
-                  artists.map((e) => e.name.toLocalized()).join()
+              SizedBox(
+                height: 70,
+                child: Text(
+                  album.title.byContext(context),
+                  maxLines: 3,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
-            ),
-          ],
+              Visibility(
+                visible: showArtistName,
+                child: Text(
+                    artists.map((e) => e.name.toLocalized()).join()
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
