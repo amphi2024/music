@@ -25,8 +25,17 @@ class PlayingSongsNotifier extends Notifier<PlayingSongsState> {
     return PlayingSongsState(playlistId: "!SONGS", songs: [""], shuffled: true, playingSongIndex: 0);
   }
 
-  void setShuffled(bool value) {
-    state = PlayingSongsState(playlistId: state.playlistId, songs: [...state.songs], shuffled: value, playingSongIndex: state.playingSongIndex);
+  void setShuffled(bool shuffle) {
+    final songs = [...state.songs];
+    final playingSongId = songs[state.playingSongIndex];
+    if(shuffle) {
+      songs.shuffle(Random());
+      state = PlayingSongsState(playlistId: state.playlistId, songs: songs, shuffled: shuffle, playingSongIndex: songs.indexOf(playingSongId));
+    }
+    else {
+      songs.sortSongs(state.playlistId, ref);
+      state = PlayingSongsState(playlistId: state.playlistId, songs: songs, shuffled: shuffle, playingSongIndex: songs.indexOf(playingSongId));
+    }
   }
 
   String playingSongId() {
