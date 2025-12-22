@@ -118,6 +118,10 @@ class PlaylistsNotifier extends Notifier<PlaylistsState> {
     return PlaylistsState(playlists, idList, trash);
   }
 
+  Future<void> rebuild() async {
+    state = await initialized(songs: ref.read(songsProvider), albums: ref.read(albumsProvider), artists: ref.read(artistsProvider));
+  }
+
   @override
   PlaylistsState build() {
     return PlaylistsState({}, [], Trash());

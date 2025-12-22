@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/models/music/album.dart';
 import 'package:music/models/music/song.dart';
+import 'package:music/providers/albums_provider.dart';
+import 'package:music/providers/songs_provider.dart';
 
 class GenresNotifier extends Notifier<Map<String, Map<String, dynamic>>> {
   @override
@@ -29,6 +31,10 @@ class GenresNotifier extends Notifier<Map<String, Map<String, dynamic>>> {
     });
 
     return genres;
+  }
+
+  void rebuild() {
+    state = initialized(songs: ref.read(songsProvider), albums: ref.read(albumsProvider));
   }
 }
 

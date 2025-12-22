@@ -20,7 +20,7 @@ class SongsNotifier extends Notifier<Map<String, Song>> {
   static Future<Map<String, Song>> initialized() async {
     final Map<String, Song> songs = {};
     final database = await databaseHelper.database;
-    final List<Map<String, dynamic>> list = await database.rawQuery("SELECT * FROM songs", []);
+    final List<Map<String, dynamic>> list = await database.rawQuery("SELECT * FROM songs ORDER BY track_number ASC", []);
 
     for(var data in list) {
       final song = Song.fromMap(data);
@@ -28,6 +28,10 @@ class SongsNotifier extends Notifier<Map<String, Song>> {
     }
 
     return songs;
+  }
+
+  Future<void> rebuild() async {
+    state = await initialized();
   }
 
   void insertSong(Song song) {

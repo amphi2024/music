@@ -13,6 +13,7 @@ import 'package:music/providers/playlists_provider.dart';
 import 'package:music/providers/providers.dart';
 import 'package:music/providers/songs_provider.dart';
 
+import '../../channels/app_method_channel.dart';
 import '../../channels/app_web_channel.dart';
 import '../../models/app_storage.dart';
 import '../../utils/account_utils.dart';
@@ -47,11 +48,21 @@ class Sidebar extends ConsumerWidget {
                       wideScreenProfileIconSize: 20,
                       appWebChannel: appWebChannel,
                       appStorage: appStorage,
-                      onUserRemoved: () {},
-                      onUserAdded: () {},
-                      onUsernameChanged: () {},
-                      onSelectedUserChanged: (user) {},
-                      setAndroidNavigationBarColor: () {},
+                      onUserRemoved: () {
+                        onSelectedUserChanged(ref);
+                      },
+                      onUserAdded: () {
+                        onSelectedUserChanged(ref);
+                      },
+                      onUsernameChanged: () {
+                        onUsernameChanged(ref);
+                      },
+                      onSelectedUserChanged: (user) {
+                        onSelectedUserChanged(ref);
+                      },
+                      setAndroidNavigationBarColor: () {
+                        appMethodChannel.setNavigationBarColor(Theme.of(context).cardColor);
+                      },
                     )],
                   ),
                 ),
@@ -128,7 +139,6 @@ List<Widget> _menuItems({required WidgetRef ref, required BuildContext context})
             title: AppLocalizations.of(context).get("@songs"),
             icon: Icons.music_note,
             onPressed: () {
-              ref.read(playlistsProvider.notifier).releaseAlbumSongs();
               ref.read(showingPlaylistIdProvider.notifier).set("!SONGS");
               ref.read(fragmentStateProvider.notifier).setState(titleMinimized: false, titleShowing: true);
               if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
@@ -142,7 +152,6 @@ List<Widget> _menuItems({required WidgetRef ref, required BuildContext context})
         title: AppLocalizations.of(context).get("@artists"),
         icon: Icons.people,
         onPressed: () {
-          ref.read(playlistsProvider.notifier).releaseAlbumSongs();
           ref.read(showingPlaylistIdProvider.notifier).set("!ARTISTS");
           ref.read(fragmentStateProvider.notifier).setState(titleMinimized: false, titleShowing: true);
           if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
@@ -159,7 +168,6 @@ List<Widget> _menuItems({required WidgetRef ref, required BuildContext context})
           if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
             saveWindowSize();
           }
-          ref.read(playlistsProvider.notifier).preloadAlbumSongs();
         }),
     _MenuItem(
         focused: showingPlaylistId == "!GENRES",

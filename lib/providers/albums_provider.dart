@@ -28,6 +28,10 @@ class AlbumsNotifier extends Notifier<Map<String, Album>> {
     return albums;
   }
 
+  Future<void> rebuild() async {
+    state = await initialized();
+  }
+
   void insertAlbum(Album album) {
     state = {...state, album.id: album};
   }

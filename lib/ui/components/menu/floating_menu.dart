@@ -4,6 +4,7 @@ import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music/channels/app_method_channel.dart';
 import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/app_cache.dart';
 import 'package:music/models/app_storage.dart';
@@ -106,11 +107,21 @@ class _FloatingMenuState extends ConsumerState<FloatingMenu> {
                     wideScreenProfileIconSize: 15,
                     appWebChannel: appWebChannel,
                     appStorage: appStorage,
-                    onUserRemoved: () {},
-                    onUserAdded: () {},
-                    onUsernameChanged: () {},
-                    onSelectedUserChanged: (user) {},
-                    setAndroidNavigationBarColor: () {},
+                    onUserRemoved: () {
+                      onSelectedUserChanged(ref);
+                    },
+                    onUserAdded: () {
+                      onSelectedUserChanged(ref);
+                    },
+                    onUsernameChanged: () {
+                      onUsernameChanged(ref);
+                    },
+                    onSelectedUserChanged: (user) {
+                      onSelectedUserChanged(ref);
+                    },
+                    setAndroidNavigationBarColor: () {
+                      appMethodChannel.setNavigationBarColor(Theme.of(context).cardColor);
+                    },
                   ),
                   AddItemButton(),
                   IconButton(

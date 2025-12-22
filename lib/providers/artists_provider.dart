@@ -26,6 +26,10 @@ class ArtistsNotifier extends Notifier<Map<String, Artist>> {
     return artists;
   }
 
+  Future<void> rebuild() async {
+    state = await initialized();
+  }
+
   void insertArtist(Artist artist) {
     state = {...state, artist.id: artist};
   }
