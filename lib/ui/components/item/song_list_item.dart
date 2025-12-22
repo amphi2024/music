@@ -12,7 +12,7 @@ import 'package:music/providers/providers.dart';
 import 'package:music/providers/songs_provider.dart';
 import 'package:music/providers/transfers_provider.dart';
 import 'package:music/ui/components/select_playlist.dart';
-import 'package:music/ui/dialogs/edit_song_info_dialog.dart';
+import 'package:music/ui/dialogs/edit_song_dialog.dart';
 import 'package:music/ui/dialogs/song_detail_dialog.dart';
 import 'package:music/utils/localized_title.dart';
 import 'package:music/utils/screen_size.dart';
@@ -253,7 +253,7 @@ class SongListItem extends ConsumerWidget {
                             PopupMenuItem(child: Text(AppLocalizations.of(context).get("@edit_song_info")), onTap: () {
                               showDialog(
                                   context: context, builder: (context) {
-                                return EditSongInfoDialog(song: song.clone());
+                                return EditSongDialog(song: song.clone());
                               });
                             }),
                             PopupMenuItem(child: Text(AppLocalizations.of(context).get("@move_to_archive")), onTap: () {
