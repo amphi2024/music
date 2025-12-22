@@ -149,7 +149,7 @@ class ArtistFragment extends ConsumerWidget {
                 return SongListItem(
                     song: song,
                     playlistId: playlistId,
-                    coverStyle: CoverStyle.cover
+                    coverStyle: CoverStyle.trackNumber
                 );
               }),
             ],
