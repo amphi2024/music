@@ -1,3 +1,4 @@
+import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/providers/albums_provider.dart';
@@ -34,14 +35,12 @@ class ArtistFragment extends ConsumerWidget {
 
     return ListView.builder(
       padding: fragmentPadding(context),
-      itemCount: playlist.songs.length + 3,
+      itemCount: playlist.songs.length + 1,
       itemBuilder: (context, index) {
         if (index == 0) {
           return Padding(
             padding: const EdgeInsets.only(top: 50.0, bottom: 15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+            child: Column(
               children: [
                 SizedBox(
                   width: 250,
@@ -51,69 +50,90 @@ class ArtistFragment extends ConsumerWidget {
                     child: ArtistProfileImage(artist: artist),
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(artist.name.byContext(context), textAlign: TextAlign.center, style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold
+                  )),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    FloatingButton(icon: Icons.play_arrow, onPressed: () {
+                      // TODO: implement
+                      // var albumId = artist.albums.firstOrNull;
+                      // if (albumId != null) {
+                      //   var songId = appStorage.albums
+                      //       .get(albumId)
+                      //       .songs
+                      //       .firstOrNull;
+                      //   if (songId != null) {
+                      //     // startPlay(song: song, playlistId: playlistId, ref: ref, shuffle: false);
+                      //     // appState.setState(() {
+                      //     //   playerService.isPlaying = true;
+                      //     //   playerService.shuffled = false;
+                      //     //   playerService.startPlay(song: ref.watch(songsProvider).get(songId), playlistId: playlistId);
+                      //     // });
+                      //   }
+                      // }
+                    }),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15.0),
+                      child: FloatingButton(icon: Icons.shuffle, onPressed: () {
+                        // TODO: implement
+                        // var albumId = artist.albums.firstOrNull;
+                        // if (albumId != null) {
+                        //   var songId = appStorage.albums
+                        //       .get(albumId)
+                        //       .songs
+                        //       .firstOrNull;
+                        //   if (songId != null) {
+                        //     // appState.setState(() {
+                        //     //   playerService.isPlaying = true;
+                        //     //   playerService.startPlay(song: ref.watch(songsProvider).get(songId), playlistId: playlistId, shuffle: true);
+                        //     // });
+                        //   }
+                        // }
+                      }),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    PopupMenuButton(itemBuilder: (context) {
+                      return [
+                        //TODO: localize
+                        PopupMenuItem(child: Text("edit"), onTap: () {
+                          showDialog(context: context, builder: (context) {
+                            return EditArtistDialog(artist: artist, ref: ref);
+                          });
+                        }),
+                        PopupMenuItem(child: Text("move to trash"), onTap: () {
+                          showDialog(context: context, builder: (context) {
+                            return ConfirmationDialog(
+                              title: "?",
+                              onConfirmed: () {
+                                artist.deleted = DateTime.now();
+                                artist.save();
+                                ref.read(artistsProvider.notifier).insertArtist(artist);
+                                ref.read(playlistsProvider.notifier).notifyArtistUpdate(artist);
+                              },
+                            );
+                          });
+                        })
+                      ];
+                    })
+                  ],
+                )
               ],
             ),
           );
         }
-        else if (index == 1) {
-          return GestureDetector(
-            onLongPress: () {
-              showDialog(context: context, builder: (context) =>
-                  EditArtistDialog(artist: artist, ref: ref));
-            },
-            child: Text(artist.name.byContext(context), textAlign: TextAlign.center, style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold
-            ),),
-          );
-        }
-        else if (index == 2) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              FloatingButton(icon: Icons.play_arrow, onPressed: () {
-                // TODO: implement
-                // var albumId = artist.albums.firstOrNull;
-                // if (albumId != null) {
-                //   var songId = appStorage.albums
-                //       .get(albumId)
-                //       .songs
-                //       .firstOrNull;
-                //   if (songId != null) {
-                //     // startPlay(song: song, playlistId: playlistId, ref: ref, shuffle: false);
-                //     // appState.setState(() {
-                //     //   playerService.isPlaying = true;
-                //     //   playerService.shuffled = false;
-                //     //   playerService.startPlay(song: ref.watch(songsProvider).get(songId), playlistId: playlistId);
-                //     // });
-                //   }
-                // }
-              }),
-              Padding(
-                padding: const EdgeInsets.only(left: 15.0),
-                child: FloatingButton(icon: Icons.shuffle, onPressed: () {
-                  // TODO: implement
-                  // var albumId = artist.albums.firstOrNull;
-                  // if (albumId != null) {
-                  //   var songId = appStorage.albums
-                  //       .get(albumId)
-                  //       .songs
-                  //       .firstOrNull;
-                  //   if (songId != null) {
-                  //     // appState.setState(() {
-                  //     //   playerService.isPlaying = true;
-                  //     //   playerService.startPlay(song: ref.watch(songsProvider).get(songId), playlistId: playlistId, shuffle: true);
-                  //     // });
-                  //   }
-                  // }
-                }),
-              ),
-            ],
-          );
-        }
         else {
-          final albumId = playlist.songs[index - 3];
+          final albumId = playlist.songs[index - 1];
           final album = albums.get(albumId);
           final albumPlaylist = playlists.get("!ALBUM,$albumId");
 

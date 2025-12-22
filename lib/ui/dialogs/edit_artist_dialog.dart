@@ -6,45 +6,53 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/models/music/artist.dart';
+import 'package:music/ui/components/artist_input.dart';
+import 'package:music/ui/components/edit_music_date.dart';
 import 'package:music/ui/components/image/artist_profile_image.dart';
 import 'package:music/utils/generated_id.dart';
 import 'package:music/utils/media_file_path.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../providers/artists_provider.dart';
 import '../../providers/playlists_provider.dart';
 import '../components/add_image_button.dart';
 import '../components/music_data_input.dart';
 
-class EditArtistDialog extends StatefulWidget {
-
+class EditArtistDialog extends ConsumerStatefulWidget {
   final Artist artist;
   final WidgetRef ref;
+
   const EditArtistDialog({super.key, required this.artist, required this.ref});
 
   @override
-  State<EditArtistDialog> createState() => _EditArtistDialogState();
+  ConsumerState<EditArtistDialog> createState() => _EditArtistDialogState();
 }
 
-class _EditArtistDialogState extends State<EditArtistDialog> {
+class _EditArtistDialogState extends ConsumerState<EditArtistDialog> {
   final Map<String, File> selectedFiles = {};
+  late Artist artist = widget.artist;
+  final pageController = PageController();
+
+  @override
+  void dispose() {
+    super.dispose();
+    pageController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-
     var maxHeight = MediaQuery.of(context).size.height - 20;
-    if(maxHeight > 500) {
+    if (maxHeight > 500) {
       maxHeight = 500;
     }
     final imageSize = 250.0;
     final borderRadius = BorderRadius.circular(10);
+    final padding = const EdgeInsets.only(top: 4, bottom: 4, left: 15, right: 15);
 
+    //TODO: implement country, description
     return Dialog(
       child: ConstrainedBox(
-        constraints: BoxConstraints(
-            maxWidth: 500,
-            minHeight: 250,
-            maxHeight: maxHeight
-        ),
+        constraints: BoxConstraints(maxWidth: 500, minHeight: 250, maxHeight: maxHeight),
         child: Column(
           children: [
             Expanded(
@@ -54,55 +62,125 @@ class _EditArtistDialogState extends State<EditArtistDialog> {
                     padding: const EdgeInsets.only(top: 8.0, left: 15, right: 15),
                     child: SizedBox(
                       height: 300,
-                      child: PageView.builder(
-                        itemCount: widget.artist.images.length + 1,
-                        itemBuilder: (context, index) {
-                          if (index == widget.artist.images.length) {
-                            return AddImageButton(onPressed: () async {
-                              final result = await FilePicker.platform.pickFiles(type: FileType.custom, allowMultiple: false, allowedExtensions: [
-                                "webp", "jpg", "jpeg", "png", "gif", "bmp", "tiff", "tif", "svg",
-                                "ico", "heic", "heif", "jfif", "pjpeg", "pjp", "avif",
-                                "raw", "dng", "cr2", "nef", "arw", "rw2", "orf", "sr2", "raf", "pef"
-                              ]);
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: PageView.builder(
+                                controller: pageController,
+                                itemCount: artist.images.length + 1,
+                                itemBuilder: (context, index) {
+                                  if (index == artist.images.length) {
+                                    return AddImageButton(onPressed: () async {
+                                      final result =
+                                          await FilePicker.platform.pickFiles(type: FileType.custom, allowMultiple: false, allowedExtensions: [
+                                        "webp",
+                                        "jpg",
+                                        "jpeg",
+                                        "png",
+                                        "gif",
+                                        "bmp",
+                                        "tiff",
+                                        "tif",
+                                        "svg",
+                                        "ico",
+                                        "heic",
+                                        "heif",
+                                        "jfif",
+                                        "pjpeg",
+                                        "pjp",
+                                        "avif",
+                                        "raw",
+                                        "dng",
+                                        "cr2",
+                                        "nef",
+                                        "arw",
+                                        "rw2",
+                                        "orf",
+                                        "sr2",
+                                        "raf",
+                                        "pef"
+                                      ]);
 
-                              if (result != null) {
-                                for(var file in result.files) {
-                                  final imageId = generatedArtistImageId(widget.artist);
-                                  selectedFiles[imageId] = File(file.xFile.path);
-                                }
-                              }
-                            });
-                          }
+                                      if (result != null) {
+                                        for (var file in result.files) {
+                                          final imageId = generatedArtistImageId(artist);
+                                          selectedFiles[imageId] = File(file.xFile.path);
+                                        }
+                                      }
+                                    });
+                                  }
 
-                          final imageData = widget.artist.images[index - 1];
-                          final imageId = imageData["id"];
+                                  final imageData = artist.images[index];
+                                  final imageId = imageData["id"];
+                                  final filename = imageData["filename"];
 
-                          return GestureDetector(
-                            onLongPress: () {
-                              showConfirmationDialog("@dialog_title_remove_artist_picture", () async {
-                                // setState(() {
-                                //   selectedFiles!.removeAt(i);
-                                //   i--;
-                                // });
-                              });
-                            },
-                            child: Center(
-                              child: SizedBox(
-                                width: imageSize,
-                                height: imageSize,
-                                child: ClipRRect(
-                                    borderRadius: borderRadius,
-                                    child: AbsoluteArtistProfileImage(filePath: selectedFiles[imageId]?.path ?? artistImagePath(widget.artist.id, imageData["filename"]))),
-                              ),
-                            ),
-                          );
-                        }
+                                  return GestureDetector(
+                                    onLongPress: () {
+                                      showConfirmationDialog("@dialog_title_remove_artist_picture", () async {
+                                        final file = File(albumCoverPath(artist.id, filename));
+                                        await file.delete();
+                                        setState(() {
+                                          artist.images.removeWhere((element) => element["id"] == imageId);
+                                        });
+                                      });
+                                    },
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: imageSize,
+                                        height: imageSize,
+                                        child: ClipRRect(
+                                            borderRadius: borderRadius,
+                                            child: AbsoluteArtistProfileImage(
+                                                filePath: selectedFiles[imageId]?.path ?? artistImagePath(artist.id, imageData["filename"]))),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                          ),
+                          SmoothPageIndicator(
+                              controller: pageController,
+                              count: artist.images.length + 1,
+                              effect: ColorTransitionEffect(activeDotColor: Theme.of(context).highlightColor),
+                              onDotClicked: (index) {
+                                pageController.animateToPage(index, curve: Curves.easeOutQuint, duration: const Duration(milliseconds: 750));
+                              })
+                        ],
                       ),
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: MusicDataInput(data: widget.artist.name),
+                    padding: padding,
+                    child: MusicDataInput(data: artist.name),
+                  ),
+                  ArtistInput(
+                    //TODO: implement role with other component
+                    artists: artist.members.map((e) => ref.read(artistsProvider).get(e.id)).toList(),
+                    //TODO: localize
+                    label: "Members: ",
+                    onArtistSelected: (artistId) {
+                      setState(() {
+                        artist.members.add(Member(id: artistId));
+                      });
+                    },
+                    onRemove: () {
+                      if(artist.members.isNotEmpty) {
+                        setState(() {
+                          artist.members.removeLast();
+                        });
+                      }
+                    },
+                  ),
+                  Padding(
+                    padding: padding,
+                    child: EditMusicDate(
+                        //TODO: localize
+                        label: "Debut: ",
+                        date: artist.debut,
+                        onUpdate: (date) {
+                          setState(() {
+                            artist.debut = date;
+                          });
+                        }),
                   ),
                 ],
               ),
@@ -119,19 +197,19 @@ class _EditArtistDialogState extends State<EditArtistDialog> {
                 IconButton(
                   icon: Icon(Icons.check),
                   onPressed: () async {
-                    if(widget.artist.id.isEmpty) {
-                      widget.artist.id = await generatedArtistId();
+                    if (artist.id.isEmpty) {
+                      artist.id = await generatedArtistId();
                     }
                     for (var coverId in selectedFiles.keys) {
                       final selectedFile = selectedFiles[coverId]!;
                       final fileExtension = PathUtils.extension(selectedFile.path);
-                      final file = File(artistImagePath(widget.artist.id, "$coverId.${fileExtension}"));
+                      final file = File(artistImagePath(artist.id, "$coverId.${fileExtension}"));
                       await file.writeAsBytes(await selectedFile.readAsBytes());
                     }
-                    widget.artist.save();
-                    widget.ref.read(artistsProvider.notifier).insertArtist(widget.artist);
-                    widget.ref.read(playlistsProvider.notifier).insertItem("!ARTISTS", widget.artist.id);
-                    if(context.mounted) {
+                    artist.save();
+                    widget.ref.read(artistsProvider.notifier).insertArtist(artist);
+                    widget.ref.read(playlistsProvider.notifier).insertItem("!ARTISTS", artist.id);
+                    if (context.mounted) {
                       Navigator.pop(context);
                     }
                   },

@@ -118,6 +118,8 @@ class Member {
   String id;
   String? role;
 
+  Member({required this.id, this.role});
+
   Member.fromMap(Map<String, dynamic> map) : id = map["id"], role = map["role"];
 
   Map<String, dynamic> toMap() {

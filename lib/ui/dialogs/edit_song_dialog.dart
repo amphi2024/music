@@ -3,24 +3,24 @@ import 'dart:io';
 import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
-import 'package:music/models/music/artist.dart';
 import 'package:music/models/music/song.dart';
 import 'package:music/models/music/song_file.dart';
 import 'package:music/providers/songs_provider.dart';
+import 'package:music/ui/components/edit_music_date.dart';
 import 'package:music/ui/components/edit_music_genre.dart';
 import 'package:music/ui/components/edit_song_files.dart';
 import 'package:music/ui/components/music_data_input.dart';
 import 'package:music/ui/dialogs/select_album_dialog.dart';
-import 'package:music/ui/dialogs/select_artist_dialog.dart';
 import 'package:music/utils/localized_title.dart';
 import 'package:music/utils/media_file_path.dart';
 
 import '../../providers/albums_provider.dart';
 import '../../providers/artists_provider.dart';
+import '../components/artist_input.dart';
 
 class EditSongDialog extends ConsumerStatefulWidget {
   final Song song;
+
   const EditSongDialog({super.key, required this.song});
 
   @override
@@ -28,10 +28,8 @@ class EditSongDialog extends ConsumerStatefulWidget {
 }
 
 class _EditSongInfoDialogState extends ConsumerState<EditSongDialog> {
-  late final trackNumberController =
-  TextEditingController(text: song.trackNumber.toString());
-  late final discNumberController =
-  TextEditingController(text: song.discNumber.toString());
+  late final trackNumberController = TextEditingController(text: song.trackNumber.toString());
+  late final discNumberController = TextEditingController(text: song.discNumber.toString());
   late Song song = widget.song;
   Map<String, SongFile> creatingFiles = {};
   Map<String, File> selectedFiles = {};
@@ -52,7 +50,8 @@ class _EditSongInfoDialogState extends ConsumerState<EditSongDialog> {
     final lyricists = ref.watch(artistsProvider).getAll(song.lyricistIds);
     final arrangers = ref.watch(artistsProvider).getAll(song.arrangerIds);
     final producers = ref.watch(artistsProvider).getAll(song.producerIds);
-    
+
+    //TODO: implement description
     return Dialog(
       child: SizedBox(
         width: MediaQuery.of(context).size.width > 400 ? 400 : 250,
@@ -66,8 +65,8 @@ class _EditSongInfoDialogState extends ConsumerState<EditSongDialog> {
                     padding: padding,
                     child: MusicDataInput(data: song.title),
                   ),
-                  _ArtistInput(
-                    label: "Artist: ",
+                  ArtistInput(
+                    label: AppLocalizations.of(context).get("@edit_info_label_artist"),
                     artists: artists,
                     onArtistSelected: (id) {
                       setState(() {
@@ -75,7 +74,7 @@ class _EditSongInfoDialogState extends ConsumerState<EditSongDialog> {
                       });
                     },
                     onRemove: () {
-                      if(song.artistIds.isNotEmpty) {
+                      if (song.artistIds.isNotEmpty) {
                         setState(() {
                           song.artistIds.removeLast();
                         });
@@ -86,22 +85,28 @@ class _EditSongInfoDialogState extends ConsumerState<EditSongDialog> {
                     padding: padding,
                     child: Row(
                       children: [
-                        Text("Album: "),
+                        Text(AppLocalizations.of(context).get("@edit_info_label_album")),
                         Flexible(child: Text(album.title.toLocalized(), maxLines: 10)),
-                        IconButton(onPressed: () {
-                          showDialog(context: context, builder: (context) {
-                            return SelectAlbumDialog(onSelected: (id) {
+                        IconButton(
+                            onPressed: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return SelectAlbumDialog(onSelected: (id) {
+                                      setState(() {
+                                        song.albumId = id;
+                                      });
+                                    });
+                                  });
+                            },
+                            icon: Icon(Icons.edit)),
+                        IconButton(
+                            onPressed: () {
                               setState(() {
-                                song.albumId = id;
+                                song.albumId = "";
                               });
-                            });
-                          });
-                        }, icon: Icon(Icons.edit)),
-                        IconButton(onPressed: () {
-                          setState(() {
-                            song.albumId = "";
-                          });
-                        }, icon: Icon(Icons.remove))
+                            },
+                            icon: Icon(Icons.remove))
                       ],
                     ),
                   ),
@@ -147,110 +152,103 @@ class _EditSongInfoDialogState extends ConsumerState<EditSongDialog> {
                   ),
                   Padding(
                     padding: padding,
-                    child: Row(
-                      children: [
-                        Visibility(
-                          visible: song.released != null || album.released != null,
-                          child: Flexible(child: Text("${AppLocalizations.of(context).get("@edit_info_label_released")} ${DateFormat.yMMMEd(Localizations
-                              .localeOf(context)
-                              .languageCode
-                              .toString()).format(song.released ?? album.released ?? DateTime.now())}")),
-                        ),
-                        IconButton(
-                            onPressed: () async {
-                              final now = DateTime.now();
-                              DateTime? result = await showDatePicker(context: context, firstDate: DateTime(1600), lastDate: DateTime(
-                                  now.year + 100
-                              ), initialDate: song.released,);
-
-                              if (result != null) {
-                                setState(() {
-                                  song.released = result;
-                                });
-                              }
-                            },
-                            icon: Icon(Icons.edit))
-                      ],
-                    ),
+                    child: EditMusicDate(
+                        date: song.released,
+                        onUpdate: (date) {
+                          setState(() {
+                            song.released = date;
+                          });
+                        }),
                   ),
                   Padding(
                     padding: padding,
-                    child: EditSongFiles(song: song, onFileSelected: (songFile, file) {
-                      setState(() {
-                        song.files.add(songFile);
-                        selectedFiles[songFile.id] = file;
-                        creatingFiles[songFile.id] = songFile;
-                      });
-                    }, onRemoveFile: (id) {
-                     setState(() {
-                       song.files.removeWhere((element) => element.id == id);
-                     });
-                    }, onUpdateFile: (songFile) {
-                      final index = song.files.indexWhere((file) => file.id == songFile.id);
-                      if(index >= 0) {
-                        setState(() {
-                          song.files[index] = songFile;
-                        });
-                      }
-                      else {
-                       setState(() {
-                         song.files.add(songFile);
-                       });
-                      }
-                    }),
+                    child: EditSongFiles(
+                        song: song,
+                        onFileSelected: (songFile, file) {
+                          setState(() {
+                            song.files.add(songFile);
+                            selectedFiles[songFile.id] = file;
+                            creatingFiles[songFile.id] = songFile;
+                          });
+                        },
+                        onRemoveFile: (id) {
+                          setState(() {
+                            song.files.removeWhere((element) => element.id == id);
+                          });
+                        },
+                        onUpdateFile: (songFile) {
+                          final index = song.files.indexWhere((file) => file.id == songFile.id);
+                          if (index >= 0) {
+                            setState(() {
+                              song.files[index] = songFile;
+                            });
+                          } else {
+                            setState(() {
+                              song.files.add(songFile);
+                            });
+                          }
+                        }),
                   ),
-                  _ArtistInput(
-                      label: "Composer: ",
-                      artists: composers, onArtistSelected: (id) {
-                    setState(() {
-                      song.composerIds.add(id);
-                    });
-                  }, onRemove: () {
-                    if(song.composerIds.isNotEmpty) {
-                      setState(() {
-                        song.composerIds.removeLast();
-                      });
-                    }
-                  }),
-                  _ArtistInput(
-                      label: "lyricist: ",
-                      artists: lyricists, onArtistSelected: (id) {
-                    setState(() {
-                      song.lyricistIds.add(id);
-                    });
-                  }, onRemove: () {
-                    if(song.lyricistIds.isNotEmpty) {
-                      setState(() {
-                        song.lyricistIds.removeLast();
-                      });
-                    }
-                  }),
-                  _ArtistInput(
-                      label: "Arranger: ",
-                      artists: arrangers, onArtistSelected: (id) {
-                    setState(() {
-                      song.arrangerIds.add(id);
-                    });
-                  }, onRemove: () {
-                    if(song.arrangerIds.isNotEmpty) {
-                      setState(() {
-                        song.arrangerIds.removeLast();
-                      });
-                    }
-                  }),
-                  _ArtistInput(
-                      label: "Producer: ",
-                      artists: producers, onArtistSelected: (id) {
-                    setState(() {
-                      song.producerIds.add(id);
-                    });
-                  }, onRemove: () {
-                    if(song.producerIds.isNotEmpty) {
-                      setState(() {
-                        song.producerIds.removeLast();
-                      });
-                    }
-                  })
+                  ArtistInput(
+                      label: AppLocalizations.of(context).get("@edit_info_label_composer"),
+                      artists: composers,
+                      onArtistSelected: (id) {
+                        setState(() {
+                          song.composerIds.add(id);
+                        });
+                      },
+                      onRemove: () {
+                        if (song.composerIds.isNotEmpty) {
+                          setState(() {
+                            song.composerIds.removeLast();
+                          });
+                        }
+                      }),
+                  ArtistInput(
+                      label: AppLocalizations.of(context).get("@edit_info_label_lyricist"),
+                      artists: lyricists,
+                      onArtistSelected: (id) {
+                        setState(() {
+                          song.lyricistIds.add(id);
+                        });
+                      },
+                      onRemove: () {
+                        if (song.lyricistIds.isNotEmpty) {
+                          setState(() {
+                            song.lyricistIds.removeLast();
+                          });
+                        }
+                      }),
+                  ArtistInput(
+                      label: AppLocalizations.of(context).get("@edit_info_label_arranger"),
+                      artists: arrangers,
+                      onArtistSelected: (id) {
+                        setState(() {
+                          song.arrangerIds.add(id);
+                        });
+                      },
+                      onRemove: () {
+                        if (song.arrangerIds.isNotEmpty) {
+                          setState(() {
+                            song.arrangerIds.removeLast();
+                          });
+                        }
+                      }),
+                  ArtistInput(
+                      label: AppLocalizations.of(context).get("@edit_info_label_producer"),
+                      artists: producers,
+                      onArtistSelected: (id) {
+                        setState(() {
+                          song.producerIds.add(id);
+                        });
+                      },
+                      onRemove: () {
+                        if (song.producerIds.isNotEmpty) {
+                          setState(() {
+                            song.producerIds.removeLast();
+                          });
+                        }
+                      })
                 ],
               ),
             ),
@@ -273,7 +271,7 @@ class _EditSongInfoDialogState extends ConsumerState<EditSongDialog> {
                     song.modified = DateTime.now();
                     await song.save();
                     ref.read(songsProvider.notifier).insertSong(song);
-                    if(context.mounted) {
+                    if (context.mounted) {
                       Navigator.pop(context);
                     }
                   },
@@ -282,34 +280,6 @@ class _EditSongInfoDialogState extends ConsumerState<EditSongDialog> {
             )
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _ArtistInput extends StatelessWidget {
-
-  final String label;
-  final List<Artist> artists;
-  final void Function(String) onArtistSelected;
-  final void Function() onRemove;
-  const _ArtistInput({required this.artists, required this.onArtistSelected, required this.onRemove, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 4, bottom: 4, left: 15, right: 15),
-      child: Row(
-        children: [
-          Text(label),
-          Flexible(child: Text(artists.localizedName(), maxLines: 10)),
-          IconButton(onPressed: () {
-            showDialog(context: context, builder: (context) {
-              return SelectArtistDialog(onSelected: onArtistSelected);
-            });
-          }, icon: Icon(Icons.add_circle_outline)),
-          IconButton(onPressed: onRemove, icon: Icon(Icons.remove))
-        ],
       ),
     );
   }
