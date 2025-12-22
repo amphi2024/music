@@ -139,10 +139,14 @@ class _NowPlayingPanelState extends ConsumerState<NowPlayingPanel> with TickerPr
                             child: Text(
                               song.title.toLocalized(),
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),
+                              maxLines: 3,
+                              textAlign: TextAlign.center
                             ),
                           ),
                           Text(
                             artists.map((e) => e.name.toLocalized()).join(),
+                              maxLines: 3,
+                              textAlign: TextAlign.center
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
