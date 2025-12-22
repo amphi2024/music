@@ -11,8 +11,6 @@ import 'package:music/providers/playlists_provider.dart';
 import 'package:music/providers/providers.dart';
 import 'package:music/ui/components/add_item_button.dart';
 
-import '../dialogs/settings_dialog.dart';
-import 'account/account_button.dart';
 
 class FragmentTitle extends ConsumerWidget {
   final String title;
@@ -46,51 +44,42 @@ class FragmentTitle extends ConsumerWidget {
     return Container(
       height: height,
       decoration: BoxDecoration(color: themeData
-          .cardColor
+          .scaffoldBackgroundColor
           .withAlpha(125)),
       child: Padding(
         padding: padding,
         child: Stack(
           children: [
-            // AnimatedOpacity(
-            //   opacity: fragmentTitleShowing ? 1 : 0,
-            //   curve: Curves.easeOutQuint,
-            //   duration: const Duration(milliseconds: 750),
-            //   child: AnimatedAlign(
-            //     alignment: fragmentTitleMinimized ? Alignment.center : Alignment.centerLeft,
-            //     curve: Curves.easeOutQuint,
-            //     duration: const Duration(milliseconds: 750),
-            //     child: selectedSongs == null
-            //         ? AnimatedScale(
-            //         scale: fragmentTitleMinimized ? scaleValue : 1,
-            //         curve: Curves.easeOutQuint,
-            //         duration: const Duration(milliseconds: 750),
-            //         child: Text(title, style: Theme
-            //             .of(context)
-            //             .textTheme
-            //             .headlineMedium))
-            //         : IconButton(
-            //         onPressed: () {
-            //           ref.read(selectedItemsProvider.notifier).endSelection();
-            //         },
-            //         icon: Icon(Icons.check)),
-            //   ),
-            // ),
+            AnimatedOpacity(
+              opacity: fragmentTitleShowing ? 1 : 0,
+              curve: Curves.easeOutQuint,
+              duration: const Duration(milliseconds: 750),
+              child: AnimatedAlign(
+                alignment: fragmentTitleMinimized ? Alignment.center : Alignment.centerLeft,
+                curve: Curves.easeOutQuint,
+                duration: const Duration(milliseconds: 750),
+                child: selectedSongs == null
+                    ? AnimatedScale(
+                    scale: fragmentTitleMinimized ? scaleValue : 1,
+                    curve: Curves.easeOutQuint,
+                    duration: const Duration(milliseconds: 750),
+                    child: Text(title, style: Theme
+                        .of(context)
+                        .textTheme
+                        .headlineMedium))
+                    : IconButton(
+                    onPressed: () {
+                      ref.read(selectedItemsProvider.notifier).endSelection();
+                    },
+                    icon: Icon(Icons.check)),
+              ),
+            ),
             Align(
               alignment: Alignment.centerRight,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  // Visibility(visible: App.isDesktop() || App.isWideScreen(context), child: AccountButton()),
                   Visibility(visible: App.isDesktop() || App.isWideScreen(context), child: AddItemButton()),
-                  // Visibility(
-                  //   visible: App.isDesktop() || App.isWideScreen(context),
-                  //   child: IconButton(
-                  //       onPressed: () {
-                  //         showDialog(context: context, builder: (context) => SettingsDialog());
-                  //       },
-                  //       icon: Icon(Icons.settings)),
-                  // ),
                   PopupMenuButton(
                       itemBuilder: (context) {
                         final sortOption = appCacheData.sortOption(ref.watch(showingPlaylistIdProvider));
