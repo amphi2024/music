@@ -82,7 +82,6 @@ class MyApp extends ConsumerStatefulWidget {
 class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
 
   Timer? timer;
-  String get localeCode => appSettings.localeCode ?? "default";
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -129,7 +128,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
 
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (Platform.isWindows || Platform.isLinux) {
+      if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
         timer = Timer.periodic(Duration(milliseconds: 500), (timer) async {
           final position = await playerService.getPlaybackPosition();
           if (ref.watch(isPlayingProvider)) {
