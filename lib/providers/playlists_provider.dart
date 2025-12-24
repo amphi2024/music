@@ -27,24 +27,6 @@ class PlaylistsNotifier extends Notifier<PlaylistsState> {
 
   //TODO: sync artist albums or album songs when applying updates
 
-  Future<void> preloadGenreSongs(Map<String, dynamic> genre) async {
-    final genreName = genre["default"]!;
-    final genrePlaylist = Playlist(id: "!GENRE,$genreName");
-    ref.read(songsProvider).forEach((id, song) {
-      for (final genre in song.genres) {
-        if (genre.containsValue(genreName)) {
-          genrePlaylist.songs.add(song.id);
-        }
-      }
-    });
-    genrePlaylist.sort(ref);
-    state.playlists[genrePlaylist.id] = genrePlaylist;
-  }
-
-  Future<void> releaseGenreSongs() async {
-    state.playlists.removeWhere((id, playlist) => id.startsWith("!GENRE,"));
-  }
-
   static Future<PlaylistsState> initialized({required Map<String, Song> songs, required Map<String, Album> albums, required Map<String, Artist> artists}) async {
     final Map<String, Playlist> playlists = {};
     final List<String> idList = [];
@@ -77,6 +59,9 @@ class PlaylistsNotifier extends Notifier<PlaylistsState> {
       else {
         playlists.putIfAbsent("!ALBUM,${song.albumId}", () => Playlist(id: "!ALBUM,${song.albumId}")).songs.add(song.id);
         songsPlaylist.songs.add(id);
+        for(var genre in song.genres) {
+          playlists.putIfAbsent("!GENRE,${genre["default"]}", () => Playlist(id: "!GENRE,${genre["default"]}")).songs.add(song.id);
+        }
       }
     });
 
@@ -109,10 +94,14 @@ class PlaylistsNotifier extends Notifier<PlaylistsState> {
     });
 
     playlists["!ALBUMS"] = albumsPlaylist;
-    songsPlaylist.songs.sortSongsWithMap(sortOption: appCacheData.sortOption("!SONGS"), songs: songs, albums: albums, artists: artists);
     artistsPlaylist.songs.sortArtists(appCacheData.sortOption("!ARTISTS"), artists);
     albumsPlaylist.songs.sortAlbums(appCacheData.sortOption("!ALBUMS"), albums: albums, artists: artists);
-    archivePlaylist.songs.sortSongsWithMap(sortOption: appCacheData.sortOption("!ARCHIVE"), songs: songs, albums: albums, artists: artists);
+    playlists.forEach((playlistId, playlist) {
+      if(playlistId.startsWith("!ARTIST") || playlistId.startsWith("!ALBUM")) {
+        return;
+      }
+      playlist.songs.sortSongsWithMap(sortOption: appCacheData.sortOption(playlistId), songs: songs, albums: albums, artists: artists);
+    });
     trash.sortWithMap(songs: songs, albums: albums, artists: artists);
 
     return PlaylistsState(playlists, idList, trash);
