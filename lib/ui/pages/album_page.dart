@@ -40,7 +40,7 @@ class AlbumPage extends ConsumerWidget {
             flexibleSpace: FlexibleSpaceBar(
               title: GestureDetector(
                 onLongPress: () {
-                  showDialog(context: context, builder: (context) => EditAlbumDialog(album: album, ref: ref));
+                  showDialog(context: context, builder: (context) => EditAlbumDialog(album: Album.fromMap(album.toSqlInsertMap()), ref: ref));
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(5.0),
