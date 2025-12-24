@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:music/models/app_settings.dart';
 
@@ -17,6 +19,6 @@ extension LocalizedTitle on Map<String, dynamic> {
   }
 
   String toLocalized() {
-    return byLocaleCode(appSettings.localeCode ?? "default");
+    return byLocaleCode(appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode);
   }
 }

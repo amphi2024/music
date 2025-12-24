@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,7 @@ class Lyrics {
   }
 
   List<LyricLine> getLocalizedLines() {
-    return data[appSettings.localeCode ?? "default"] ?? [];
+    return data[appSettings.localeCode ?? PlatformDispatcher.instance.locale.languageCode] ?? data["default"] ?? [];
   }
 
   Map<String, dynamic> toMap() {
