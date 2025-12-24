@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_kit/media_kit.dart' show Player, Media;
 import 'package:music/channels/app_method_channel.dart';
 import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/app_cache.dart';
@@ -16,136 +17,217 @@ import '../models/app_storage.dart';
 import '../models/music/song.dart';
 import '../providers/playing_state_provider.dart';
 
-Future<void> startPlay({required Song song, required String playlistId, bool? shuffle, bool playNow = true, required WidgetRef ref}) async {
-  if(song.id.isEmpty) {
-    return;
+final playerService = PlayerService.getInstance();
+
+class PlayerService {
+  static final _instance = PlayerService();
+
+  static PlayerService getInstance() => _instance;
+
+  Player? player = Platform.isWindows || Platform.isMacOS || Platform.isLinux ? Player() : null;
+
+  Future<void> startPlay({required Song song, required String playlistId, bool? shuffle, bool playNow = true, required WidgetRef ref}) async {
+    if(song.id.isEmpty) {
+      return;
+    }
+    appCacheData.lastPlayedPlaylistId = playlistId;
+    appCacheData.lastPlayedSongId = song.id;
+    appCacheData.save();
+
+    await setMediaSource(song: song, playNow: playNow, ref: ref);
+
+    syncPlaylistState(ref);
+
+    ref.read(playingSongsProvider.notifier).notifyPlayStarted(song: song, playlistId: playlistId, shuffle: shuffle);
+    ref.read(isPlayingProvider.notifier).set(playNow);
   }
-  appCacheData.lastPlayedPlaylistId = playlistId;
-  appCacheData.lastPlayedSongId = song.id;
-  appCacheData.save();
 
-  await setMediaSource(song: song, playNow: playNow, ref: ref);
-
-  syncPlaylistState(ref);
-
-  ref.read(playingSongsProvider.notifier).notifyPlayStarted(song: song, playlistId: playlistId, shuffle: shuffle);
-  ref.read(isPlayingProvider.notifier).set(playNow);
-}
-
-Future<void> syncMediaSourceToNative(WidgetRef ref) async {
-  await appMethodChannel.invokeMethod(
-      "sync_media_source_to_native", {"index": ref.read(playingSongsProvider).playingSongIndex, "is_playing": ref.read(isPlayingProvider)});
-}
-
-Future<void> playNext(WidgetRef ref) async {
-  ref.read(playingSongsProvider.notifier).updateToNextSong();
-  final song = playingSong(ref);
-  appCacheData.lastPlayedSongId = song.id;
-  appCacheData.save();
-  
-  setMediaSource(song: playingSong(ref), ref: ref, playNow: ref.read(isPlayingProvider));
-
-  if (Platform.isAndroid || Platform.isIOS) {
-    await syncMediaSourceToNative(ref);
+  Future<void> syncMediaSourceToNative(WidgetRef ref) async {
+    await appMethodChannel.invokeMethod(
+        "sync_media_source_to_native", {"index": ref.read(playingSongsProvider).playingSongIndex, "is_playing": ref.read(isPlayingProvider)});
   }
-}
 
-void togglePlayMode(WidgetRef ref) {
-  var playMode = ref.watch(playModeProvider);
-  playMode++;
-  if (playMode > playOnce) {
-    playMode = 0;
+  Future<void> resume() async {
+    if(Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+      await player!.playOrPause();
+    }
+    else {
+      await appMethodChannel.resumeMusic();
+    }
   }
-  if (Platform.isAndroid || Platform.isIOS) {
+
+  Future<void> pause() async {
+    if(Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+      await player!.pause();
+    }
+    else {
+      await appMethodChannel.pauseMusic();
+    }
+  }
+
+  Future<bool> isPlaying() async {
+    if(Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+      return player!.state.playing;
+    }
+    else {
+      return appMethodChannel.isMusicPlaying();
+    }
+  }
+
+  Future<void> setVolume(double volume) async {
+    if(Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+      await player!.setVolume(volume);
+    }
+    else {
+      appMethodChannel.setVolume(volume);
+    }
+  }
+
+  Future<void> applyPlaybackPosition(int position) async {
+    if(Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+      await player!.seek(Duration(milliseconds: position));
+    }
+    else {
+      await appMethodChannel.applyPlaybackPosition(position);
+    }
+  }
+
+  Future<int> getMusicDuration() async {
+    if(Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+      return player!.state.duration.inMilliseconds;
+    }
+    else {
+      return appMethodChannel.getMusicDuration();
+    }
+  }
+
+  Future<int> getPlaybackPosition() async {
+    if(Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+      return player!.state.position.inMilliseconds;
+    }
+    else {
+      return appMethodChannel.getPlaybackPosition();
+    }
+  }
+
+  Future<void> playNext(WidgetRef ref) async {
+    ref.read(playingSongsProvider.notifier).updateToNextSong();
+    final song = playingSong(ref);
+    appCacheData.lastPlayedSongId = song.id;
+    appCacheData.save();
+
+    setMediaSource(song: playingSong(ref), ref: ref, playNow: ref.read(isPlayingProvider));
+
+    if (Platform.isAndroid || Platform.isIOS) {
+      await syncMediaSourceToNative(ref);
+    }
+  }
+
+  void togglePlayMode(WidgetRef ref) {
+    var playMode = ref.watch(playModeProvider);
+    playMode++;
+    if (playMode > playOnce) {
+      playMode = 0;
+    }
+    if (Platform.isAndroid || Platform.isIOS) {
+      syncPlaylistState(ref);
+    }
+    ref.read(playModeProvider.notifier).set(playMode);
+    appCacheData.playMode = playMode;
+    appCacheData.save();
+  }
+
+  void toggleShuffle(WidgetRef ref) {
+    final shuffled = ref.watch(playingSongsProvider).shuffled;
+    if (shuffled) {
+      appCacheData.shuffled = false;
+    } else {
+      appCacheData.shuffled = true;
+    }
+    ref.read(playingSongsProvider.notifier).setShuffled(appCacheData.shuffled);
+    appCacheData.save();
+
     syncPlaylistState(ref);
   }
-  ref.read(playModeProvider.notifier).set(playMode);
-  appCacheData.playMode = playMode;
-  appCacheData.save();
-}
 
-void toggleShuffle(WidgetRef ref) {
-  final shuffled = ref.watch(playingSongsProvider).shuffled;
-  if (shuffled) {
-    appCacheData.shuffled = false;
-  } else {
-    appCacheData.shuffled = true;
+  Future<void> playPrevious(WidgetRef ref) async {
+    ref.read(playingSongsProvider.notifier).updateToPreviousSong();
+    final song = playingSong(ref);
+    appCacheData.lastPlayedSongId = song.id;
+    appCacheData.save();
+
+    setMediaSource(song: playingSong(ref), ref: ref, playNow: ref.read(isPlayingProvider));
+
+    if (Platform.isAndroid || Platform.isIOS) {
+      await syncMediaSourceToNative(ref);
+    }
   }
-  ref.read(playingSongsProvider.notifier).setShuffled(appCacheData.shuffled);
-  appCacheData.save();
 
-  syncPlaylistState(ref);
-}
-
-Future<void> playPrevious(WidgetRef ref) async {
-  ref.read(playingSongsProvider.notifier).updateToPreviousSong();
-  final song = playingSong(ref);
-  appCacheData.lastPlayedSongId = song.id;
-  appCacheData.save();
-
-  setMediaSource(song: playingSong(ref), ref: ref, playNow: ref.read(isPlayingProvider));
-
-  if (Platform.isAndroid || Platform.isIOS) {
-    await syncMediaSourceToNative(ref);
+  Future<void> playAt(WidgetRef ref, int i) async {
+    if (await isPlaying()) {
+      await pause();
+    }
+    ref.read(playingSongsProvider.notifier).updateTo(i);
+    await setMediaSource(song: playingSong(ref), ref: ref, playNow: ref.read(isPlayingProvider));
+    if(Platform.isAndroid || Platform.isIOS) {
+      await syncMediaSourceToNative(ref);
+    }
   }
-}
 
-Future<void> playAt(WidgetRef ref, int i) async {
-  if (await appMethodChannel.isMusicPlaying()) {
-    await appMethodChannel.pauseMusic();
-  }
-  ref.read(playingSongsProvider.notifier).updateTo(i);
-  await setMediaSource(song: playingSong(ref), ref: ref, playNow: ref.read(isPlayingProvider));
-  if(Platform.isAndroid || Platform.isIOS) {
-    await syncMediaSourceToNative(ref);
-  }
-}
+  Future<void> syncPlaylistState(WidgetRef ref) async {
+    List<Map<String, dynamic>> list = [];
+    for (String songId in currentPlaylist(ref).songs) {
+      final song = ref.read(songsProvider).get(songId);
+      final artists = ref.read(artistsProvider).getAll(song.artistIds);
+      final album = ref.read(albumsProvider).get(song.albumId);
+      final songFile = song.playingFile();
+      list.add({
+        "media_file_path": songMediaFilePath(song.id, songFile.filename),
+        "url": "${appWebChannel.serverAddress}/music/songs/${songId}/files/${songFile.id}",
+        "title": song.title.toLocalized(),
+        "artist": artists.map((e) => e.name.toLocalized()).join(),
+        "album_cover_file_path": album.covers.firstOrNull,
+        "song_id": song.id
+      });
+    }
 
-Future<void> syncPlaylistState(WidgetRef ref) async {
-  List<Map<String, dynamic>> list = [];
-  for (String songId in currentPlaylist(ref).songs) {
-    final song = ref.read(songsProvider).get(songId);
+    if (Platform.isAndroid || Platform.isIOS) {
+      await appMethodChannel.invokeMethod(
+          "sync_playlist_state", {"list": list, "play_mode": ref.read(playModeProvider), "index": ref.read(playingSongsProvider).playingSongIndex});
+    }
+  }
+
+  Playlist currentPlaylist(WidgetRef ref) {
+    return ref.read(playlistsProvider).playlists.get(ref.read(playingSongsProvider).playlistId);
+  }
+
+  String playingSongId(WidgetRef ref) {
+    return ref.read(playingSongsProvider.notifier).playingSongId();
+  }
+
+  Song playingSong(WidgetRef ref) {
+    return ref.read(songsProvider).get(playingSongId(ref));
+  }
+
+  Future<void> setMediaSource({required Song song, required WidgetRef ref, String localeCode = "default", bool playNow = true}) async {
     final artists = ref.read(artistsProvider).getAll(song.artistIds);
     final album = ref.read(albumsProvider).get(song.albumId);
-    final songFile = song.playingFile();
-    list.add({
-      "media_file_path": songMediaFilePath(song.id, songFile.filename),
-      "url": "${appWebChannel.serverAddress}/music/songs/${songId}/files/${songFile.id}",
-      "title": song.title.toLocalized(),
-      "artist": artists.map((e) => e.name.toLocalized()).join(),
-      "album_cover_file_path": album.covers.firstOrNull,
-      "song_id": song.id
-    });
+    if(Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+      if(player!.state.playlist.medias.isNotEmpty) {
+        await player!.remove(0);
+      }
+      await player!.open(Media(songMediaFilePath(song.id, song.playingFile().filename)), play: playNow);
+    }
+    else {
+      await appMethodChannel.invokeMethod("set_media_source", {
+        "path": songMediaFilePath(song.id, song.playingFile().filename),
+        "play_now": playNow,
+        "title": song.title.byLocaleCode(localeCode),
+        "artist": artists.map((e) => e.name.toLocalized()).join(),
+        "album_cover": album.coverIndex != null ? albumCoverPath(album.id, album.covers[album.coverIndex!]["filename"]) : "",
+        "url": "${appWebChannel.serverAddress}/music/songs/${song.id}/files/${song.playingFile().filename}",
+        "token": appStorage.selectedUser.token
+      });
+    }
   }
-
-  if (Platform.isAndroid || Platform.isIOS) {
-    await appMethodChannel.invokeMethod(
-        "sync_playlist_state", {"list": list, "play_mode": ref.read(playModeProvider), "index": ref.read(playingSongsProvider).playingSongIndex});
-  }
-}
-
-Playlist currentPlaylist(WidgetRef ref) {
-  return ref.read(playlistsProvider).playlists.get(ref.read(playingSongsProvider).playlistId);
-}
-
-String playingSongId(WidgetRef ref) {
-  return ref.read(playingSongsProvider.notifier).playingSongId();
-}
-
-Song playingSong(WidgetRef ref) {
-  return ref.read(songsProvider).get(playingSongId(ref));
-}
-
-Future<void> setMediaSource({required Song song, required WidgetRef ref, String localeCode = "default", bool playNow = true}) async {
-  final artists = ref.read(artistsProvider).getAll(song.artistIds);
-  final album = ref.read(albumsProvider).get(song.albumId);
-  await appMethodChannel.invokeMethod("set_media_source", {
-    "path": songMediaFilePath(song.id, song.playingFile().filename),
-    "play_now": playNow,
-    "title": song.title.byLocaleCode(localeCode),
-    "artist": artists.map((e) => e.name.toLocalized()).join(),
-    "album_cover": album.coverIndex != null ? albumCoverPath(album.id, album.covers[album.coverIndex!]["filename"]) : "",
-    "url": "${appWebChannel.serverAddress}/music/songs/${song.id}/files/${song.playingFile().filename}",
-    "token": appStorage.selectedUser.token
-  });
 }

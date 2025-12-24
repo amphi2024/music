@@ -7,7 +7,6 @@ import 'package:music/providers/playing_state_provider.dart';
 import 'package:music/services/player_service.dart';
 import 'package:music/utils/localized_title.dart';
 
-import '../../../channels/app_method_channel.dart';
 import '../../../providers/songs_provider.dart';
 import '../../../utils/duration_converter.dart';
 
@@ -85,9 +84,9 @@ class _ConnectedDevicesState extends ConsumerState<ConnectedDevices> {
           return GestureDetector(
             onTap: () {
               if (song.id.isNotEmpty) {
-                startPlay(song: song, playlistId: device.playlistId, ref: ref, playNow: false);
-                appMethodChannel.applyPlaybackPosition(device.position);
-                appMethodChannel.resumeMusic();
+                playerService.startPlay(song: song, playlistId: device.playlistId, ref: ref, playNow: false);
+                playerService.applyPlaybackPosition(device.position);
+                playerService.resume();
                 ref.read(isPlayingProvider.notifier).set(true);
               }
             },

@@ -12,7 +12,6 @@ add_executable(${BINARY_NAME}
   "my_application.cc"
   "${FLUTTER_MANAGED_DIR}/generated_plugin_registrant.cc"
   "metadata_retriever.cc"
-  "audio_player.cc"
 )
 
 # Apply the standard set of build settings. This can be removed for applications

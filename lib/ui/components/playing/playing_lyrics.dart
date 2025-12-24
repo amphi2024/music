@@ -7,7 +7,7 @@ import 'package:music/providers/playing_state_provider.dart';
 import 'package:music/utils/lyrics_scroll.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-import '../../../channels/app_method_channel.dart';
+import '../../../services/player_service.dart';
 
 class PlayingLyrics extends ConsumerStatefulWidget {
 
@@ -97,7 +97,7 @@ class _PlayingLyricsState extends ConsumerState<PlayingLyrics> {
                       }
                       return SelectableText(
                         onTap: () {
-                          appMethodChannel.applyPlaybackPosition(line.startsAt);
+                          playerService.applyPlaybackPosition(line.startsAt);
                         },
                         lines[index].text,
                         minLines: 1,

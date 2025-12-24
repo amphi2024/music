@@ -5,7 +5,6 @@ import 'package:music/providers/playing_state_provider.dart';
 import 'package:music/utils/duration_converter.dart';
 import 'package:music/utils/localized_title.dart';
 
-import '../../../channels/app_method_channel.dart';
 import '../../../services/player_service.dart';
 
 class PlayControls extends ConsumerWidget {
@@ -56,7 +55,7 @@ class PlayControls extends ConsumerWidget {
                     ref.watch(positionProvider.notifier).set(d.toInt());
                   },
                   onChangeEnd: (d) {
-                    appMethodChannel.applyPlaybackPosition(d.toInt());
+                    playerService.applyPlaybackPosition(d.toInt());
                   },
                 ),
               ),
@@ -87,16 +86,16 @@ class PlayControls extends ConsumerWidget {
               IconButton(
                   icon: Icon(Icons.fast_rewind, size: 35),
                   onPressed: () {
-                    playPrevious(ref);
+                    playerService.playPrevious(ref);
                   }),
               IconButton(
                   icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow, size: 50),
                   onPressed: () {
                     if (isPlaying) {
-                      appMethodChannel.pauseMusic();
+                      playerService.pause();
                       ref.read(isPlayingProvider.notifier).set(false);
                     } else {
-                      appMethodChannel.resumeMusic();
+                      playerService.resume();
                       ref.read(isPlayingProvider.notifier).set(true);
                     }
                   }),
@@ -106,7 +105,7 @@ class PlayControls extends ConsumerWidget {
                     size: 35,
                   ),
                   onPressed: () {
-                    playNext(ref);
+                    playerService.playNext(ref);
                   })
             ],
           ),

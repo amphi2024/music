@@ -1,4 +1,3 @@
-#define MINIAUDIO_IMPLEMENTATION
 #include "flutter_window.h"
 
 #include <optional>
@@ -14,7 +13,6 @@
 
 #include <memory>
 #include "metadata_retriever.h"
-#include "audio_player.h"
 
 FlutterWindow::FlutterWindow(const flutter::DartProject &project)
     : project_(project) {}
@@ -58,76 +56,6 @@ bool FlutterWindow::OnCreate()
 
           result->Success(data);
         }
-        else if (call.method_name() == "pause_music")
-        {
-          AudioPlayer::GetInstance().Pause();
-          result->Success();
-        }
-        else if (call.method_name() == "resume_music")
-        {
-          AudioPlayer::GetInstance().Resume();
-          result->Success();
-        }
-        else if (call.method_name() == "stop_music")
-        {
-          AudioPlayer::GetInstance().Stop();
-          result->Success();
-        }
-        else if (call.method_name() == "set_media_source")
-        {
-          const auto *map_arg = std::get_if<std::map<flutter::EncodableValue, flutter::EncodableValue>>(call.arguments());
-          auto path_iter = map_arg->find(flutter::EncodableValue("path"));
-          std::string path = std::get<std::string>(path_iter->second);
-
-          auto url_iter = map_arg->find(flutter::EncodableValue("url"));
-          std::string url = std::get<std::string>(url_iter->second);
-
-          auto token_iter = map_arg->find(flutter::EncodableValue("token"));
-          std::string token = std::get<std::string>(token_iter->second);
-
-          auto playNow_iter = map_arg->find(flutter::EncodableValue("play_now"));
-          bool playNow = std::get<bool>(playNow_iter->second);
-
-          AudioPlayer::GetInstance().SetMediaSource(path, url, token, playNow);
-          result->Success();
-        }
-        else if (call.method_name() == "apply_playback_position")
-        {
-          const auto *map_arg = std::get_if<std::map<flutter::EncodableValue, flutter::EncodableValue>>(call.arguments());
-          auto position_iter = map_arg->find(flutter::EncodableValue("position"));
-          if (std::holds_alternative<std::int32_t>(position_iter->second))
-          {
-            auto value = std::get<std::int32_t>(position_iter->second);
-            AudioPlayer::GetInstance().SeekTo((long)value);
-          }
-          if (std::holds_alternative<std::int64_t>(position_iter->second))
-          {
-            auto value = std::get<std::int64_t>(position_iter->second);
-            AudioPlayer::GetInstance().SeekTo((long)value);
-          }
-          result->Success(true);
-        }
-        else if (call.method_name() == "set_volume")
-        {
-          const auto *map_arg = std::get_if<std::map<flutter::EncodableValue, flutter::EncodableValue>>(call.arguments());
-          auto iter = map_arg->find(flutter::EncodableValue("volume"));
-          auto value = std::get<double>(iter->second);
-          AudioPlayer::GetInstance().SetVolume(value);
-          result->Success(true);
-        }
-        else if (call.method_name() == "get_playback_position")
-        {
-          result->Success(flutter::EncodableValue(AudioPlayer::GetInstance().GetPlaybackPosition()));
-        }
-        else if (call.method_name() == "get_music_duration")
-        {
-          result->Success(flutter::EncodableValue(AudioPlayer::GetInstance().GetMusicDuration()));
-        }
-        else if (call.method_name() == "is_music_playing")
-        {
-          bool playing = AudioPlayer::GetInstance().IsPlaying();
-          result->Success(flutter::EncodableValue(playing));
-        }
         else
         {
           result->NotImplemented();
@@ -150,34 +78,6 @@ bool FlutterWindow::OnCreate()
 
   return true;
 }
-
-// void FlutterWindow::StartPositionTracking() {
-//   position_thread_ = std::make_unique<std::thread>([this]() {
-//       while (true) {
-//           if (AudioPlayer::GetInstance().IsPlaying()) {
-//             //methodChannelMutex.lock();
-//               int position = AudioPlayer::GetInstance().GetPlaybackPosition();
-//               std::cout << position << std::endl;
-
-//                std::map<flutter::EncodableValue, flutter::EncodableValue> map = {};
-//                map[flutter::EncodableValue("position")] = flutter::EncodableValue(position);
-//                //auto args = std::make_unique<flutter::EncodableValue>(map);
-//                flutter::EncodableValue data = flutter::EncodableValue(map);
-//                auto args1 = make_unique<flutter::EncodableValue>(data);
-//                methodChannel->InvokeMethod("on_playback_changed", 0);
-//           }
-
-//           std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-//       }
-//   });
-// }
-
-// void FlutterWindow::StopPositionTracking() {
-//   if (position_thread_ && position_thread_->joinable()) {
-//       position_thread_->join();
-//   }
-//   position_thread_.reset();
-// }
 
 void FlutterWindow::OnDestroy()
 {

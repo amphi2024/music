@@ -4,8 +4,8 @@ import 'package:music/providers/playing_state_provider.dart';
 import 'package:music/utils/lyrics_scroll.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-import '../../../channels/app_method_channel.dart';
 import '../../../models/music/lyrics.dart';
+import '../../../services/player_service.dart';
 
 class DesktopPlayingLyrics extends ConsumerStatefulWidget {
   const DesktopPlayingLyrics({super.key});
@@ -31,7 +31,6 @@ class _DesktopPlayingLyricsState extends ConsumerState<DesktopPlayingLyrics> {
     final lyrics = ref.watch(playingSongsProvider.notifier).playingSong().playingFile().lyrics;
     final List<LyricLine> lines = lyrics.getLinesByLocale(context);
     final position = ref.watch(positionProvider);
-
     ref.listen<int>(positionProvider, (prev, position) {
       scrollToCurrentLyric(ref: ref, scrollController: scrollController, position: position);
     });
@@ -45,15 +44,12 @@ class _DesktopPlayingLyricsState extends ConsumerState<DesktopPlayingLyrics> {
           itemCount: lines.length,
           padding: EdgeInsets.zero,
           itemBuilder: (context, index) {
-            var focused = false;
-            var line = lines[index];
-            if (line.startsAt <= position &&
-                line.endsAt >= position) {
-              focused = true;
-            }
+            final line = lines[index];
+            final focused = line.startsAt <= position &&
+                line.endsAt >= position;
             return GestureDetector(
               onTap: () {
-                appMethodChannel.applyPlaybackPosition(line.startsAt);
+                playerService.applyPlaybackPosition(line.startsAt);
               },
               child: Text(
                 lines[index].text,

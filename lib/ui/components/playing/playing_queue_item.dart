@@ -26,7 +26,7 @@ class PlayingQueueItem extends ConsumerWidget {
 
     return GestureDetector(
       onTap: () {
-        playAt(ref, index);
+        playerService.playAt(ref, index);
       },
       child: Padding(
         padding: const EdgeInsets.only(top: 5.0, bottom: 5),

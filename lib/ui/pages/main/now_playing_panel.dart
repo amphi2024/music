@@ -12,7 +12,6 @@ import 'package:music/ui/components/playing/desktop_playing_lyrics.dart';
 import 'package:music/ui/components/playing/playing_queue.dart';
 import 'package:music/utils/localized_title.dart';
 
-import '../../../channels/app_method_channel.dart';
 import '../../../models/app_cache.dart';
 import '../../../providers/playing_state_provider.dart';
 import '../../../services/player_service.dart';
@@ -67,7 +66,7 @@ class _NowPlayingPanelState extends ConsumerState<NowPlayingPanel> with TickerPr
 
   @override
   Widget build(BuildContext context) {
-    final song = playingSong(ref);
+    final song = playerService.playingSong(ref);
     final artists = ref.watch(artistsProvider).getAll(song.artistIds);
     final album = ref.watch(albumsProvider).get(song.albumId);
     final isPlaying = ref.watch(isPlayingProvider);
@@ -162,7 +161,7 @@ class _NowPlayingPanelState extends ConsumerState<NowPlayingPanel> with TickerPr
                                       ref.watch(positionProvider.notifier).set(d.toInt());
                                     },
                                     onChangeEnd: (d) {
-                                      appMethodChannel.applyPlaybackPosition(d.toInt());
+                                      playerService.applyPlaybackPosition(d.toInt());
                                     },
                                   ),
                                 ),
@@ -181,21 +180,21 @@ class _NowPlayingPanelState extends ConsumerState<NowPlayingPanel> with TickerPr
                                 IconButton(
                                     icon: ShuffleIcon(size: 20),
                                     onPressed: () {
-                                      toggleShuffle(ref);
+                                      playerService.toggleShuffle(ref);
                                     }),
                                 IconButton(
                                     icon: Icon(Icons.fast_rewind, size: 35),
                                     onPressed: () {
-                                      playPrevious(ref);
+                                      playerService.playPrevious(ref);
                                     }),
                                 IconButton(
                                     icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow, size: 50),
                                     onPressed: () {
                                       if (isPlaying) {
-                                        appMethodChannel.pauseMusic();
+                                        playerService.pause();
                                         ref.read(isPlayingProvider.notifier).set(false);
                                       } else {
-                                        appMethodChannel.resumeMusic();
+                                        playerService.resume();
                                         ref.read(isPlayingProvider.notifier).set(true);
                                       }
                                     }),
@@ -205,12 +204,12 @@ class _NowPlayingPanelState extends ConsumerState<NowPlayingPanel> with TickerPr
                                       size: 35,
                                     ),
                                     onPressed: () {
-                                      playNext(ref);
+                                      playerService.playNext(ref);
                                     }),
                                 IconButton(
                                     icon: RepeatIcon(size: 20),
                                     onPressed: () {
-                                      togglePlayMode(ref);
+                                      playerService.togglePlayMode(ref);
                                     })
                               ],
                             ),
@@ -259,10 +258,10 @@ class _NowPlayingPanelState extends ConsumerState<NowPlayingPanel> with TickerPr
                         width: 150,
                         child: Slider(
                           min: 0,
-                          max: 1,
+                          max: 200,
                           value: volume,
                           onChanged: (value) {
-                            appMethodChannel.setVolume(value);
+                            playerService.setVolume(value);
                             ref.read(volumeProvider.notifier).set(value);
                           },
                           onChangeEnd: (value) {

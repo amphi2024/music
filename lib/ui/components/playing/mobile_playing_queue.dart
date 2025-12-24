@@ -4,7 +4,6 @@ import 'package:music/providers/playing_state_provider.dart';
 import 'package:music/ui/components/icon/shuffle_icon.dart';
 import 'package:music/ui/components/playing/playing_queue.dart';
 
-import '../../../channels/app_method_channel.dart';
 import '../../../models/app_cache.dart';
 import '../../../services/player_service.dart';
 import '../icon/repeat_icon.dart';
@@ -78,7 +77,7 @@ class _MobilePlayingQueueState extends ConsumerState<MobilePlayingQueue> {
                                 onChanged: (value) {
                                   appCacheData.volume = value;
                                   appCacheData.save();
-                                  appMethodChannel.setVolume(value);
+                                  playerService.setVolume(value);
                                   ref.read(volumeProvider.notifier).set(value);
                                 }),
                           ),
@@ -87,7 +86,7 @@ class _MobilePlayingQueueState extends ConsumerState<MobilePlayingQueue> {
                           // toggleShuffle(ref);
                         }, icon: ShuffleIcon()),
                         IconButton(onPressed: () {
-                          togglePlayMode(ref);
+                          playerService.togglePlayMode(ref);
                         }, icon: RepeatIcon()),
                       ],
                     ),

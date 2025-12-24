@@ -5,7 +5,6 @@
 #ifdef GDK_WINDOWING_X11
 #include <gdk/gdkx.h>
 #include <iostream>
-#include "audio_player.h"
 #endif
 
 #include "flutter/generated_plugin_registrant.h"
@@ -63,65 +62,6 @@ static void music_method_call_handler(FlMethodChannel *channel,
     // }
 
     response = FL_METHOD_RESPONSE(fl_method_success_response_new(result));
-  }
-  else if (strcmp(method_name, "pause_music") == 0)
-  {
-    AudioPlayer::GetInstance().Pause();
-    response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_bool(true)));
-  }
-  else if (strcmp(method_name, "resume_music") == 0)
-  {
-    AudioPlayer::GetInstance().Resume();
-    response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_bool(true)));
-  }
-  else if (strcmp(method_name, "stop_music") == 0)
-  {
-    AudioPlayer::GetInstance().Stop();
-    response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_bool(true)));
-  }
-  else if (strcmp(method_name, "set_media_source") == 0)
-  {
-    FlValue *args = fl_method_call_get_args(method_call);
-
-    std::string path = get_string_arg(args, "path");
-    std::string url = get_string_arg(args, "url");
-    std::string token = get_string_arg(args, "token");
-    bool play_now = get_bool_arg(args, "play_now");
-
-    AudioPlayer::GetInstance().SetMediaSource(path, url, token, play_now);
-
-    response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_bool(true)));
-  }
-  else if (strcmp(method_name, "apply_playback_position") == 0)
-  {
-    FlValue *args = fl_method_call_get_args(method_call);
-    int position = get_int_arg(args, "position");
-    AudioPlayer::GetInstance().SeekTo(position);
-
-    response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_bool(true)));
-  }
-  else if (strcmp(method_name, "get_playback_position") == 0)
-  {
-    long position = AudioPlayer::GetInstance().GetPlaybackPosition();
-    response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_int(position)));
-  }
-  else if (strcmp(method_name, "get_music_duration") == 0)
-  {
-    long duration = AudioPlayer::GetInstance().GetMusicDuration();
-    response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_int(duration)));
-  }
-  else if (strcmp(method_name, "set_volume") == 0)
-  {
-    FlValue *args = fl_method_call_get_args(method_call);
-    double volume = get_double_arg(args, "volume");
-    AudioPlayer::GetInstance().SetVolume(volume);
-
-    response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_bool(true)));
-  }
-  else if (strcmp(method_name, "is_music_playing") == 0)
-  {
-    bool is_playing = AudioPlayer::GetInstance().IsPlaying();
-    response = FL_METHOD_RESPONSE(fl_method_success_response_new(fl_value_new_bool(is_playing)));
   }
   else
   {

@@ -34,7 +34,7 @@ class _PlayingBarState extends ConsumerState<PlayingBar> {
     final playingBarExpanded = ref.watch(playingBarExpandedProvider);
     final playingBarShowing = ref.watch(playingBarShowingProvider);
 
-    final song = ref.watch(songsProvider).get(playingSongId(ref));
+    final song = ref.watch(songsProvider).get(playerService.playingSongId(ref));
     final isPlaying = ref.watch(isPlayingProvider);
     final album = ref.watch(albumsProvider).get(song.albumId);
     final artists = ref.watch(artistsProvider).getAll(song.artistIds);
@@ -123,7 +123,7 @@ class _PlayingBarState extends ConsumerState<PlayingBar> {
                                 icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
                                 onPressed: () {
                                   if (isPlaying) {
-                                    appMethodChannel.pauseMusic();
+                                    playerService.pause();
                                     ref.read(isPlayingProvider.notifier).set(false);
                                   } else {
                                     appMethodChannel.resumeMusic();
