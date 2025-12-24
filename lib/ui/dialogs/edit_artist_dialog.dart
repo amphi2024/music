@@ -11,6 +11,7 @@ import 'package:music/ui/components/edit_music_date.dart';
 import 'package:music/ui/components/image/artist_profile_image.dart';
 import 'package:music/utils/generated_id.dart';
 import 'package:music/utils/media_file_path.dart';
+import 'package:music/utils/pick_images.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../providers/artists_provider.dart';
@@ -71,35 +72,7 @@ class _EditArtistDialogState extends ConsumerState<EditArtistDialog> {
                                 itemBuilder: (context, index) {
                                   if (index == artist.images.length) {
                                     return AddImageButton(onPressed: () async {
-                                      final result =
-                                          await FilePicker.platform.pickFiles(type: FileType.custom, allowMultiple: false, allowedExtensions: [
-                                        "webp",
-                                        "jpg",
-                                        "jpeg",
-                                        "png",
-                                        "gif",
-                                        "bmp",
-                                        "tiff",
-                                        "tif",
-                                        "svg",
-                                        "ico",
-                                        "heic",
-                                        "heif",
-                                        "jfif",
-                                        "pjpeg",
-                                        "pjp",
-                                        "avif",
-                                        "raw",
-                                        "dng",
-                                        "cr2",
-                                        "nef",
-                                        "arw",
-                                        "rw2",
-                                        "orf",
-                                        "sr2",
-                                        "raf",
-                                        "pef"
-                                      ]);
+                                      final result = await FilePicker.platform.pickImages();
 
                                       if (result != null) {
                                         for (var file in result.files) {
@@ -203,7 +176,11 @@ class _EditArtistDialogState extends ConsumerState<EditArtistDialog> {
                     for (var coverId in selectedFiles.keys) {
                       final selectedFile = selectedFiles[coverId]!;
                       final fileExtension = PathUtils.extension(selectedFile.path);
-                      final file = File(artistImagePath(artist.id, "$coverId.${fileExtension}"));
+                      final file = File(artistImagePath(artist.id, "$coverId.${fileExtension}".replaceAll("..", ".")));
+                      final parent = file.parent;
+                      if(!await parent.exists()) {
+                        await parent.create(recursive: true);
+                      }
                       await file.writeAsBytes(await selectedFile.readAsBytes());
                     }
                     artist.save();

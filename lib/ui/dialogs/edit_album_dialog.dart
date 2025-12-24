@@ -15,6 +15,7 @@ import 'package:music/ui/components/artist_input.dart';
 import 'package:music/ui/components/image/album_cover.dart';
 import 'package:music/utils/generated_id.dart';
 import 'package:music/utils/media_file_path.dart';
+import 'package:music/utils/pick_images.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../components/edit_music_date.dart';
@@ -75,40 +76,21 @@ class _EditAlbumDialogState extends State<EditAlbumDialog> {
                                 itemBuilder: (context, index) {
                                   if (index == album.covers.length) {
                                     return AddImageButton(onPressed: () async {
-                                      final result =
-                                          await FilePicker.platform.pickFiles(type: FileType.custom, allowMultiple: true, allowedExtensions: [
-                                        "webp",
-                                        "jpg",
-                                        "jpeg",
-                                        "png",
-                                        "gif",
-                                        "bmp",
-                                        "tiff",
-                                        "tif",
-                                        "svg",
-                                        "ico",
-                                        "heic",
-                                        "heif",
-                                        "jfif",
-                                        "pjpeg",
-                                        "pjp",
-                                        "avif",
-                                        "raw",
-                                        "dng",
-                                        "cr2",
-                                        "nef",
-                                        "arw",
-                                        "rw2",
-                                        "orf",
-                                        "sr2",
-                                        "raf",
-                                        "pef"
-                                      ]);
+                                      final result = await FilePicker.platform.pickImages();
 
                                       if (result != null) {
                                         for (var file in result.files) {
                                           final coverId = generatedAlbumCoverId(album);
-                                          selectedFiles[coverId] = File(file.xFile.path);
+                                          setState(() {
+                                            final filePath = file.xFile.path;
+                                            selectedFiles[coverId] = File(filePath);
+                                            final fileExtension = PathUtils.extension(filePath);
+                                            final filename = "${coverId}.${fileExtension}".replaceAll("..", ".");
+                                            album.covers.add({
+                                              "id": coverId,
+                                              "filename": filename
+                                            });
+                                          });
                                         }
                                       }
                                     });
@@ -206,7 +188,11 @@ class _EditAlbumDialogState extends State<EditAlbumDialog> {
                     for (var coverId in selectedFiles.keys) {
                       final selectedFile = selectedFiles[coverId]!;
                       final fileExtension = PathUtils.extension(selectedFile.path);
-                      final file = File(albumCoverPath(album.id, "$coverId.${fileExtension}"));
+                      final file = File(albumCoverPath(album.id, "$coverId.${fileExtension}".replaceAll("..", ".")));
+                      final parent = file.parent;
+                      if(!await parent.exists()) {
+                        await parent.create(recursive: true);
+                      }
                       await file.writeAsBytes(await selectedFile.readAsBytes());
                     }
                     album.save();
