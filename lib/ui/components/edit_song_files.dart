@@ -12,6 +12,7 @@ import 'package:music/models/music/song_file.dart';
 import 'package:music/ui/dialogs/edit_song_file_dialog.dart';
 import 'package:music/utils/generated_id.dart';
 import 'package:music/utils/media_file_path.dart';
+import 'package:music/utils/screen_size.dart';
 
 class EditSongFiles extends ConsumerStatefulWidget {
 
@@ -151,7 +152,7 @@ class _EditSongFilesState extends ConsumerState<EditSongFiles> {
                             Expanded(
                               child: Slider(
                                   min: 0,
-                                  max: 200,
+                                  max: isDesktop() ? 200 : 1,
                                   value: players[songFile.id]?.state.volume ?? 0, onChanged: (value) {
                                     setState(() {
                                       players[songFile.id]?.setVolume(value);
