@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/channels/app_web_channel.dart';
@@ -91,6 +92,12 @@ class Song {
       final file = File(songMediaFilePath(id, songFile.filename));
       await file.delete();
       songFile.availableOnOffline = false;
+    }
+  }
+
+  void setRandomFileIndex() {
+    if(files.length > 1) {
+      fileIndex = Random().nextInt(files.length);
     }
   }
 
