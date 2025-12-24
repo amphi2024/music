@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/music/song_file.dart';
+import 'package:music/models/transfer_state.dart';
+import 'package:music/providers/transfers_provider.dart';
 import 'package:music/utils/generated_id.dart';
 import 'package:music/utils/json_value_extractor.dart';
 import 'package:music/utils/media_file_path.dart';
@@ -13,44 +16,36 @@ import '../../database/database_helper.dart';
 class Song {
 
   String id;
-  Map<String, dynamic> title;
-  List<Map<String, dynamic>> genres;
-  List<String> artistIds;
+  Map<String, dynamic> title = {};
+  List<Map<String, dynamic>> genres = [];
+  List<String> artistIds = [];
   String albumId;
   DateTime created;
   DateTime modified;
   DateTime? deleted;
   DateTime? released;
-  List<String> composerIds;
-  List<String> lyricistIds;
-  List<String> arrangerIds;
-  List<String> producerIds;
+  List<String> composerIds = [];
+  List<String> lyricistIds = [];
+  List<String> arrangerIds = [];
+  List<String> producerIds = [];
   int? trackNumber;
   int? discNumber;
   bool archived;
   String? description;
-  List<SongFile> files;
+  List<SongFile> files = [];
   int fileIndex = 0;
 
   Song({
     required this.id,
-    this.title = const {},
-    this.genres = const [],
-    this.artistIds = const [],
     this.albumId = "",
     DateTime? created,
     DateTime? modified,
     this.deleted,
     this.released,
-    this.composerIds = const [],
-    this.lyricistIds = const [],
-    this.arrangerIds = const [],
-    this.producerIds = const [],
     this.trackNumber,
     this.discNumber,
     this.archived = false,
     this.description,
-    this.files = const [],
     this.fileIndex = 0,
   }) : created = created ?? DateTime.now(),
         modified = modified ?? DateTime.now();
@@ -99,14 +94,24 @@ class Song {
     }
   }
 
-  Future<void> save({bool upload = true}) async {
+  Future<void> save({bool upload = true, WidgetRef? ref}) async {
     if (id.isEmpty) {
       id = await generatedSongId();
     }
     final database = await databaseHelper.database;
     await database.insert("songs", toSqlInsertMap(), conflictAlgorithm: ConflictAlgorithm.replace);
     if(upload) {
-      appWebChannel.uploadSong(song: this);
+      appWebChannel.uploadSong(song: this, onProgress: (sent, total, fileId) {
+        if(ref == null) {
+          return;
+        }
+        ref.read(transfersNotifier.notifier).updateTransferProgress(TransferState(songId: id, fileId: fileId, transferredBytes: sent, totalBytes: total));
+      }, onFileUploadComplete: (fileId) {
+        if(ref == null) {
+          return;
+        }
+        ref.read(transfersNotifier.notifier).markTransferCompleted(songId: id, fileId: fileId);
+      });
     }
   }
 

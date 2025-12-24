@@ -11,9 +11,9 @@ import 'package:sqflite/sqflite.dart';
 
 class Artist {
   String id;
-  Map<String, dynamic> name;
-  List<Member> members;
-  List<Map<String, dynamic>> images;
+  Map<String, dynamic> name = {};
+  List<Member> members = [];
+  List<Map<String, dynamic>> images = [];
   DateTime created;
   DateTime modified;
   DateTime? deleted;
@@ -24,9 +24,6 @@ class Artist {
 
   Artist({
     required this.id,
-    this.name = const {},
-    this.members = const [],
-    this.images = const [],
     DateTime? created,
     DateTime? modified,
     this.deleted,

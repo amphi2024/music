@@ -11,10 +11,10 @@ import 'package:sqflite/sqflite.dart';
 
 class Album {
   String id;
-  Map<String, dynamic> title;
-  List<Map<String, dynamic>> genres;
-  List<String> artistIds;
-  List<Map<String, dynamic>> covers;
+  Map<String, dynamic> title = {};
+  List<Map<String, dynamic>> genres = [];
+  List<String> artistIds = [];
+  List<Map<String, dynamic>> covers = [];
   DateTime created;
   DateTime modified;
   DateTime? deleted;
@@ -25,10 +25,6 @@ class Album {
 
   Album(
       {required this.id,
-      this.title = const {},
-      this.genres = const [],
-      this.artistIds = const [],
-      this.covers = const [],
       DateTime? created,
       DateTime? modified,
       this.deleted,
