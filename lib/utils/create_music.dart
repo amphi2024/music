@@ -119,7 +119,7 @@ void createMusicFromFile(File file, WidgetRef ref) async {
   }
 
   final song = await createdSong(metadata: metadata, artist: artist, album: album, file: file);
-  song.save();
+  song.save(ref: ref);
 
   ref.read(songsProvider.notifier).insertSong(song);
   ref.read(playlistsProvider.notifier).insertItem("!SONGS", song.id);
@@ -143,7 +143,6 @@ Future<Song> createdSong({required Map<dynamic, dynamic> metadata, required File
     song.artistIds.add(artistId);
   }
   song.albumId = album?.id ?? "";
-  song.title["default"] = metadata["title"];
   var genreName = metadata["genre"];
   if (genreName is String && genreName.isNotEmpty) {
     song.genres.add({"default": genreName});
@@ -159,6 +158,13 @@ Future<Song> createdSong({required Map<dynamic, dynamic> metadata, required File
   lyrics.data.get("default").add(LyricLine(text: metadata["lyrics"] ?? ""));
   songFile.lyrics = lyrics;
   song.files.add(songFile);
+
+  final mediaFile = File(songMediaFilePath(id, songFile.filename));
+  final parent = mediaFile.parent;
+  if(!await parent.exists()) {
+    await parent.create(recursive: true);
+  }
+  await mediaFile.writeAsBytes(await file.readAsBytes());
 
   return song;
 }

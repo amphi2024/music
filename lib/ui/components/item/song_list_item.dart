@@ -37,12 +37,12 @@ class SongListItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final playing = playingSongId(ref) == song.id && ref.watch(playingSongsProvider).playlistId == playlistId;
+    final playing = playerService.playingSongId(ref) == song.id && ref.watch(playingSongsProvider).playlistId == playlistId;
     final selectedSongs = ref.watch(selectedItemsProvider);
     final album = ref.watch(albumsProvider).get(song.albumId);
     final artists = ref.watch(artistsProvider).getAll(song.artistIds);
     final selected = selectedSongs?.contains(song.id) == true;
-    final downloadingStates = ref.watch(transfersNotifier)[song.id];
+    final transferringState = ref.watch(transfersNotifier)[song.id];
 
     final widget = Material(
       color: selected ? Theme.of(context).highlightColor.withAlpha(150) : Colors.transparent,
@@ -74,7 +74,7 @@ class SongListItem extends ConsumerWidget {
             ref.read(selectedItemsProvider.notifier).endSelection();
           }
           else {
-            startPlay(song: song, playlistId: playlistId, ref: ref);
+            playerService.startPlay(song: song, playlistId: playlistId, ref: ref);
           }
         },
         child: Padding(
@@ -150,7 +150,7 @@ class SongListItem extends ConsumerWidget {
                           )
                       ),
                       Visibility(
-                          visible: !song.availableOnOffline() && downloadingStates == null,
+                          visible: !song.availableOnOffline() && transferringState == null,
                           child: IconButton(onPressed: () async {
                             for(var i = 0 ; i < song.files.length; i++) {
                               final songFile = song.files[i];
@@ -166,9 +166,9 @@ class SongListItem extends ConsumerWidget {
                             Icons.arrow_downward_outlined,
                             size: 13,
                           ))),
-                      if(downloadingStates != null) ... () {
+                      if(transferringState != null) ... () {
                         final List<Widget> children = [];
-                        downloadingStates.forEach((key, element) {
+                        transferringState.forEach((key, element) {
                           children.add(CircularPercentIndicator(
                               radius: 10,
                               lineWidth: 5,
@@ -253,7 +253,7 @@ class SongListItem extends ConsumerWidget {
                             PopupMenuItem(child: Text(AppLocalizations.of(context).get("@edit_song_info")), onTap: () {
                               showDialog(
                                   context: context, builder: (context) {
-                                return EditSongDialog(song: song.clone());
+                                return EditSongDialog(song: song.clone(), ref: ref);
                               });
                             }),
                             PopupMenuItem(child: Text(AppLocalizations.of(context).get("@move_to_archive")), onTap: () {

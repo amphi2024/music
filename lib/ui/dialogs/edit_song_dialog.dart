@@ -11,6 +11,7 @@ import 'package:music/ui/components/edit_music_genre.dart';
 import 'package:music/ui/components/edit_song_files.dart';
 import 'package:music/ui/components/music_data_input.dart';
 import 'package:music/ui/dialogs/select_album_dialog.dart';
+import 'package:music/utils/generated_id.dart';
 import 'package:music/utils/localized_title.dart';
 import 'package:music/utils/media_file_path.dart';
 
@@ -20,8 +21,8 @@ import '../components/artist_input.dart';
 
 class EditSongDialog extends ConsumerStatefulWidget {
   final Song song;
-
-  const EditSongDialog({super.key, required this.song});
+  final WidgetRef ref;
+  const EditSongDialog({super.key, required this.song, required this.ref});
 
   @override
   ConsumerState<EditSongDialog> createState() => _EditSongInfoDialogState();
@@ -264,12 +265,19 @@ class _EditSongInfoDialogState extends ConsumerState<EditSongDialog> {
                 IconButton(
                   icon: Icon(Icons.check_circle_outline),
                   onPressed: () async {
-                    creatingFiles.forEach((songFileId, songFile) async {
-                      final file = File(songMediaFilePath(song.id, songFile.filename));
+                    if(song.id.isEmpty) {
+                      song.id = await generatedSongId();
+                    }
+                    for(var songFileId in creatingFiles.keys) {
+                      final file = File(songMediaFilePath(song.id, creatingFiles[songFileId]!.filename));
+                      final parent = file.parent;
+                      if(!await parent.exists()) {
+                        await parent.create(recursive: true);
+                      }
                       await file.writeAsBytes(await selectedFiles[songFileId]!.readAsBytes());
-                    });
+                    }
                     song.modified = DateTime.now();
-                    await song.save();
+                    await song.save(ref: widget.ref);
                     ref.read(songsProvider.notifier).insertSong(song);
                     if (context.mounted) {
                       Navigator.pop(context);

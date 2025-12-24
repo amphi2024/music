@@ -183,7 +183,8 @@ class AppWebChannel extends AppWebChannelCore {
       {required Song song,
       void Function()? onSuccess,
       void Function(int?)? onFailed,
-      void Function(int sent, int total, String fileId)? onProgress}) async {
+      void Function(int sent, int total, String fileId)? onProgress,
+      void Function(String fileId)? onFileUploadComplete}) async {
     final updateEvent = UpdateEvent(action: "upload_song", value: song.id);
     await postJson(
         url: "$serverAddress/music/songs/${song.id}",
@@ -205,7 +206,10 @@ class AppWebChannel extends AppWebChannelCore {
                         filePath: filePath,
                         onProgress: (sent, total) {
                           onProgress?.call(sent, total, songFile.id);
-                        });
+                        },
+                    onSuccess: () {
+                      onFileUploadComplete?.call(songFile.id);
+                    });
                   }
                 }
               });
