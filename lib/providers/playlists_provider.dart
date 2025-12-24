@@ -103,6 +103,7 @@ class PlaylistsNotifier extends Notifier<PlaylistsState> {
       playlist.songs.sortSongsWithMap(sortOption: appCacheData.sortOption(playlistId), songs: songs, albums: albums, artists: artists);
     });
     trash.sortWithMap(songs: songs, albums: albums, artists: artists);
+    idList.sortPlaylistList(playlists);
 
     return PlaylistsState(playlists, idList, trash);
   }
