@@ -125,16 +125,16 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
       });
     }
 
-    appMethodChannel.setVolume(appCacheData.volume);
+    playerService.setVolume(appCacheData.volume);
 
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (Platform.isWindows || Platform.isLinux) {
         timer = Timer.periodic(Duration(milliseconds: 500), (timer) async {
-          final position = await appMethodChannel.getPlaybackPosition();
+          final position = await playerService.getPlaybackPosition();
           if (ref.watch(isPlayingProvider)) {
             await onPlaybackChanged(position);
-            if (position + 50 >= ref.watch(durationProvider)) {
+            if (position + 300 >= ref.watch(durationProvider)) {
               onPlaybackFinished();
             }
           }
@@ -154,7 +154,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
             await onPlaybackChanged(position);
             break;
           case "play_previous":
-            playPrevious(ref);
+            playerService.playPrevious(ref);
             break;
           case "play_next":
             onPlaybackFinished();
@@ -173,7 +173,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     final lastPlayedSongId = appCacheData.lastPlayedSongId;
 
     if (lastPlayedSongId.isNotEmpty) {
-      startPlay(ref: ref, playlistId: appCacheData.lastPlayedPlaylistId, playNow: false, song: ref.read(songsProvider).get(lastPlayedSongId));
+      playerService.startPlay(ref: ref, playlistId: appCacheData.lastPlayedPlaylistId, playNow: false, song: ref.read(songsProvider).get(lastPlayedSongId));
     }
     if (appSettings.useOwnServer) {
       appWebChannel.connectWebSocket();
@@ -195,20 +195,20 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   void onPlaybackFinished() {
     switch(ref.watch(playModeProvider)) {
       case playOnce:
-        if(ref.read(playingSongsProvider).playingSongIndex == currentPlaylist(ref).songs.length - 1) {
+        if(ref.read(playingSongsProvider).playingSongIndex == playerService.currentPlaylist(ref).songs.length - 1) {
           ref.read(positionProvider.notifier).set(ref.watch(durationProvider));
           ref.read(isPlayingProvider.notifier).set(false);
         }
         else {
-          playNext(ref);
+          playerService.playNext(ref);
         }
         break;
       case repeatOne:
-        appMethodChannel.applyPlaybackPosition(0);
-        appMethodChannel.resumeMusic();
+        playerService.applyPlaybackPosition(0);
+        playerService.resume();
         break;
       default:
-        playNext(ref);
+        playerService.playNext(ref);
         break;
     }
   }
@@ -217,15 +217,15 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     if (position <= ref.watch(durationProvider)) {
       ref.read(positionProvider.notifier).set(position);
       if (position < 1500) {
-        ref.read(durationProvider.notifier).set(await appMethodChannel.getMusicDuration());
+        ref.read(durationProvider.notifier).set(await playerService.getMusicDuration());
       }
     } else {
-      ref.read(durationProvider.notifier).set(await appMethodChannel.getMusicDuration());
+      ref.read(durationProvider.notifier).set(await playerService.getMusicDuration());
     }
 
     final deviceType = Platform.operatingSystem;
     final connectedDevice = ConnectedDevice(
-        position: position, duration: ref.watch(durationProvider), songId: playingSongId(ref), name: appWebChannel.deviceName, deviceType: deviceType, playlistId: ref.watch(playingSongsProvider).playlistId);
+        position: position, duration: ref.watch(durationProvider), songId: playerService.playingSongId(ref), name: appWebChannel.deviceName, deviceType: deviceType, playlistId: ref.watch(playingSongsProvider).playlistId);
     final message = jsonEncode(connectedDevice.toMap());
     appWebChannel.postWebSocketMessage(message);
   }
