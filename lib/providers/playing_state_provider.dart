@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music/providers/playlists_provider.dart';
 import 'package:music/providers/songs_provider.dart';
 
+import '../models/music/playlist.dart';
 import '../models/music/song.dart';
 
 const repeatAll = 0;
@@ -51,12 +51,12 @@ class PlayingSongsNotifier extends Notifier<PlayingSongsState> {
     state = PlayingSongsState(playlistId: state.playlistId, songs: [...state.songs], shuffled: state.shuffled, playingSongIndex: index);
   }
 
-  void notifyPlayStarted({required Song song, required String playlistId, bool? shuffle}) {
-    final songs = [...ref.read(playlistsProvider).playlists.get(playlistId).songs];
+  void notifyPlayStarted({required Song song, required Playlist playlist, bool? shuffle}) {
+    final songs = [...playlist.songs];
     if (shuffle ?? state.shuffled == true) {
       songs.shuffle(Random());
     } else {
-      songs.sortSongs(playlistId, ref);
+      songs.sortSongs(playlist.id, ref);
     }
 
     int index = 0;
@@ -67,7 +67,7 @@ class PlayingSongsNotifier extends Notifier<PlayingSongsState> {
         break;
       }
     }
-    state = PlayingSongsState(playlistId: playlistId, songs: songs, shuffled: shuffle ?? state.shuffled, playingSongIndex: index);
+    state = PlayingSongsState(playlistId: playlist.id, songs: songs, shuffled: shuffle ?? state.shuffled, playingSongIndex: index);
   }
 
   void updateToNextSong() {

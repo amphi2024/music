@@ -27,10 +27,14 @@ class PlayerService {
   Player? player = Platform.isWindows || Platform.isMacOS || Platform.isLinux ? Player() : null;
 
   Future<void> startPlay({required Song song, required String playlistId, bool? shuffle, bool playNow = true, required WidgetRef ref}) async {
+    startPlayFromPlaylist(song: song, playlist: ref.read(playlistsProvider).playlists.get(playlistId), ref: ref, playNow: playNow);
+  }
+
+  Future<void> startPlayFromPlaylist({required Song song, required Playlist playlist, bool? shuffle, bool playNow = true, required WidgetRef ref}) async {
     if(song.id.isEmpty) {
       return;
     }
-    appCacheData.lastPlayedPlaylistId = playlistId;
+    appCacheData.lastPlayedPlaylistId = playlist.id;
     appCacheData.lastPlayedSongId = song.id;
     appCacheData.save();
 
@@ -38,7 +42,7 @@ class PlayerService {
 
     syncPlaylistState(ref);
 
-    ref.read(playingSongsProvider.notifier).notifyPlayStarted(song: song, playlistId: playlistId, shuffle: shuffle);
+    ref.read(playingSongsProvider.notifier).notifyPlayStarted(song: song, playlist: playlist, shuffle: shuffle);
     ref.read(isPlayingProvider.notifier).set(playNow);
   }
 
@@ -209,9 +213,10 @@ class PlayerService {
     return ref.read(songsProvider).get(playingSongId(ref));
   }
 
-  Future<void> setMediaSource({required Song song, required WidgetRef ref, String localeCode = "default", bool playNow = true}) async {
+  Future<void> setMediaSource({required Song song, required WidgetRef ref, bool playNow = true}) async {
     final artists = ref.read(artistsProvider).getAll(song.artistIds);
     final album = ref.read(albumsProvider).get(song.albumId);
+    song.setRandomFileIndex();
     if(Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
       if(player!.state.playlist.medias.isNotEmpty) {
         await player!.remove(0);
@@ -222,7 +227,7 @@ class PlayerService {
       await appMethodChannel.invokeMethod("set_media_source", {
         "path": songMediaFilePath(song.id, song.playingFile().filename),
         "play_now": playNow,
-        "title": song.title.byLocaleCode(localeCode),
+        "title": song.title.toLocalized(),
         "artist": artists.map((e) => e.name.toLocalized()).join(),
         "album_cover": album.coverIndex != null ? albumCoverPath(album.id, album.covers[album.coverIndex!]["filename"]) : "",
         "url": "${appWebChannel.serverAddress}/music/songs/${song.id}/files/${song.playingFile().filename}",

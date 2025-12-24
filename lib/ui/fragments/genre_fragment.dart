@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/providers/genres_provider.dart';
@@ -6,6 +8,7 @@ import 'package:music/ui/fragments/components/floating_button.dart';
 import 'package:music/utils/localized_title.dart';
 
 import '../../providers/songs_provider.dart';
+import '../../services/player_service.dart';
 import '../components/item/song_list_item.dart';
 import 'components/fragment_padding.dart';
 
@@ -43,14 +46,10 @@ class GenreFragment extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 15, bottom: 15),
                 child: FloatingButton(icon: Icons.play_arrow, onPressed: () {
-                  // appState.setState(() {
-                  //   var song = songList.firstOrNull;
-                  //   if (song != null) {
-                  //     playerService.isPlaying = true;
-                  //     playerService.shuffled = false;
-                  //     playerService.startPlay(song: song, playlistId: playlistId);
-                  //   }
-                  // });
+                  if (playlist.songs.isNotEmpty) {
+                    final song = ref.read(songsProvider).get(playlist.songs[0]);
+                    playerService.startPlay(song: song, playlistId: playlist.id, ref: ref, shuffle: false);
+                  }
                 }),
               ),
               Padding(
@@ -58,13 +57,11 @@ class GenreFragment extends ConsumerWidget {
                   child: FloatingButton(
                       icon: Icons.shuffle,
                       onPressed: () {
-                        // appState.setState(() {
-                        //   var song = songList.firstOrNull;
-                        //   if (song != null) {
-                        //     playerService.isPlaying = true;
-                        //     playerService.startPlay(song: song, playlistId: playlistId, shuffle: true);
-                        //   }
-                        // });
+                        if(playlist.songs.isNotEmpty) {
+                          final index = Random().nextInt(playlist.songs.length);
+                          final song = ref.read(songsProvider).get(playlist.songs[index]);
+                          playerService.startPlay(song: song, playlistId: playlist.id, ref: ref, shuffle: true);
+                        }
                       }))
             ],
           );

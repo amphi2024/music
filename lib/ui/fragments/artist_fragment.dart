@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music/models/music/playlist.dart';
 import 'package:music/providers/albums_provider.dart';
 import 'package:music/providers/artists_provider.dart';
 import 'package:music/providers/playlists_provider.dart';
@@ -11,6 +14,7 @@ import 'package:music/ui/dialogs/edit_artist_dialog.dart';
 import 'package:music/ui/fragments/components/floating_button.dart';
 import 'package:music/utils/localized_title.dart';
 
+import '../../services/player_service.dart';
 import '../components/image/album_cover.dart';
 import '../components/item/song_list_item.dart';
 import 'components/fragment_padding.dart';
@@ -62,40 +66,29 @@ class ArtistFragment extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     FloatingButton(icon: Icons.play_arrow, onPressed: () {
-                      // TODO: implement
-                      // var albumId = artist.albums.firstOrNull;
-                      // if (albumId != null) {
-                      //   var songId = appStorage.albums
-                      //       .get(albumId)
-                      //       .songs
-                      //       .firstOrNull;
-                      //   if (songId != null) {
-                      //     // startPlay(song: song, playlistId: playlistId, ref: ref, shuffle: false);
-                      //     // appState.setState(() {
-                      //     //   playerService.isPlaying = true;
-                      //     //   playerService.shuffled = false;
-                      //     //   playerService.startPlay(song: ref.watch(songsProvider).get(songId), playlistId: playlistId);
-                      //     // });
-                      //   }
-                      // }
+                      final artistPlaylist = Playlist(id: "!ARTIST,${artist.id}");
+                      for(var id in playlist.songs) {
+                        final albumPlaylist = playlists.get("!ALBUM,$id");
+                        artistPlaylist.songs.addAll(albumPlaylist.songs);
+                      }
+                      if(artistPlaylist.songs.isNotEmpty) {
+                        final song = ref.read(songsProvider).get(artistPlaylist.songs[0]);
+                        playerService.startPlayFromPlaylist(song: song, playlist: artistPlaylist, ref: ref, shuffle: false);
+                      }
                     }),
                     Padding(
                       padding: const EdgeInsets.only(left: 15.0),
                       child: FloatingButton(icon: Icons.shuffle, onPressed: () {
-                        // TODO: implement
-                        // var albumId = artist.albums.firstOrNull;
-                        // if (albumId != null) {
-                        //   var songId = appStorage.albums
-                        //       .get(albumId)
-                        //       .songs
-                        //       .firstOrNull;
-                        //   if (songId != null) {
-                        //     // appState.setState(() {
-                        //     //   playerService.isPlaying = true;
-                        //     //   playerService.startPlay(song: ref.watch(songsProvider).get(songId), playlistId: playlistId, shuffle: true);
-                        //     // });
-                        //   }
-                        // }
+                        final artistPlaylist = Playlist(id: "!ARTIST,${artist.id}");
+                        for(var id in playlist.songs) {
+                          final albumPlaylist = playlists.get("!ALBUM,$id");
+                          artistPlaylist.songs.addAll(albumPlaylist.songs);
+                        }
+                        if(artistPlaylist.songs.isNotEmpty) {
+                          final index = Random().nextInt(artistPlaylist.songs.length);
+                          final song = ref.read(songsProvider).get(artistPlaylist.songs[index]);
+                          playerService.startPlayFromPlaylist(song: song, playlist: artistPlaylist, ref: ref, shuffle: true);
+                        }
                       }),
                     ),
                   ],
