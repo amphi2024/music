@@ -1,12 +1,12 @@
 import AVFoundation
 import MediaPlayer
 import Flutter
+import media_kit_video
 
 class MusicService {
     static let shared = MusicService()
-    
+
     private var volume: Double = 0.5
-    private var stream: HSTREAM = 0
     var duration: Int = 0
     var position: Int = 0
     private var soundLoaded: Bool = false
@@ -19,10 +19,13 @@ class MusicService {
     var token: String = ""
     var methodChannel: FlutterMethodChannel?
     var playMode: Int = 0
+    var ctx = mpv_create()
     
     private init() {
-        BASS_Init(-1, 44100, 0, nil, nil)
-        
+
+        mpv_initialize(ctx)
+        mpv_set_option_string(ctx, "ao", "audiounit")
+        mpv_set_option_string(ctx, "vo", "null")
         let commandCenter = MPRemoteCommandCenter.shared()
         
         commandCenter.nextTrackCommand.isEnabled = true
@@ -87,12 +90,31 @@ class MusicService {
     
     func pause() {
         isPlaying = false
-        BASS_ChannelPause(self.stream)
+        var pause: Int32 = 1
+        mpv_set_property(ctx, "pause", MPV_FORMAT_FLAG, &pause)
     }
     
     func resume() {
-        isPlaying = true
-        BASS_ChannelPlay(self.stream, 0)
+        isPlaying = false
+        var pause: Int32 = 0
+        mpv_set_property(ctx, "pause", MPV_FORMAT_FLAG, &pause)
+    }
+    
+    func stop() {
+        var args: [UnsafePointer<CChar>?] = [
+            UnsafePointer(strdup("stop")),
+            nil
+        ]
+
+        args.withUnsafeMutableBufferPointer { buffer in
+            mpv_command(ctx, buffer.baseAddress)
+        }
+
+        for arg in args {
+            if let arg {
+                free(UnsafeMutableRawPointer(mutating: arg))
+            }
+        }
     }
     
     func syncPlaylist(list: Array<Dictionary<String, Any>>) {
@@ -102,51 +124,131 @@ class MusicService {
             itemList.append(playableItem)
         }
     }
+    func applyHTTPHeaderFields() {
+        var node = mpv_node()
+        node.format = MPV_FORMAT_NODE_ARRAY
+
+        let listPtr = UnsafeMutablePointer<mpv_node_list>.allocate(capacity: 1)
+        node.u.list = listPtr
+
+        let headers = ["Authorization: \(token)"]
+        let count = headers.count
+        listPtr.pointee.num = Int32(count)
+        
+        let valuesPtr = UnsafeMutablePointer<mpv_node>.allocate(capacity: count)
+        listPtr.pointee.values = valuesPtr
+
+        for (i, header) in headers.enumerated() {
+            valuesPtr[i].format = MPV_FORMAT_STRING
+            valuesPtr[i].u.string = strdup(header)
+        }
+
+        defer {
+            for i in 0..<count {
+                if let strPtr = valuesPtr[i].u.string {
+                    free(strPtr)
+                }
+            }
+            valuesPtr.deallocate()
+            listPtr.deallocate()
+        }
+
+        let result = mpv_set_property(ctx, "http-header-fields", MPV_FORMAT_NODE, &node)
+        
+        if result < 0 {
+            let errorMsg = String(cString: mpv_error_string(result))
+            print("MPV Header Error: \(errorMsg)")
+        }
+    }
     
     func setMediaSource(filePath: String, playNow: Bool, url: String) {
         
-        BASS_StreamFree(stream)
-        
         let fileManager = FileManager.default
         
+        stop()
+        pause()
+        
         if fileManager.fileExists(atPath: filePath) && !filePath.isEmpty {
-            let stream = BASS_StreamCreateFile(0, filePath, 0, 0, 0)
-            self.stream = stream
             
-            BASS_ChannelSetAttribute(stream, 2, Float(volume))
-            if playNow {
-                self.isPlaying = true
-                BASS_ChannelPlay(stream, 0)
+            var args: [UnsafePointer<CChar>?] = [
+                UnsafePointer(strdup("loadfile")),
+                UnsafePointer(strdup(filePath)),
+                nil
+            ]
+
+            args.withUnsafeMutableBufferPointer { buffer in
+                mpv_command(ctx, buffer.baseAddress)
+            }
+
+            for arg in args {
+                if let arg = arg {
+                    free(UnsafeMutableRawPointer(mutating: arg))
+                }
             }
         }
         else {
-            let stream = BASS_StreamCreateURL("\(url)\r\nAuthorization:\(token)\r\n", 0, 0, nil , nil)
-            self.stream = stream
             
-            BASS_ChannelSetAttribute(stream, 2, Float(volume))
-            if playNow {
-                self.isPlaying = true
-                BASS_ChannelPlay(stream, 0)
+            var args: [UnsafePointer<CChar>?] = [
+                UnsafePointer(strdup("loadfile")),
+                UnsafePointer(strdup(url)),
+                nil
+            ]
+
+            args.withUnsafeMutableBufferPointer { buffer in
+               mpv_command(ctx, buffer.baseAddress)
             }
+
+            for arg in args {
+                if let arg = arg {
+                    free(UnsafeMutableRawPointer(mutating: arg))
+                }
+            }
+            
+            applyHTTPHeaderFields()
+        }
+        
+        if playNow {
+            resume()
         }
     }
     
     func applyPlaybackPosition(position: Int) {
         let timeMs = Double(position) / 1000
-        let pos = BASS_ChannelSeconds2Bytes(stream, timeMs)
-        BASS_ChannelSetPosition(stream, pos, 0)
+        
+        var args: [UnsafePointer<CChar>?] = [
+            UnsafePointer(strdup("seek")),
+            UnsafePointer(strdup(String(timeMs))),
+            UnsafePointer(strdup("absolute")),
+            nil
+        ]
+
+        args.withUnsafeMutableBufferPointer { buffer in
+            mpv_command(ctx, buffer.baseAddress)
+        }
+
+        for arg in args {
+            if let arg = arg {
+                free(UnsafeMutableRawPointer(mutating: arg))
+            }
+        }
     }
     
     func setVolume(volume: Double) {
-        self.volume = volume
-        BASS_ChannelSetAttribute(stream, 2, Float(volume))
+        self.volume = volume * 100
+        mpv_set_property(ctx, "volume", MPV_FORMAT_DOUBLE, &self.volume)
     }
     
     func getDuration() -> Int {
-        let pos = BASS_ChannelGetLength(stream, 0)
-        let timeMs = BASS_ChannelBytes2Seconds(stream, pos) * 1000
-        duration = Int(timeMs)
+        var time: Double = 0
+        
+        if mpv_get_property(ctx, "duration", MPV_FORMAT_DOUBLE, &time) < 0 {
+            return 0
+        }
+        
+        duration = Int(time * 1000)
+        
         return duration
+        
     }
     
     func updateNowPlayingInfo() {
@@ -185,9 +287,12 @@ class MusicService {
     }
     
     func getPlaybackPosition() -> Int {
-        let pos = BASS_ChannelGetPosition(stream, 0)
-        let timeMs = BASS_ChannelBytes2Seconds(stream, pos) * 1000
-        position = Int(timeMs)
+        var time: Double = 0
+        
+        if mpv_get_property(ctx, "time-pos", MPV_FORMAT_DOUBLE, &time) < 0 {
+            return 0
+        }
+        position = Int(time * 1000)
         
         return position
     }

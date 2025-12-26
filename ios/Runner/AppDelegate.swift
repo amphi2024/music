@@ -11,14 +11,6 @@ import MediaPlayer
     @available(iOS 13.0, *)
     private var timerTask: Task<Void, Never>?
     
-    override func applicationWillResignActive(_ application: UIApplication) {
-//        BASS_StreamFree(stream)
-//        BASS_Free()
-//        if #available(iOS 13.0, *) {
-//            timerTask?.cancel()
-//        }
-    }
-    
     override func applicationDidBecomeActive(_ application: UIApplication) {
         super.applicationDidBecomeActive(application)
         MusicService.shared.methodChannel?.invokeMethod("sync_media_source_to_flutter", arguments: [
