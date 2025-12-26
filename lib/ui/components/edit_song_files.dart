@@ -60,7 +60,7 @@ class _EditSongFilesState extends ConsumerState<EditSongFiles> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 150,
+      height: isWideScreen(context) ? 150 : 175,
       child: Scrollbar(
           controller: scrollController,
           child: ListView.builder(
@@ -152,7 +152,7 @@ class _EditSongFilesState extends ConsumerState<EditSongFiles> {
                             Expanded(
                               child: Slider(
                                   min: 0,
-                                  max: isDesktop() ? 200 : 1,
+                                  max: 200,
                                   value: players[songFile.id]?.state.volume ?? 0, onChanged: (value) {
                                     setState(() {
                                       players[songFile.id]?.setVolume(value);
