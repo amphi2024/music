@@ -35,7 +35,7 @@ class PlayControls extends ConsumerWidget {
             ),
             Center(
               child: Text(
-                artists.map((e) => e.name.toLocalized()).join(),
+                artists.localizedName(),
                 style: textTheme.bodyMedium,
               ),
             ),

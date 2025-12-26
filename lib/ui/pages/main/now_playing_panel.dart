@@ -143,7 +143,7 @@ class _NowPlayingPanelState extends ConsumerState<NowPlayingPanel> with TickerPr
                             ),
                           ),
                           Text(
-                            artists.map((e) => e.name.toLocalized()).join(),
+                            artists.localizedName(),
                               maxLines: 3,
                               textAlign: TextAlign.center
                           ),

@@ -50,7 +50,7 @@ class AlbumGridItem extends ConsumerWidget {
               Visibility(
                 visible: showArtistName,
                 child: Text(
-                    artists.map((e) => e.name.toLocalized()).join()
+                    artists.localizedName()
                 ),
               ),
             ],

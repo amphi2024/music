@@ -135,7 +135,7 @@ class SongListItem extends ConsumerWidget {
                                 ),
                               ),
                               Text(
-                                artists.map((e) => e.name.toLocalized()).join(),
+                                artists.localizedName(),
                                 style: Theme
                                     .of(context)
                                     .textTheme
