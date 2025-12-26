@@ -290,7 +290,7 @@ class AppWebChannel extends AppWebChannelCore {
       void Function(int received, int total)? onProgress}) async {
     final file = File(albumCoverPath(albumId, filename));
     if (!await file.parent.exists()) {
-      file.parent.create(recursive: true);
+      await file.parent.create(recursive: true);
     }
     await downloadFile(
         url: "$serverAddress/music/albums/${albumId}/covers/${filename}",
