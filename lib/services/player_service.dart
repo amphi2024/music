@@ -30,8 +30,9 @@ class PlayerService {
     startPlayFromPlaylist(song: song, playlist: ref.read(playlistsProvider).playlists.get(playlistId), ref: ref, playNow: playNow);
   }
 
-  Future<void> startPlayFromPlaylist({required Song song, required Playlist playlist, bool? shuffle, bool playNow = true, required WidgetRef ref}) async {
-    if(song.id.isEmpty) {
+  Future<void> startPlayFromPlaylist(
+      {required Song song, required Playlist playlist, bool? shuffle, bool playNow = true, required WidgetRef ref}) async {
+    if (song.id.isEmpty) {
       return;
     }
     appCacheData.lastPlayedPlaylistId = playlist.id;
@@ -52,64 +53,57 @@ class PlayerService {
   }
 
   Future<void> resume() async {
-    if(Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
       await player!.playOrPause();
-    }
-    else {
+    } else {
       await appMethodChannel.resumeMusic();
     }
   }
 
   Future<void> pause() async {
-    if(Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
       await player!.pause();
-    }
-    else {
+    } else {
       await appMethodChannel.pauseMusic();
     }
   }
 
   Future<bool> isPlaying() async {
-    if(Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
       return player!.state.playing;
-    }
-    else {
+    } else {
       return appMethodChannel.isMusicPlaying();
     }
   }
 
   Future<void> setVolume(double volume) async {
-    if(Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
       await player!.setVolume(volume);
-    }
-    else {
+    } else {
       appMethodChannel.setVolume(volume);
     }
   }
 
   Future<void> applyPlaybackPosition(int position) async {
-    if(Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
       await player!.seek(Duration(milliseconds: position));
-    }
-    else {
+    } else {
       await appMethodChannel.applyPlaybackPosition(position);
     }
   }
 
   Future<int> getMusicDuration() async {
-    if(Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
       return player!.state.duration.inMilliseconds;
-    }
-    else {
+    } else {
       return appMethodChannel.getMusicDuration();
     }
   }
 
   Future<int> getPlaybackPosition() async {
-    if(Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
       return player!.state.position.inMilliseconds;
-    }
-    else {
+    } else {
       return appMethodChannel.getPlaybackPosition();
     }
   }
@@ -173,7 +167,7 @@ class PlayerService {
     }
     ref.read(playingSongsProvider.notifier).updateTo(i);
     await setMediaSource(song: playingSong(ref), ref: ref, playNow: ref.read(isPlayingProvider));
-    if(Platform.isAndroid || Platform.isIOS) {
+    if (Platform.isAndroid || Platform.isIOS) {
       await syncMediaSourceToNative(ref);
     }
   }
@@ -189,7 +183,7 @@ class PlayerService {
         "media_file_path": songMediaFilePath(song.id, songFile.filename),
         "url": "${appWebChannel.serverAddress}/music/songs/${songId}/files/${songFile.id}",
         "title": song.title.toLocalized(),
-        "artist": artists.map((e) => e.name.toLocalized()).join(),
+        "artist": artists.localizedName(),
         "album_cover_file_path": album.covers.firstOrNull,
         "song_id": song.id
       });
@@ -217,18 +211,24 @@ class PlayerService {
     final artists = ref.read(artistsProvider).getAll(song.artistIds);
     final album = ref.read(albumsProvider).get(song.albumId);
     song.setRandomFileIndex();
-    if(Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-      if(player!.state.playlist.medias.isNotEmpty) {
+    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+      if (player!.state.playlist.medias.isNotEmpty) {
         await player!.remove(0);
       }
-      await player!.open(Media(songMediaFilePath(song.id, song.playingFile().filename)), play: playNow);
-    }
-    else {
+      if (song.availableOnOffline()) {
+        await player!.open(Media(songMediaFilePath(song.id, song.playingFile().filename)), play: playNow);
+      } else {
+        await player!.open(
+            Media("${appWebChannel.serverAddress}/music/songs/${song.id}/files/${song.playingFile().filename}",
+                httpHeaders: {"Authorization": appStorage.selectedUser.token}),
+            play: playNow);
+      }
+    } else {
       await appMethodChannel.invokeMethod("set_media_source", {
         "path": songMediaFilePath(song.id, song.playingFile().filename),
         "play_now": playNow,
         "title": song.title.toLocalized(),
-        "artist": artists.map((e) => e.name.toLocalized()).join(),
+        "artist": artists.localizedName(),
         "album_cover": album.coverIndex != null ? albumCoverPath(album.id, album.covers[album.coverIndex!]["filename"]) : "",
         "url": "${appWebChannel.serverAddress}/music/songs/${song.id}/files/${song.playingFile().filename}",
         "token": appStorage.selectedUser.token
