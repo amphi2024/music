@@ -165,6 +165,7 @@ class PlaylistsNotifier extends Notifier<PlaylistsState> {
       return;
     }
 
+    trash.songs.remove(song.id);
     if(song.archived) {
       final archivePlaylist = playlists.get("!ARCHIVE");
       if(!archivePlaylist.songs.contains(song.id)) {
@@ -208,6 +209,7 @@ class PlaylistsNotifier extends Notifier<PlaylistsState> {
       return;
     }
 
+    trash.albums.remove(album.id);
     final albumsPlaylist = playlists.get("!ALBUMS");
     if(!albumsPlaylist.songs.contains(album.id)) {
       albumsPlaylist.songs.add(album.id);
@@ -230,6 +232,7 @@ class PlaylistsNotifier extends Notifier<PlaylistsState> {
       return;
     }
 
+    trash.artists.remove(artist.id);
     final artistsPlaylist = playlists.get("!ARTISTS");
     if(!artistsPlaylist.songs.contains(artist.id)) {
       artistsPlaylist.songs.add(artist.id);
