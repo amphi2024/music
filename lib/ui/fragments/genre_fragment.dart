@@ -26,6 +26,7 @@ class GenreFragment extends ConsumerWidget {
     final playlist = showingPlaylist(ref);
     final idList = playlist.songs;
     final songs = ref.watch(songsProvider);
+    final searchKeyword = ref.watch(searchKeywordProvider);
 
     return ListView.builder(
       padding: fragmentPadding(context),
@@ -69,6 +70,14 @@ class GenreFragment extends ConsumerWidget {
         else {
           final id = idList[index - 2];
           final song = songs.get(id);
+
+          if (searchKeyword != null &&
+              !song.title
+                  .toLocalized()
+                  .toLowerCase()
+                  .contains(searchKeyword.toLowerCase())) {
+            return const SizedBox.shrink();
+          }
           return SongListItem(song: song, playlistId: playlist.id);
         }
       },
