@@ -116,7 +116,7 @@ class _NowPlayingPanelState extends ConsumerState<NowPlayingPanel> with TickerPr
                           mouseDown: Color(0xFFB71C1C),
                           iconNormal: Color(0xFF805306),
                           iconMouseOver: Color(0xFFFFFFFF),
-                          normal: Theme.of(context).scaffoldBackgroundColor))
+                          normal: Theme.of(context).cardColor))
                 ]
               ],
             ),
