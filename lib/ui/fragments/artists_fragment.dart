@@ -9,6 +9,7 @@ import 'package:music/providers/providers.dart';
 import 'package:music/ui/components/item/artist_linear_item.dart';
 import 'package:music/ui/pages/artist_page.dart';
 import 'package:music/utils/fragment_scroll_listener.dart';
+import 'package:music/utils/localized_title.dart';
 
 import 'components/fragment_padding.dart';
 
@@ -25,6 +26,7 @@ class _ArtistsFragmentState extends ConsumerState<ArtistsFragment> with Fragment
   Widget build(BuildContext context) {
     final idList = ref.watch(playlistsProvider).playlists.get("!ARTISTS").songs;
     final artists = ref.watch(artistsProvider);
+    final searchKeyword = ref.watch(searchKeywordProvider);
 
     return ListView.builder(
       padding: fragmentPadding(context),
@@ -33,6 +35,14 @@ class _ArtistsFragmentState extends ConsumerState<ArtistsFragment> with Fragment
       itemBuilder: (context, index) {
         final id = idList[index];
         final artist = artists.get(id);
+        if (searchKeyword != null &&
+            !artist.name
+                .toLocalized()
+                .toLowerCase()
+                .contains(searchKeyword.toLowerCase())) {
+          return const SizedBox.shrink();
+        }
+
         return ArtistLinearItem(
             artist: artist,
             onPressed: () {

@@ -36,6 +36,7 @@ class ArtistFragment extends ConsumerWidget {
         .watch(playlistsProvider)
         .playlists;
     final playlist = playlists.get(playlistId);
+    final searchKeyword = ref.watch(searchKeywordProvider);
 
     return ListView.builder(
       padding: fragmentPadding(context),
@@ -159,6 +160,13 @@ class ArtistFragment extends ConsumerWidget {
               ),
               ...albumPlaylist.songs.map((songId) {
                 final song = ref.watch(songsProvider).get(songId);
+                if (searchKeyword != null &&
+                    !song.title
+                        .toLocalized()
+                        .toLowerCase()
+                        .contains(searchKeyword.toLowerCase())) {
+                  return const SizedBox.shrink();
+                }
                 return SongListItem(
                     song: song,
                     playlistId: playlistId,

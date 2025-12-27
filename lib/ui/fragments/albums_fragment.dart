@@ -4,11 +4,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:music/providers/albums_provider.dart';
+import 'package:music/providers/artists_provider.dart';
 import 'package:music/providers/fragment_provider.dart';
 import 'package:music/providers/playlists_provider.dart';
 import 'package:music/providers/providers.dart';
 import 'package:music/ui/components/item/album_grid_item.dart';
 import 'package:music/utils/fragment_scroll_listener.dart';
+import 'package:music/utils/localized_title.dart';
 
 import '../../utils/screen_size.dart';
 import '../pages/album_page.dart';
@@ -35,6 +37,8 @@ class _AlbumsFragmentState extends ConsumerState<AlbumsFragment> with FragmentVi
 
     final idList = ref.watch(playlistsProvider).playlists.get("!ALBUMS").songs;
     final albums = ref.watch(albumsProvider);
+    final searchKeyword = ref.watch(searchKeywordProvider);
+    final artists = ref.watch(artistsProvider);
 
     return MasonryGridView.builder(
         controller: scrollController,
@@ -44,6 +48,17 @@ class _AlbumsFragmentState extends ConsumerState<AlbumsFragment> with FragmentVi
         itemBuilder: (context, index) {
           final id = idList[index];
           final album = albums.get(id);
+
+          if (searchKeyword != null &&
+              !album.title
+                  .toLocalized()
+                  .toLowerCase()
+                  .contains(searchKeyword.toLowerCase()) && !artists.getAll(album.artistIds).localizedName()
+              .toLowerCase()
+              .contains(searchKeyword.toLowerCase())) {
+            return const SizedBox.shrink();
+          }
+
           return AlbumGridItem(
             album: album,
             onPressed: () {

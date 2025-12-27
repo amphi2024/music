@@ -7,6 +7,7 @@ import 'package:music/providers/songs_provider.dart';
 import 'package:music/ui/components/item/song_list_item.dart';
 import 'package:music/ui/fragments/components/album_fragment_title.dart';
 import 'package:music/ui/fragments/components/fragment_padding.dart';
+import 'package:music/utils/localized_title.dart';
 
 class AlbumFragment extends ConsumerWidget {
   const AlbumFragment({super.key});
@@ -23,6 +24,7 @@ class AlbumFragment extends ConsumerWidget {
         .watch(playlistsProvider)
         .playlists
         .get(playlistId);
+    final searchKeyword = ref.watch(searchKeywordProvider);
 
     return ListView.builder(
       padding: fragmentPadding(context),
@@ -36,7 +38,15 @@ class AlbumFragment extends ConsumerWidget {
         }
         else {
           final songId = playlist.songs[index - 1];
-          return SongListItem(song: songs.get(songId), playlistId: "!ALBUM,${album.id}", coverStyle: CoverStyle.trackNumber);
+          final song = songs.get(songId);
+          if (searchKeyword != null &&
+              !song.title
+                  .toLocalized()
+                  .toLowerCase()
+                  .contains(searchKeyword.toLowerCase())) {
+            return const SizedBox.shrink();
+          }
+          return SongListItem(song: song, playlistId: "!ALBUM,${album.id}", coverStyle: CoverStyle.trackNumber);
         }
       },
     );
