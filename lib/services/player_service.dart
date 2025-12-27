@@ -210,7 +210,6 @@ class PlayerService {
   Future<void> setMediaSource({required Song song, required WidgetRef ref, bool playNow = true}) async {
     final artists = ref.read(artistsProvider).getAll(song.artistIds);
     final album = ref.read(albumsProvider).get(song.albumId);
-    song.setRandomFileIndex();
     if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
       if (player!.state.playlist.medias.isNotEmpty) {
         await player!.remove(0);
@@ -234,5 +233,6 @@ class PlayerService {
         "token": appStorage.selectedUser.token
       });
     }
+    song.updateFileIndex();
   }
 }

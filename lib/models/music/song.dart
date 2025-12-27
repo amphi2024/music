@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/channels/app_web_channel.dart';
 import 'package:music/models/music/song_file.dart';
@@ -95,9 +93,10 @@ class Song {
     }
   }
 
-  void setRandomFileIndex() {
-    if(files.length > 1) {
-      fileIndex = Random().nextInt(files.length);
+  void updateFileIndex() {
+    fileIndex++;
+    if(fileIndex >= files.length) {
+      fileIndex = 0;
     }
   }
 
