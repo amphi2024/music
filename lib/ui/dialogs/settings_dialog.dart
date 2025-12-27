@@ -25,7 +25,18 @@ class SettingsDialog extends StatelessWidget {
           height: height,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: const SettingsView(),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(onPressed: () {
+                      Navigator.pop(context);
+                    }, icon: Icon(Icons.cancel_outlined))
+                ]),
+                Expanded(child: const SettingsView()),
+              ],
+            ),
           ),
         ),
       ),
