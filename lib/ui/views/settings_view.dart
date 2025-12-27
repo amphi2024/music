@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:music/ui/components/settings/language_settings.dart';
 
 import '../../models/app_settings.dart';
 import '../components/settings/server_settings_component.dart';
@@ -55,7 +56,29 @@ class _SettingsViewState extends State<SettingsView> {
             })
           ],
         ),
-        Visibility(child: ServerSettingComponent(serverAddressController: serverAddressController))
+        Visibility(child: ServerSettingComponent(serverAddressController: serverAddressController)),
+        Row(
+          // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            //TODO: implement theme settings
+            // Column(
+            //   children: [
+            //     Text(
+            //       AppLocalizations.of(context).get("@theme"),
+            //     ),
+            //     const ThemeSettings(),
+            //   ],
+            // ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(AppLocalizations.of(context).get("@language")),
+                LanguageSettings()
+              ],
+            ),
+          ],
+        ),
       ],
     );
   }
