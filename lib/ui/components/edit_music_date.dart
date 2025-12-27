@@ -6,7 +6,8 @@ class EditMusicDate extends StatelessWidget {
   final DateTime? date;
   final void Function(DateTime date) onUpdate;
   final String? label;
-  const EditMusicDate({super.key, required this.date, required this.onUpdate, this.label});
+  final DateTime? placeholder;
+  const EditMusicDate({super.key, required this.date, required this.onUpdate, this.label, this.placeholder});
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +22,13 @@ class EditMusicDate extends StatelessWidget {
         },
         icon: Icon(Icons.edit));
     if (date == null) {
+      if(placeholder == null) {
+        return Row(
+          children: [Flexible(child: Text("${label ?? AppLocalizations.of(context).get("@edit_info_label_released")} ?")), button],
+        );
+      }
       return Row(
-        children: [Flexible(child: Text("${label ?? AppLocalizations.of(context).get("@edit_info_label_released")} ?")), button],
+        children: [Flexible(child: Text("${label ?? AppLocalizations.of(context).get("@edit_info_label_released")} (${DateFormat.yMMMEd(Localizations.localeOf(context).languageCode.toString()).format(placeholder!)})")), button],
       );
     }
     return Row(

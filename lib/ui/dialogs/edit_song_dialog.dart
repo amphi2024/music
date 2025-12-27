@@ -155,6 +155,7 @@ class _EditSongInfoDialogState extends ConsumerState<EditSongDialog> {
                     padding: padding,
                     child: EditMusicDate(
                         date: song.released,
+                        placeholder: album.released,
                         onUpdate: (date) {
                           setState(() {
                             song.released = date;
