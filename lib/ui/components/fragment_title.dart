@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:amphi/models/app.dart';
 import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +8,6 @@ import 'package:music/providers/fragment_provider.dart';
 import 'package:music/providers/playlists_provider.dart';
 import 'package:music/providers/providers.dart';
 import 'package:music/ui/components/add_item_button.dart';
-
 
 class FragmentTitle extends ConsumerWidget {
   final String title;
@@ -28,50 +25,46 @@ class FragmentTitle extends ConsumerWidget {
     final selectedSongs = ref.watch(selectedItemsProvider);
     final showingPlaylistId = ref.watch(showingPlaylistIdProvider);
 
-    var padding = EdgeInsets.only(left: 15.0, right: 5);
-    double height = 55;
-    if (Platform.isAndroid && App.isWideScreen(context)) {
-      padding = EdgeInsets.only(left: 15.0, right: 5, top: MediaQuery
-          .of(context)
-          .padding
-          .top);
-      height += MediaQuery
-          .of(context)
-          .padding
-          .top;
-    }
-
     return Container(
-      height: height,
-      decoration: BoxDecoration(color: themeData
-          .scaffoldBackgroundColor
-          .withAlpha(125)),
+      height: 55,
+      decoration: BoxDecoration(color: themeData.scaffoldBackgroundColor.withAlpha(125)),
       child: Padding(
-        padding: padding,
+        padding: EdgeInsets.only(left: 5, right: 5),
         child: Stack(
           children: [
-            AnimatedOpacity(
-              opacity: fragmentTitleShowing ? 1 : 0,
-              curve: Curves.easeOutQuint,
-              duration: const Duration(milliseconds: 750),
-              child: AnimatedAlign(
-                alignment: fragmentTitleMinimized ? Alignment.center : Alignment.centerLeft,
-                curve: Curves.easeOutQuint,
-                duration: const Duration(milliseconds: 750),
-                child: selectedSongs == null
-                    ? AnimatedScale(
-                    scale: fragmentTitleMinimized ? scaleValue : 1,
-                    curve: Curves.easeOutQuint,
-                    duration: const Duration(milliseconds: 750),
-                    child: Text(title, style: Theme
-                        .of(context)
-                        .textTheme
-                        .headlineMedium))
-                    : IconButton(
+            Visibility(
+              visible: selectedSongs != null,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
                     onPressed: () {
                       ref.read(selectedItemsProvider.notifier).endSelection();
                     },
-                    icon: Icon(Icons.check)),
+                    icon: Icon(Icons.check_circle_outline)),
+              ),
+            ),
+            Visibility(
+              visible: selectedSongs == null,
+              child: AnimatedOpacity(
+                opacity: fragmentTitleShowing ? 1 : 0,
+                curve: Curves.easeOutQuint,
+                duration: const Duration(milliseconds: 750),
+                child: AnimatedAlign(
+                    alignment: fragmentTitleMinimized ? Alignment.center : Alignment.centerLeft,
+                    curve: Curves.easeOutQuint,
+                    duration: const Duration(milliseconds: 750),
+                    child: AnimatedScale(
+                        scale: fragmentTitleMinimized ? scaleValue : 1,
+                        curve: Curves.easeOutQuint,
+                        duration: const Duration(milliseconds: 750),
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 10),
+                          child: Text(title,
+                              style: TextStyle(
+                                fontSize: 25,
+                                fontWeight: FontWeight.w500
+                              )),
+                        ))),
               ),
             ),
             Align(
@@ -97,8 +90,7 @@ class FragmentTitle extends ConsumerWidget {
                               onTap: () {
                                 if (sortOption == SortOption.title) {
                                   sortListByOption(playlistId: showingPlaylistId, ref: ref, sortOption: SortOption.titleDescending);
-                                }
-                                else {
+                                } else {
                                   sortListByOption(playlistId: showingPlaylistId, ref: ref, sortOption: SortOption.title);
                                 }
                               })
@@ -118,8 +110,7 @@ class FragmentTitle extends ConsumerWidget {
                               onTap: () {
                                 if (sortOption == SortOption.artist) {
                                   sortListByOption(playlistId: showingPlaylistId, ref: ref, sortOption: SortOption.artistDescending);
-                                }
-                                else {
+                                } else {
                                   sortListByOption(playlistId: showingPlaylistId, ref: ref, sortOption: SortOption.artist);
                                 }
                               }));
@@ -139,8 +130,7 @@ class FragmentTitle extends ConsumerWidget {
                               onTap: () {
                                 if (sortOption == SortOption.album) {
                                   sortListByOption(playlistId: showingPlaylistId, ref: ref, sortOption: SortOption.albumDescending);
-                                }
-                                else {
+                                } else {
                                   sortListByOption(playlistId: showingPlaylistId, ref: ref, sortOption: SortOption.album);
                                 }
                               }));
@@ -152,7 +142,7 @@ class FragmentTitle extends ConsumerWidget {
                         }
                         return items;
                       },
-                      icon: Icon(Icons.more_horiz_outlined)),
+                      icon: Icon(Icons.view_agenda)),
                 ],
               ),
             )
