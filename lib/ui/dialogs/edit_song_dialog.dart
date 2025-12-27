@@ -268,6 +268,8 @@ class _EditSongInfoDialogState extends ConsumerState<EditSongDialog> {
                     if(song.id.isEmpty) {
                       song.id = await generatedSongId();
                     }
+                    song.trackNumber = int.tryParse(trackNumberController.text);
+                    song.discNumber = int.tryParse(discNumberController.text);
                     for(var songFileId in creatingFiles.keys) {
                       final file = File(songMediaFilePath(song.id, creatingFiles[songFileId]!.filename));
                       final parent = file.parent;
