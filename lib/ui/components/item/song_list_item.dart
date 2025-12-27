@@ -13,7 +13,6 @@ import 'package:music/providers/songs_provider.dart';
 import 'package:music/providers/transfers_provider.dart';
 import 'package:music/ui/components/select_playlist.dart';
 import 'package:music/ui/dialogs/edit_song_dialog.dart';
-import 'package:music/ui/dialogs/song_detail_dialog.dart';
 import 'package:music/utils/localized_title.dart';
 import 'package:music/utils/screen_size.dart';
 import 'package:music/utils/toast.dart';
@@ -45,11 +44,13 @@ class SongListItem extends ConsumerWidget {
     final transferringState = ref.watch(transfersNotifier)[song.id];
 
     final widget = Material(
-      color: selected ? Theme.of(context).highlightColor.withAlpha(150) : Colors.transparent,
+      color: selected && isDesktop() ? Theme.of(context).highlightColor.withAlpha(150) : Colors.transparent,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         mouseCursor: SystemMouseCursors.basic,
         borderRadius: BorderRadius.circular(8),
+        highlightColor: Color.fromARGB(25, 125, 125, 125),
+        splashColor: Color.fromARGB(25, 125, 125, 125),
         onLongPress: () {
           ref.read(selectedItemsProvider.notifier).startSelection();
         },
@@ -84,12 +85,12 @@ class SongListItem extends ConsumerWidget {
             child: Stack(
               children: [
                 Positioned(
-                  left: 15,
-                  bottom: 10,
+                  left: 0,
+                  bottom: 5,
                   child: AnimatedOpacity(opacity: selectedSongs != null && !isDesktop() ? 1 : 0,
                     curve: Curves.easeOutQuint, duration: Duration(milliseconds: 1000),
-                    child: Checkbox(value: selectedSongs?.contains(song.id) ?? false, onChanged: (value) {
-                      if (selectedSongs?.contains(song.id) == true) {
+                    child: Checkbox(value: selectedSongs?.contains(song.id) == true, onChanged: (value) {
+                      if (selectedSongs?.contains(song.id) == false) {
                         ref.read(selectedItemsProvider.notifier).addItem(song.id);
                       }
                       else {
@@ -242,13 +243,6 @@ class SongListItem extends ConsumerWidget {
                                     )).then((value) {
                                 });
                               }
-                            }),
-                            //TODO localize details
-                            PopupMenuItem(child: Text("Details"), onTap: () {
-                              showDialog(
-                                  context: context, builder: (context) {
-                                return SongDetailDialog(song: song);
-                              });
                             }),
                             PopupMenuItem(child: Text(AppLocalizations.of(context).get("@edit_song_info")), onTap: () {
                               showDialog(
