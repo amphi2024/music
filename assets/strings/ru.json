@@ -70,12 +70,15 @@
   "@edit_info_label_track_number": "Номер трека:",
   "@edit_info_label_disc_number": "Номер диска:",
   "@edit_info_label_released": "Дата выпуска:",
-  "@edit_info_label_composer": "(Композитор)",
-  "@edit_info_label_lyricist": "(Автор текста)",
-  "@edit_info_label_arranger": "(Аранжировщик)",
-  "@edit_info_label_producer": "(Продюсер)",
-  "@edit_info_label_album": "(Альбом)",
-  "@edit_info_label_artist": "(Исполнитель)",
+  "@edit_info_label_composer": "Композитор:",
+  "@edit_info_label_lyricist": "Автор текста:",
+  "@edit_info_label_arranger": "Аранжировщик:",
+  "@edit_info_label_producer": "Продюсер:",
+  "@edit_info_label_album": "Альбом:",
+  "@edit_info_label_artist": "Исполнитель:",
+  "@edit_info_label_debut": "Дебют:",
+  "@edit_info_label_members": "Участники:",
+
   "@name": "Имя",
   "@dialog_title_delete_playlist": "Вы хотите удалить этот плейлист?",
   "@dialog_title_delete_song": "Вы хотите удалить эту песню?",
@@ -84,6 +87,15 @@
   "@dialog_title_delete_artist": "Вы хотите удалить этого исполнителя?",
   "@dialog_title_remove_artist_picture": "Вы хотите удалить это изображение?",
   "@dialog_title_delete_lyric": "Удалить эту строку?",
-  "@no_lyrics_available": "Текст песни недоступен"
+  "@no_lyrics_available": "Текст песни недоступен",
+
+  "trash": "Корзина",
+  "move_to_trash": "Переместить в корзину",
+  "restore": "Восстановить",
+  "dialog_title_remove_song_file": "Вы уверены, что хотите удалить этот файл?",
+  "dialog_title_move_to_trash": "Вы уверены, что хотите переместить этот элемент в корзину?",
+  "edit": "Редактировать",
+  "delete": "Удалить",
+  "dialog_title_permanently_delete": "Вы уверены, что хотите удалить этот элемент навсегда?"
 
 }

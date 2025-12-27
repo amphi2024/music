@@ -83,12 +83,14 @@
   "@edit_info_label_track_number": "Track number:",
   "@edit_info_label_disc_number": "Disc number:",
   "@edit_info_label_released": "Released:",
-  "@edit_info_label_composer": "(Composer)",
-  "@edit_info_label_lyricist": "(Lyricist)",
-  "@edit_info_label_arranger": "(Arranger)",
-  "@edit_info_label_producer": "(Producer)",
-  "@edit_info_label_album": "(Album)",
-  "@edit_info_label_artist": "(Artist)",
+  "@edit_info_label_composer": "Composer:",
+  "@edit_info_label_lyricist": "Lyricist:",
+  "@edit_info_label_arranger": "Arranger:",
+  "@edit_info_label_producer": "Producer:",
+  "@edit_info_label_album": "Album:",
+  "@edit_info_label_artist": "Artist:",
+  "@edit_info_label_debut": "Debut:",
+  "@edit_info_label_members": "Members:",
 
   "@name": "Name",
 
@@ -100,5 +102,14 @@
   "@dialog_title_remove_artist_picture": "Are you sure you want to remove this picture?",
   "@dialog_title_delete_lyric": "Delete this line?",
 
-  "@no_lyrics_available": "No lyrics available"
+  "@no_lyrics_available": "No lyrics available",
+
+  "trash": "Trash",
+  "move_to_trash": "Move to Trash",
+  "restore": "Restore",
+  "dialog_title_remove_song_file": "Are you sure you want to remove this file?",
+  "dialog_title_move_to_trash": "Are you sure you want to move this item to trash?",
+  "edit": "Edit",
+  "delete": "Delete",
+  "dialog_title_permanently_delete": "Are you sure you want to permanently delete this item?"
 }

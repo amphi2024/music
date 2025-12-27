@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:amphi/models/app_localizations.dart';
 import 'package:amphi/utils/path_utils.dart';
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:file_picker/file_picker.dart';
@@ -136,8 +137,7 @@ class _EditSongFilesState extends ConsumerState<EditSongFiles> {
                           }, icon: Icon(players[songFile.id]?.state.playing == true ? Icons.pause : Icons.play_arrow)),
                           IconButton(onPressed: () {
                             showDialog(context: context, builder: (context) {
-                              //TODO: localize this
-                              return ConfirmationDialog(title: "delete?", onConfirmed: () {
+                              return ConfirmationDialog(title: AppLocalizations.of(context).get("dialog_title_remove_song_file"), onConfirmed: () {
                                 widget.onRemoveFile(songFile.id);
                               });
                             });

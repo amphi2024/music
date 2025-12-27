@@ -70,12 +70,15 @@
   "@edit_info_label_track_number": "Titelnummer:",
   "@edit_info_label_disc_number": "Discnummer:",
   "@edit_info_label_released": "Veröffentlichungsdatum:",
-  "@edit_info_label_composer": "(Komponist)",
-  "@edit_info_label_lyricist": "(Texter)",
-  "@edit_info_label_arranger": "(Arrangeur)",
-  "@edit_info_label_producer": "(Produzent)",
-  "@edit_info_label_album": "(Album)",
-  "@edit_info_label_artist": "(Künstler)",
+  "@edit_info_label_composer": "Komponist:",
+  "@edit_info_label_lyricist": "Texter:",
+  "@edit_info_label_arranger": "Arrangeur:",
+  "@edit_info_label_producer": "Produzent:",
+  "@edit_info_label_album": "Album:",
+  "@edit_info_label_artist": "Künstler:",
+  "@edit_info_label_debut": "Debüt:",
+  "@edit_info_label_members": "Mitglieder:",
+
   "@name": "Name",
   "@dialog_title_delete_playlist": "Möchten Sie diese Wiedergabeliste löschen?",
   "@dialog_title_delete_song": "Möchten Sie diesen Song löschen?",
@@ -84,6 +87,15 @@
   "@dialog_title_delete_artist": "Möchten Sie diesen Künstler löschen?",
   "@dialog_title_remove_artist_picture": "Möchten Sie dieses Bild entfernen?",
   "@dialog_title_delete_lyric": "Diesen Satz löschen?",
-  "@no_lyrics_available": "Keine Liedtexte verfügbar"
+  "@no_lyrics_available": "Keine Liedtexte verfügbar",
+
+  "trash": "Papierkorb",
+  "move_to_trash": "In den Papierkorb verschieben",
+  "restore": "Wiederherstellen",
+  "dialog_title_remove_song_file": "Möchten Sie diese Datei wirklich entfernen?",
+  "dialog_title_move_to_trash": "Möchten Sie dieses Element wirklich in den Papierkorb verschieben?",
+  "edit": "Bearbeiten",
+  "delete": "Löschen",
+  "dialog_title_permanently_delete": "Möchten Sie dieses Element wirklich dauerhaft löschen?"
 
 }

@@ -70,12 +70,15 @@
   "@edit_info_label_track_number": "Numéro de piste :",
   "@edit_info_label_disc_number": "Numéro de disque :",
   "@edit_info_label_released": "Date de sortie :",
-  "@edit_info_label_composer": "(Compositeur)",
-  "@edit_info_label_lyricist": "(Parolier)",
-  "@edit_info_label_arranger": "(Arrangeur)",
-  "@edit_info_label_producer": "(Producteur)",
-  "@edit_info_label_album": "(Album)",
-  "@edit_info_label_artist": "(Artiste)",
+  "@edit_info_label_composer": "Compositeur:",
+  "@edit_info_label_lyricist": "Parolier:",
+  "@edit_info_label_arranger": "Arrangeur:",
+  "@edit_info_label_producer": "Producteur:",
+  "@edit_info_label_album": "Album:",
+  "@edit_info_label_artist": "Artiste:",
+  "@edit_info_label_debut": "Début :",
+  "@edit_info_label_members": "Membres :",
+
   "@name": "Nom",
   "@dialog_title_delete_playlist": "Voulez-vous supprimer cette playlist ?",
   "@dialog_title_delete_song": "Voulez-vous supprimer cette chanson ?",
@@ -84,6 +87,15 @@
   "@dialog_title_delete_artist": "Voulez-vous supprimer cet artiste ?",
   "@dialog_title_remove_artist_picture": "Voulez-vous supprimer cette image ?",
   "@dialog_title_delete_lyric": "Supprimer cette ligne ?",
-  "@no_lyrics_available": "Paroles non disponibles"
+  "@no_lyrics_available": "Paroles non disponibles",
+
+  "trash": "Corbeille",
+  "move_to_trash": "Déplacer vers la corbeille",
+  "restore": "Restaurer",
+  "dialog_title_remove_song_file": "Voulez-vous vraiment supprimer ce fichier ?",
+  "dialog_title_move_to_trash": "Voulez-vous vraiment déplacer cet élément dans la corbeille ?",
+  "edit": "Modifier",
+  "delete": "Supprimer",
+  "dialog_title_permanently_delete": "Voulez-vous vraiment supprimer définitivement cet élément ?"
 
 }

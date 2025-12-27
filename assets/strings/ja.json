@@ -70,12 +70,15 @@
   "@edit_info_label_track_number": "トラック番号：",
   "@edit_info_label_disc_number": "ディスク番号：",
   "@edit_info_label_released": "リリース日：",
-  "@edit_info_label_composer": "（作曲者）",
-  "@edit_info_label_lyricist": "（作詞者）",
-  "@edit_info_label_arranger": "（編曲者）",
-  "@edit_info_label_producer": "（プロデューサー）",
-  "@edit_info_label_album": "（アルバム）",
-  "@edit_info_label_artist": "（アーティスト）",
+  "@edit_info_label_composer": "作曲者:",
+  "@edit_info_label_lyricist": "作詞者:",
+  "@edit_info_label_arranger": "編曲者:",
+  "@edit_info_label_producer": "プロデューサー:",
+  "@edit_info_label_album": "アルバム:",
+  "@edit_info_label_artist": "アーティスト:",
+  "@edit_info_label_debut": "デビュー:",
+  "@edit_info_label_members": "メンバー:",
+
   "@name": "名前",
   "@dialog_title_delete_playlist": "このプレイリストを削除しますか？",
   "@dialog_title_delete_song": "この曲を削除しますか？",
@@ -84,6 +87,15 @@
   "@dialog_title_delete_artist": "このアーティストを削除しますか？",
   "@dialog_title_remove_artist_picture": "この画像を削除しますか？",
   "@dialog_title_delete_lyric": "この行を削除しますか？",
-  "@no_lyrics_available": "歌詞は利用できません"
+  "@no_lyrics_available": "歌詞は利用できません",
+
+  "trash": "ゴミ箱",
+  "move_to_trash": "ゴミ箱に移動",
+  "restore": "復元",
+  "dialog_title_remove_song_file": "このファイルを削除してもよろしいですか？",
+  "dialog_title_move_to_trash": "この項目をゴミ箱に移動してもよろしいですか？",
+  "edit": "編集",
+  "delete": "削除",
+  "dialog_title_permanently_delete": "この項目を完全に削除してもよろしいですか？"
 
 }

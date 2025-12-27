@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:amphi/models/app_localizations.dart';
 import 'package:amphi/utils/path_utils.dart';
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:file_picker/file_picker.dart';
@@ -128,8 +129,7 @@ class _EditArtistDialogState extends ConsumerState<EditArtistDialog> {
                   ArtistInput(
                     //TODO: implement role with other component
                     artists: artist.members.map((e) => ref.read(artistsProvider).get(e.id)).toList(),
-                    //TODO: localize
-                    label: "Members: ",
+                    label: AppLocalizations.of(context).get("@edit_info_label_members"),
                     onArtistSelected: (artistId) {
                       setState(() {
                         artist.members.add(Member(id: artistId));
@@ -146,8 +146,7 @@ class _EditArtistDialogState extends ConsumerState<EditArtistDialog> {
                   Padding(
                     padding: padding,
                     child: EditMusicDate(
-                        //TODO: localize
-                        label: "Debut: ",
+                        label: AppLocalizations.of(context).get("@edit_info_label_debut"),
                         date: artist.debut,
                         onUpdate: (date) {
                           setState(() {

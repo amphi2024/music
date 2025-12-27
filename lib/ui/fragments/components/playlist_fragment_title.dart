@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:amphi/models/app_localizations.dart';
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -80,16 +81,15 @@ class PlaylistFragmentTitle extends ConsumerWidget {
                   children: [
                     PopupMenuButton(itemBuilder: (context) {
                       return [
-                        //TODO: localize
-                        PopupMenuItem(child: Text("edit"), onTap: () {
+                        PopupMenuItem(child: Text(AppLocalizations.of(context).get("edit")), onTap: () {
                           showDialog(context: context, builder: (context) =>
                               EditPlaylistDialog(
                                   playlist: playlist, ref: ref));
                         }),
-                        PopupMenuItem(child: Text("move to trash"), onTap: () {
+                        PopupMenuItem(child: Text(AppLocalizations.of(context).get("move_to_trash")), onTap: () {
                           showDialog(context: context, builder: (context) {
                             return ConfirmationDialog(
-                              title: "?",
+                              title: AppLocalizations.of(context).get("dialog_title_move_to_trash"),
                               onConfirmed: () {
                                 playlist.deleted = DateTime.now();
                                 playlist.save();

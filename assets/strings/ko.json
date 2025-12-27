@@ -86,12 +86,14 @@
   "@edit_info_label_track_number": "트랙 번호:",
   "@edit_info_label_disc_number": "디스크 번호:",
   "@edit_info_label_released": "발매날짜:",
-  "@edit_info_label_composer": "(작곡가)",
-  "@edit_info_label_lyricist": "(작사가)",
-  "@edit_info_label_arranger": "(편곡자)",
-  "@edit_info_label_producer": "(기획자)",
-  "@edit_info_label_album": "(앨범)",
-  "@edit_info_label_artist": "(아티스트)",
+  "@edit_info_label_composer": "작곡가:",
+  "@edit_info_label_lyricist": "작사가:",
+  "@edit_info_label_arranger": "편곡자:",
+  "@edit_info_label_producer": "기획자:",
+  "@edit_info_label_album": "앨범:",
+  "@edit_info_label_artist": "아티스트:",
+  "@edit_info_label_debut": "데뷔 날짜:",
+  "@edit_info_label_members": "멤버:",
 
   "@name": "이름",
 
@@ -102,6 +104,15 @@
   "@dialog_title_delete_artist": "해당 아티스트를 삭제하시겠습니까?",
   "@dialog_title_remove_artist_picture": "해당 사진을 제거하시겠습니까?",
   "@dialog_title_delete_lyric": "지우시겠습니까？",
-  "@no_lyrics_available": "가사가 없습니다"
+  "@no_lyrics_available": "가사가 없습니다",
+
+  "trash": "휴지통",
+  "move_to_trash": "휴지통으로 이동",
+  "restore": "복원",
+  "dialog_title_remove_song_file": "해당 파일을 제거하시겠습니까?",
+  "dialog_title_move_to_trash": "휴지통으로 이동하시겠습니까?",
+  "edit": "수정",
+  "delete": "삭제",
+  "dialog_title_permanently_delete": "영구삭제하시겠습니까?"
 
 }

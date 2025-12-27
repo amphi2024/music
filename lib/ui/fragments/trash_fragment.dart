@@ -1,3 +1,4 @@
+import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/providers/albums_provider.dart';
@@ -113,9 +114,8 @@ class _Item extends StatelessWidget {
               tooltip: "",
               itemBuilder: (context) {
                 return [
-                  //TODO: localize
-                  PopupMenuItem(child: Text("restore"), onTap: onRestore),
-                  PopupMenuItem(child: Text("delete"), onTap: onDelete),
+                  PopupMenuItem(onTap: onRestore, child: Text(AppLocalizations.of(context).get("restore"))),
+                  PopupMenuItem(onTap: onDelete, child: Text(AppLocalizations.of(context).get("delete"))),
                 ];
               })
         ],

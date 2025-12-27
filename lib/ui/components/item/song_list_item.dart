@@ -15,7 +15,6 @@ import 'package:music/ui/components/select_playlist.dart';
 import 'package:music/ui/dialogs/edit_song_dialog.dart';
 import 'package:music/utils/localized_title.dart';
 import 'package:music/utils/screen_size.dart';
-import 'package:music/utils/toast.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 import '../../../providers/albums_provider.dart';
@@ -183,17 +182,15 @@ class SongListItem extends ConsumerWidget {
                         icon: Icon(Icons.more_vert),
                         itemBuilder: (context) {
                           List<PopupMenuItem> list = [
-                            PopupMenuItem(child: Text(AppLocalizations.of(context).get("@remove_download")), onTap: () async {
-                              if(appSettings.useOwnServer) {
-                                // TODO: prevent deleting files before upload is finished
-                                await song.removeDownload();
-                                ref.read(songsProvider.notifier).insertSong(song);
-                              }
-                              else {
-                                //TODO: localize
-                                showToast(context, "?");
-                              }
-                            }),
+                            if(appSettings.useOwnServer) ... [
+                              PopupMenuItem(child: Text(AppLocalizations.of(context).get("@remove_download")), onTap: () async {
+                                if(appSettings.useOwnServer) {
+                                  // TODO: prevent deleting files before upload is finished
+                                  await song.removeDownload();
+                                  ref.read(songsProvider.notifier).insertSong(song);
+                                }
+                              })
+                            ],
                             PopupMenuItem(child: Text(AppLocalizations.of(context).get("@add_to_playlist")), onTap: () {
                               if (isDesktopOrTablet(context)) {
                                 showDialog(context: context, builder: (context) =>
@@ -267,13 +264,12 @@ class SongListItem extends ConsumerWidget {
                             }));
                           }
 
-                          //TODO: localize
-                          list.add(PopupMenuItem(child: Text("move to trash"), onTap: () {
+                          list.add(PopupMenuItem(child: Text(AppLocalizations.of(context).get("move_to_trash")), onTap: () {
                             showDialog(
                                 context: context,
                                 builder: (context) {
                                   return ConfirmationDialog(
-                                    title: "move to trash?",
+                                    title: AppLocalizations.of(context).get("dialog_title_move_to_trash"),
                                     onConfirmed: () {
                                       song.deleted = DateTime.now();
                                       song.save();

@@ -70,12 +70,15 @@
   "@edit_info_label_track_number": "曲目编号：",
   "@edit_info_label_disc_number": "光盘编号：",
   "@edit_info_label_released": "发行日期：",
-  "@edit_info_label_composer": "(作曲者)",
-  "@edit_info_label_lyricist": "(作词者)",
-  "@edit_info_label_arranger": "(编曲)",
-  "@edit_info_label_producer": "(制作人)",
-  "@edit_info_label_album": "(专辑)",
-  "@edit_info_label_artist": "(艺术家)",
+  "@edit_info_label_composer": "作曲者:",
+  "@edit_info_label_lyricist": "作词者:",
+  "@edit_info_label_arranger": "编曲:",
+  "@edit_info_label_producer": "制作人:",
+  "@edit_info_label_album": "专辑:",
+  "@edit_info_label_artist": "艺术家:",
+  "@edit_info_label_debut": "出道：",
+  "@edit_info_label_members": "成员：",
+
   "@name": "名称",
   "@dialog_title_delete_playlist": "您确定要删除此播放列表吗？",
   "@dialog_title_delete_song": "您确定要删除此歌曲吗？",
@@ -84,6 +87,15 @@
   "@dialog_title_delete_artist": "您确定要删除此艺术家吗？",
   "@dialog_title_remove_artist_picture": "您想删除这张图片吗？",
   "@dialog_title_delete_lyric": "要删除这一行吗？",
-  "@no_lyrics_available": "暂无歌词"
+  "@no_lyrics_available": "暂无歌词",
+
+  "trash": "回收站",
+  "move_to_trash": "移至回收站",
+  "restore": "恢复",
+  "dialog_title_remove_song_file": "确定要删除此文件吗？",
+  "dialog_title_move_to_trash": "确定要将此项目移至回收站吗？",
+  "edit": "编辑",
+  "delete": "删除",
+  "dialog_title_permanently_delete": "确定要永久删除此项目吗？"
 
 }
