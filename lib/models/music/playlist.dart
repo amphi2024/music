@@ -38,11 +38,18 @@ class Playlist {
         deleted = data.getNullableDateTime("deleted"),
         thumbnails = data.getMapList("thumbnails"),
         note = data["note"] {
+    initThumbnailIndexes();
+  }
+
+  void initThumbnailIndexes() {
     if(songs.length > 3) {
       while(thumbnailIndexes.length < 4) {
         final index = Random().nextInt(songs.length);
         thumbnailIndexes.add(index);
       }
+    }
+    else {
+      thumbnailIndexes = {};
     }
   }
 
