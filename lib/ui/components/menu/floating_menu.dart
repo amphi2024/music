@@ -40,7 +40,7 @@ class _FloatingMenuState extends ConsumerState<FloatingMenu> {
 
   @override
   Widget build(BuildContext context) {
-    final double height = 350;
+    final double height = 400;
     final screenHeight = MediaQuery.of(context).size.height;
     double verticalPadding = (screenHeight - height) / 2;
 
@@ -180,6 +180,13 @@ List<Widget> _menuButtons({required WidgetRef ref, required BuildContext context
           ref.read(fragmentStateProvider.notifier).setTitleMinimized(false);
           ref.read(showingPlaylistIdProvider.notifier).set("!ARCHIVE");
         }),
+    FloatingMenuButton(
+        icon: Icons.delete,
+        label: AppLocalizations.of(context).get("trash"),
+        onPressed: () {
+          ref.read(fragmentStateProvider.notifier).setTitleMinimized(false);
+          ref.read(showingPlaylistIdProvider.notifier).set("!TRASH");
+        })
   ];
 }
 

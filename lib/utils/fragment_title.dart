@@ -19,6 +19,8 @@ String fragmentTitle({required String playlistId, required BuildContext context,
       return AppLocalizations.of(context).get("@genres");
     case "!ARCHIVE":
       return AppLocalizations.of(context).get("@archive");
+    case "!TRASH":
+      return AppLocalizations.of(context).get("trash");
     case "!ARTIST":
       return ref.read(artistsProvider).get(playlistId).name.byContext(context);
     case "!ALBUM":

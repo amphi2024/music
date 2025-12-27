@@ -8,6 +8,7 @@ import 'package:music/ui/fragments/genres_fragment.dart';
 import 'package:music/ui/fragments/songs_fragment.dart';
 import 'package:music/ui/fragments/artists_fragment.dart';
 import 'package:music/ui/fragments/albums_fragment.dart';
+import 'package:music/ui/fragments/trash_fragment.dart';
 
 import '../../../channels/app_method_channel.dart';
 import '../../../utils/fragment_title.dart';
@@ -130,7 +131,7 @@ class _MainViewState extends ConsumerState<MainPage> {
                     menuShowing = false;
                   });
                 },
-              ),
+              )
             ],
           ),
         ),
@@ -147,16 +148,18 @@ class _Fragment extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     switch(playlistId.split(",").first) {
-      case "!SONGS":
-        return SongsFragment();
       case "!ARTISTS":
         return ArtistsFragment();
       case "!ALBUMS":
         return AlbumsFragment();
       case "!GENRES":
         return GenresFragment();
-      default:
+      case "!ARCHIVE":
         return ArchiveFragment();
+      case "!TRASH":
+        return TrashFragment();
+      default:
+        return SongsFragment();
     }
   }
 }

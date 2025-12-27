@@ -12,6 +12,7 @@ import 'package:music/providers/fragment_provider.dart';
 import 'package:music/providers/playlists_provider.dart';
 import 'package:music/providers/providers.dart';
 import 'package:music/providers/songs_provider.dart';
+import 'package:music/utils/move_to_trash.dart';
 
 import '../../channels/app_method_channel.dart';
 import '../../channels/app_web_channel.dart';
@@ -140,7 +141,6 @@ List<Widget> _menuItems({required WidgetRef ref, required BuildContext context})
             icon: Icons.music_note,
             onPressed: () {
               ref.read(showingPlaylistIdProvider.notifier).set("!SONGS");
-              ref.read(fragmentStateProvider.notifier).setState(titleMinimized: false, titleShowing: true);
               if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
                 saveWindowSize();
               }
@@ -153,7 +153,6 @@ List<Widget> _menuItems({required WidgetRef ref, required BuildContext context})
         icon: Icons.people,
         onPressed: () {
           ref.read(showingPlaylistIdProvider.notifier).set("!ARTISTS");
-          ref.read(fragmentStateProvider.notifier).setState(titleMinimized: false, titleShowing: true);
           if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
             saveWindowSize();
           }
@@ -164,7 +163,6 @@ List<Widget> _menuItems({required WidgetRef ref, required BuildContext context})
         icon: Icons.album,
         onPressed: () {
           ref.read(showingPlaylistIdProvider.notifier).set("!ALBUMS");
-          ref.read(fragmentStateProvider.notifier).setState(titleMinimized: false, titleShowing: true);
           if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
             saveWindowSize();
           }
@@ -175,7 +173,6 @@ List<Widget> _menuItems({required WidgetRef ref, required BuildContext context})
         icon: Icons.piano,
         onPressed: () {
           ref.read(showingPlaylistIdProvider.notifier).set("!GENRES");
-          ref.read(fragmentStateProvider.notifier).setState(titleMinimized: false, titleShowing: true);
           if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
             saveWindowSize();
           }
@@ -201,7 +198,25 @@ List<Widget> _menuItems({required WidgetRef ref, required BuildContext context})
             icon: Icons.archive,
             onPressed: () {
               ref.read(showingPlaylistIdProvider.notifier).set("!ARCHIVE");
-              ref.read(fragmentStateProvider.notifier).setState(titleMinimized: false, titleShowing: true);
+              if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+                saveWindowSize();
+              }
+            });
+      },
+    ),
+    DragTarget<List<String>>(
+      onAcceptWithDetails: (details) {
+        if(showingPlaylistId == "!SONGS" || !showingPlaylistId.startsWith("!")) {
+          moveSelectedSongsToTrash(selectedItems: ref.read(selectedItemsProvider) ?? [], showingPlaylistId: showingPlaylistId, ref: ref);
+        }
+      },
+      builder: (context, candidateData, rejectedData) {
+        return _MenuItem(
+            focused: showingPlaylistId == "!TRASH",
+            title: AppLocalizations.of(context).get("trash"),
+            icon: Icons.delete,
+            onPressed: () {
+              ref.read(showingPlaylistIdProvider.notifier).set("!TRASH");
               if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
                 saveWindowSize();
               }

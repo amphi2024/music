@@ -8,6 +8,7 @@ import 'package:music/ui/fragments/artist_fragment.dart';
 import 'package:music/ui/fragments/playlist_fragment.dart';
 import 'package:music/ui/fragments/genre_fragment.dart';
 import 'package:music/ui/fragments/songs_fragment.dart';
+import 'package:music/ui/fragments/trash_fragment.dart';
 import 'package:music/ui/pages/main/now_playing_panel.dart';
 import 'package:music/ui/pages/main/wide_main_page_fragment_title.dart';
 
@@ -164,6 +165,8 @@ class _Fragment extends StatelessWidget {
         return AlbumFragment();
       case "!GENRE":
         return GenreFragment();
+      case "!TRASH":
+        return TrashFragment();
       default:
         return PlaylistFragment();
     }
