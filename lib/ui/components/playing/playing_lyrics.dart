@@ -36,7 +36,7 @@ class _PlayingLyricsState extends ConsumerState<PlayingLyrics> {
   void initState() {
     super.initState();
     scrollOffsetListener.changes.listen((event) {
-      if(event > 3) { // Stop following only on the user's gesture
+      if(event > 10) { // Stop following only on the user's gesture
         following = false;
         timer?.cancel();
         timer = Timer(Duration(seconds: 2), () async {
