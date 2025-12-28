@@ -124,7 +124,12 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
       });
     }
 
-    playerService.setVolume(appCacheData.volume);
+    if(Platform.isAndroid || Platform.isIOS) {
+      playerService.setVolume(1);
+    }
+    else {
+      playerService.setVolume(appCacheData.volume);
+    }
 
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
