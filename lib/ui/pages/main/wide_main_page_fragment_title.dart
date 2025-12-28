@@ -1,3 +1,4 @@
+import 'package:amphi/models/app_localizations.dart';
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:amphi/widgets/move_window_button_or_spacer.dart';
 import 'package:flutter/material.dart';
@@ -91,7 +92,7 @@ class WideMainPageFragmentTitle extends ConsumerWidget {
           if(selectedSongs != null && showingPlaylistId == "!SONGS") ... [
             IconButton(onPressed: () {
               showDialog(context: context, builder: (context) {
-                return ConfirmationDialog(title: "move to trash", onConfirmed: () {
+                return ConfirmationDialog(title: AppLocalizations.of(context).get("move_to_trash"), onConfirmed: () {
                   moveSelectedSongsToTrash(selectedItems: selectedSongs, showingPlaylistId: showingPlaylistId, ref: ref);
                 });
               });
