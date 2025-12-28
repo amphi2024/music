@@ -12,6 +12,7 @@ import 'package:music/providers/providers.dart';
 import 'package:music/providers/songs_provider.dart';
 import 'package:music/providers/transfers_provider.dart';
 import 'package:music/ui/components/select_playlist.dart';
+import 'package:music/ui/components/select_playlist_bottom_sheet.dart';
 import 'package:music/ui/dialogs/edit_song_dialog.dart';
 import 'package:music/utils/localized_title.dart';
 import 'package:music/utils/screen_size.dart';
@@ -20,7 +21,6 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import '../../../providers/albums_provider.dart';
 import '../../../providers/artists_provider.dart';
 import '../../../services/player_service.dart';
-import '../bottom_sheet_drag_handle.dart';
 import '../image/album_cover.dart';
 import '../track_number.dart';
 
@@ -223,21 +223,8 @@ class SongListItem extends ConsumerWidget {
                                 ref.read(playingBarShowingProvider.notifier).set(false);
                                 showModalBottomSheet(
                                     context: context, builder: (context) =>
-                                    Container(
-                                      height: 500,
-                                      decoration: BoxDecoration(
-                                          color: Theme
-                                              .of(context)
-                                              .cardColor,
-                                          borderRadius: BorderRadius.circular(15)
-                                      ),
-                                      child: Column(
-                                          children: [
-                                            BottomSheetDragHandle(),
-                                            Expanded(child: SelectPlaylist(songIdList: [song.id]))
-                                          ]
-                                      ),
-                                    )).then((value) {
+                                    SelectPlaylistBottomSheet(songIdList: [song.id])).then((value) {
+                                      ref.read(playingBarShowingProvider.notifier).set(true);
                                 });
                               }
                             }),
