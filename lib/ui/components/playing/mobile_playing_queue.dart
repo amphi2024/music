@@ -51,7 +51,7 @@ class _MobilePlayingQueueState extends ConsumerState<MobilePlayingQueue> with Si
         child: Material(
           color: Theme.of(context).dialogTheme.barrierColor ?? Colors.black54,
           child: Padding(
-            padding: EdgeInsets.only(left: 25, right: 25),
+            padding: EdgeInsets.only(left: 25, right: 25, top: MediaQuery.paddingOf(context).top),
             child: PageStorage(
                 bucket: PageStorageBucket(),
                 child: PlayingQueue(textColor: Colors.white)),

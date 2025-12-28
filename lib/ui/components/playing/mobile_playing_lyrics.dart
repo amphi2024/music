@@ -50,7 +50,7 @@ class _PlayingLyricsState extends State<MobilePlayingLyrics> with SingleTickerPr
         child: Material(
           color: Theme.of(context).dialogTheme.barrierColor ?? Colors.black54,
           child: Padding(
-            padding: EdgeInsets.only(left: 15, right: 50),
+            padding: EdgeInsets.only(left: 15, right: 50, top: MediaQuery.paddingOf(context).top),
             child: PageStorage(
               bucket: PageStorageBucket(),
               child: PlayingLyrics(
