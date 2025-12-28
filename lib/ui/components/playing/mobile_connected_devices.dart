@@ -10,51 +10,54 @@ class MobileConnectedDevices extends StatefulWidget {
   State<MobileConnectedDevices> createState() => _MobileConnectedDevicesState();
 }
 
-class _MobileConnectedDevicesState extends State<MobileConnectedDevices> {
+class _MobileConnectedDevicesState extends State<MobileConnectedDevices> with SingleTickerProviderStateMixin {
 
-  double opacity = 0;
+  late final AnimationController controller = AnimationController(
+      value: 0,
+      duration: const Duration(milliseconds: 150),
+      vsync: this
+  );
+
+  late final animation = CurvedAnimation(
+      parent: controller,
+      curve: Curves.easeOut,
+      reverseCurve: Curves.easeOut
+  );
+
+  @override
+  void dispose() {
+    super.dispose();
+    controller.dispose();
+  }
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        opacity = 0.5;
-      });
-    });
     super.initState();
+    controller.forward();
   }
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      onPopInvokedWithResult: (didPop, result) {
-        widget.onRemove();
-      },
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            opacity = 0;
-          });
+    return FadeTransition(
+      opacity: controller,
+      child: PopScope(
+        onPopInvokedWithResult: (didPop, result) {
           widget.onRemove();
         },
-        child: Material(
-          color: Colors.transparent,
-          child: AnimatedContainer(
-            duration: Duration(milliseconds: 500),
-            color: Color.fromRGBO(15, 15, 15, opacity),
-            curve: Curves.easeOutQuint,
-            child: AnimatedOpacity(
-              duration: Duration(milliseconds: 500),
-              opacity: opacity * 2,
-              curve: Curves.easeOutQuint,
-              child: Padding(
-                padding: EdgeInsets.only(left: 25, right: 25, top: MediaQuery
-                    .of(context)
-                    .padding
-                    .top, bottom: 0),
-                child: ConnectedDevices(
-                  titleColor: Colors.white,
-                ),
+        child: GestureDetector(
+          onTap: () async {
+            await controller.reverse();
+            widget.onRemove();
+          },
+          child: Material(
+            color: Theme.of(context).dialogTheme.barrierColor ?? Colors.black54,
+            child: Padding(
+              padding: EdgeInsets.only(left: 25, right: 25, top: MediaQuery
+                  .of(context)
+                  .padding
+                  .top, bottom: 0),
+              child: ConnectedDevices(
+                titleColor: Colors.white,
               ),
             ),
           ),

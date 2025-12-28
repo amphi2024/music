@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music/providers/playing_state_provider.dart';
-import 'package:music/ui/components/icon/shuffle_icon.dart';
 import 'package:music/ui/components/playing/playing_queue.dart';
 
-import '../../../models/app_cache.dart';
-import '../../../services/player_service.dart';
-import '../icon/repeat_icon.dart';
 
 class MobilePlayingQueue extends ConsumerStatefulWidget {
 
@@ -18,85 +13,48 @@ class MobilePlayingQueue extends ConsumerStatefulWidget {
   ConsumerState<MobilePlayingQueue> createState() => _MobilePlayingQueueState();
 }
 
-class _MobilePlayingQueueState extends ConsumerState<MobilePlayingQueue> {
+class _MobilePlayingQueueState extends ConsumerState<MobilePlayingQueue> with SingleTickerProviderStateMixin {
 
-  double opacity = 0;
-  bool following = true;
+  late final AnimationController controller = AnimationController(
+      value: 0,
+      duration: const Duration(milliseconds: 150),
+      vsync: this
+  );
+
+  late final animation = CurvedAnimation(
+      parent: controller,
+      curve: Curves.easeOut,
+      reverseCurve: Curves.easeOut
+  );
+
+  @override
+  void dispose() {
+    super.dispose();
+    controller.dispose();
+  }
 
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        opacity = 0.5;
-      });
-    });
     super.initState();
+    controller.forward();
   }
 
   @override
   Widget build(BuildContext context) {
-    final volume = ref.watch(volumeProvider);
-    return PopScope(
-      onPopInvokedWithResult: (didPop, result) {
-        widget.onRemove();
-      },
+    return FadeTransition(
+      opacity: controller,
       child: GestureDetector(
-        onTap: () {
-          setState(() {
-            opacity = 0;
-          });
+        onTap: () async {
+          await controller.reverse();
           widget.onRemove();
         },
         child: Material(
-          color: Colors.transparent,
-          child: AnimatedContainer(
-            duration: Duration(milliseconds: 500),
-            color: Color.fromRGBO(15, 15, 15, opacity),
-            curve: Curves.easeOutQuint,
-            child: AnimatedOpacity(
-              duration: Duration(milliseconds: 500),
-              opacity: opacity * 2,
-              curve: Curves.easeOutQuint,
-              child: Padding(
-                padding: EdgeInsets.only(left: 25, right: 25, top: MediaQuery
-                    .of(context)
-                    .padding
-                    .top, bottom: 0),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Icon(volume > 0.5 ? Icons.volume_up : volume > 0.1 ? Icons.volume_down : Icons.volume_mute),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 8, left: 5),
-                            child: Slider(
-                                max: 1,
-                                value: volume,
-                                onChanged: (value) {
-                                  appCacheData.volume = value;
-                                  appCacheData.save();
-                                  playerService.setVolume(value);
-                                  ref.read(volumeProvider.notifier).set(value);
-                                }),
-                          ),
-                        ),
-                        IconButton(onPressed: () {
-                          // toggleShuffle(ref);
-                        }, icon: ShuffleIcon()),
-                        IconButton(onPressed: () {
-                          playerService.togglePlayMode(ref);
-                        }, icon: RepeatIcon()),
-                      ],
-                    ),
-                    Expanded(
-                        child: PlayingQueue(textColor: Colors.white)
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          color: Theme.of(context).dialogTheme.barrierColor ?? Colors.black54,
+          child: Padding(
+            padding: EdgeInsets.only(left: 25, right: 25),
+            child: PageStorage(
+                bucket: PageStorageBucket(),
+                child: PlayingQueue(textColor: Colors.white)),
           ),
         ),
       ),

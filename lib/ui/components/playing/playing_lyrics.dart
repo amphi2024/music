@@ -2,46 +2,47 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music/models/music/lyrics.dart';
-import 'package:music/providers/playing_state_provider.dart';
-import 'package:music/utils/lyrics_scroll.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
+import '../../../models/music/lyrics.dart';
+import '../../../providers/playing_state_provider.dart';
 import '../../../services/player_service.dart';
+import '../../../utils/lyrics_scroll.dart';
 
 class PlayingLyrics extends ConsumerStatefulWidget {
 
-  final void Function() onRemove;
-
-  const PlayingLyrics({super.key, required this.onRemove});
+  final EdgeInsets? padding;
+  final Color? color;
+  final double? fontSize;
+  const PlayingLyrics({super.key, this.padding, this.color, this.fontSize});
 
   @override
-  ConsumerState<PlayingLyrics> createState() => _PlayingLyricsState();
+  ConsumerState createState() => _PlayingLyricsState();
 }
 
 class _PlayingLyricsState extends ConsumerState<PlayingLyrics> {
-  double opacity = 0;
   bool following = true;
   final scrollController = ItemScrollController();
   Timer? timer;
+  final scrollOffsetListener = ScrollOffsetListener.create();
 
   @override
   void dispose() {
-    timer?.cancel();
     super.dispose();
+    timer?.cancel();
   }
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {
-        opacity = 0.5;
-      });
-      // timer = Timer.periodic(const Duration(milliseconds: 500), (d) {
-      //
-      // });
-
+    scrollOffsetListener.changes.listen((event) {
+      if(event > 3) { // Stop following only on the user's gesture
+        following = false;
+        timer?.cancel();
+        timer = Timer(Duration(seconds: 2), () async {
+          following = true;
+        });
+      }
     });
   }
 
@@ -51,74 +52,37 @@ class _PlayingLyricsState extends ConsumerState<PlayingLyrics> {
         .lyrics;
     final List<LyricLine> lines = lyrics.getLinesByLocale(context);
     final position = ref.watch(positionProvider);
-    final duration = ref.watch(durationProvider);
-    ref.listen(positionProvider, (prev, position) {
-      scrollToCurrentLyric(ref: ref, position: position, scrollController: scrollController);
-    });
+    if(following) {
+      ref.listen(positionProvider, (prev, position) {
+        scrollToCurrentLyric(lyricLines: lines, position: position, scrollController: scrollController);
+      });
+    }
 
-    return PopScope(
-      onPopInvokedWithResult: (didPop, result) {
-        widget.onRemove();
-      },
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            opacity = 0;
-          });
-          widget.onRemove();
-        },
-        child: Material(
-          color: Colors.transparent,
-          child: AnimatedContainer(
-            duration: Duration(milliseconds: 500),
-            color: Color.fromRGBO(15, 15, 15, opacity),
-            curve: Curves.easeOutQuint,
-            child: AnimatedOpacity(
-              duration: Duration(milliseconds: 500),
-              opacity: opacity * 2,
-              curve: Curves.easeOutQuint,
-              child: Padding(
-                padding: EdgeInsets.only(left: 25, right: 25, top: MediaQuery
-                    .of(context)
-                    .padding
-                    .top, bottom: 0),
-                child: PageStorage(
-                  bucket: PageStorageBucket(),
-                  child: ScrollablePositionedList.builder(
-                    itemScrollController: scrollController,
-                    itemCount: lines.length,
-                    padding: EdgeInsets.zero,
-                    itemBuilder: (context, index) {
-                      var focused = false;
-                      var line = lines[index];
-                      if (line.startsAt <= position &&
-                          line.endsAt >= duration) {
-                        focused = true;
-                      }
-                      return SelectableText(
-                        onTap: () {
-                          playerService.applyPlaybackPosition(line.startsAt);
-                        },
-                        lines[index].text,
-                        minLines: 1,
-                        maxLines: 200,
-                        style: TextStyle(
-                            fontSize: 30,
-                            color: focused ? Theme
-                                .of(context)
-                                .highlightColor : Colors.white,
-                            fontWeight: focused ? FontWeight.bold : null
-                        ),
-                      );
-                    },
-
-                  ),
-                ),
-              ),
-            ),
+    return ScrollablePositionedList.builder(
+      itemScrollController: scrollController,
+      itemCount: lines.length,
+      padding: widget.padding,
+      scrollOffsetListener: scrollOffsetListener,
+      physics: ClampingScrollPhysics(),
+      itemBuilder: (context, index) {
+        final line = lines[index];
+        final focused = line.startsAt <= position && line.endsAt >= position;
+        return SelectableText(
+          onTap: () {
+            playerService.applyPlaybackPosition(line.startsAt);
+          },
+          lines[index].text,
+          minLines: 1,
+          maxLines: 200,
+          style: TextStyle(
+              fontSize: widget.fontSize,
+              color: focused ? Theme
+                  .of(context)
+                  .highlightColor : widget.color,
+              fontWeight: focused ? FontWeight.bold : null
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

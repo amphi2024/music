@@ -11,11 +11,10 @@ class ShuffleIcon extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final shuffled = ref.watch(playingSongsProvider).shuffled;
-    return Icon(
-      shuffled ? Icons.shuffle_on : Icons.shuffle,
+    return Icon(Icons.shuffle,
       color: shuffled ? Theme.of(context).highlightColor : Theme
           .of(context)
-          .iconTheme.color,
+          .disabledColor,
       size: size,
     );
   }

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/providers/albums_provider.dart';
@@ -10,7 +8,7 @@ import 'package:music/ui/components/image/album_cover.dart';
 import 'package:music/ui/components/playing/mobile_connected_devices.dart';
 import 'package:music/ui/components/playing/mobile_playing_queue.dart';
 import 'package:music/ui/components/playing/play_controls.dart';
-import 'package:music/ui/components/playing/playing_lyrics.dart';
+import 'package:music/ui/components/playing/mobile_playing_lyrics.dart';
 import 'package:music/utils/localized_title.dart';
 
 import '../../../channels/app_method_channel.dart';
@@ -25,11 +23,22 @@ class PlayingBar extends ConsumerStatefulWidget {
 }
 
 class _PlayingBarState extends ConsumerState<PlayingBar> {
-  PageController pageController = PageController(initialPage: 1);
   late OverlayEntry overlayEntry;
 
   @override
+  void dispose() {
+    super.dispose();
+    overlayEntry.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    //TODO: Optimize performance for expanding animation
     final mediaQuery = MediaQuery.of(context);
     final playingBarExpanded = ref.watch(playingBarExpandedProvider);
     final playingBarShowing = ref.watch(playingBarShowingProvider);
@@ -39,10 +48,13 @@ class _PlayingBarState extends ConsumerState<PlayingBar> {
     final album = ref.watch(albumsProvider).get(song.albumId);
     final artists = ref.watch(artistsProvider).getAll(song.artistIds);
 
+    // Set padding to 15 in cases of iOS gestures or older iOS/Android versions
+    final double bottomPadding = mediaQuery.padding.bottom < 15 ? 15 : mediaQuery.padding.bottom;
+
     return AnimatedPositioned(
         left: playingBarExpanded ? 0 : 15,
         right: playingBarExpanded ? 0 : 15,
-        bottom: playingBarExpanded ? 0 : mediaQuery.padding.bottom + (playingBarShowing ? 15 : -150),
+        bottom: playingBarExpanded ? 0 : playingBarShowing ? bottomPadding : -150,
         curve: Curves.easeOutQuint,
         duration: const Duration(milliseconds: 750),
         child: GestureDetector(
@@ -153,48 +165,42 @@ class _PlayingBarState extends ConsumerState<PlayingBar> {
                                   IconButton(
                                       onPressed: () {
                                         WidgetsBinding.instance.addPostFrameCallback((_) {
-                                          final overlay = Overlay.of(context);
                                           overlayEntry = OverlayEntry(
-                                            builder: (context) => PlayingLyrics(
-                                              onRemove: () async {
-                                                await Future.delayed(const Duration(milliseconds: 500));
+                                            builder: (context) => MobilePlayingLyrics(
+                                              onRemove: () {
                                                 overlayEntry.remove();
                                               },
                                             ),
                                           );
-                                          overlay.insert(overlayEntry);
+                                          Overlay.of(context).insert(overlayEntry);
                                         });
                                       },
                                       icon: Icon(Icons.lyrics, size: 30)),
                                   IconButton(
                                       onPressed: () {
                                         WidgetsBinding.instance.addPostFrameCallback((_) {
-                                          final overlay = Overlay.of(context);
                                           overlayEntry = OverlayEntry(
                                             builder: (context) => MobileConnectedDevices(
-                                              onRemove: () async {
-                                                await Future.delayed(const Duration(milliseconds: 500));
+                                              onRemove: () {
                                                 overlayEntry.remove();
                                               },
                                             ),
                                           );
-                                          overlay.insert(overlayEntry);
+                                          Overlay.of(context).insert(overlayEntry);
                                         });
                                       },
                                       icon: Icon(Icons.devices, size: 30)),
                                   IconButton(
                                       onPressed: () {
                                         WidgetsBinding.instance.addPostFrameCallback((_) {
-                                          final overlay = Overlay.of(context);
                                           overlayEntry = OverlayEntry(
                                             builder: (context) => MobilePlayingQueue(
-                                              onRemove: () async {
-                                                await Future.delayed(const Duration(milliseconds: 500));
+                                              onRemove: () {
                                                 overlayEntry.remove();
                                               },
                                             ),
                                           );
-                                          overlay.insert(overlayEntry);
+                                          Overlay.of(context).insert(overlayEntry);
                                         });
                                       },
                                       icon: Icon(Icons.list, size: 30))

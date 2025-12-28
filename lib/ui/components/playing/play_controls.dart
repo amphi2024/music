@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/providers/artists_provider.dart';
 import 'package:music/providers/playing_state_provider.dart';
+import 'package:music/ui/components/icon/repeat_icon.dart';
+import 'package:music/ui/components/icon/shuffle_icon.dart';
 import 'package:music/utils/duration_converter.dart';
 import 'package:music/utils/localized_title.dart';
 
@@ -84,6 +86,11 @@ class PlayControls extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               IconButton(
+                  icon: ShuffleIcon(size: 25),
+                  onPressed: () {
+                    playerService.toggleShuffle(ref);
+                  }),
+              IconButton(
                   icon: Icon(Icons.fast_rewind, size: 35),
                   onPressed: () {
                     playerService.playPrevious(ref);
@@ -106,6 +113,11 @@ class PlayControls extends ConsumerWidget {
                   ),
                   onPressed: () {
                     playerService.playNext(ref);
+                  }),
+              IconButton(
+                  icon: RepeatIcon(size: 25),
+                  onPressed: () {
+                    playerService.togglePlayMode(ref);
                   })
             ],
           ),

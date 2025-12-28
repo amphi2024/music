@@ -1,69 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:music/providers/playing_state_provider.dart';
-import 'package:music/utils/lyrics_scroll.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:music/ui/components/playing/playing_lyrics.dart';
 
-import '../../../models/music/lyrics.dart';
-import '../../../services/player_service.dart';
-
-class DesktopPlayingLyrics extends ConsumerStatefulWidget {
+class DesktopPlayingLyrics extends StatelessWidget {
   const DesktopPlayingLyrics({super.key});
 
   @override
-  ConsumerState<DesktopPlayingLyrics> createState() => _DesktopPlayingLyricsState();
-}
-
-class _DesktopPlayingLyricsState extends ConsumerState<DesktopPlayingLyrics> {
-  final scrollController = ItemScrollController();
-  
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-
-    });
-
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final lyrics = ref.watch(playingSongsProvider.notifier).playingSong().playingFile().lyrics;
-    final List<LyricLine> lines = lyrics.getLinesByLocale(context);
-    final position = ref.watch(positionProvider);
-    ref.listen<int>(positionProvider, (prev, position) {
-      scrollToCurrentLyric(ref: ref, scrollController: scrollController, position: position);
-    });
-
     return Padding(
       padding: EdgeInsets.all(15),
       child: ScrollConfiguration(
         behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-        child: ScrollablePositionedList.builder(
-          itemScrollController: scrollController,
-          itemCount: lines.length,
-          padding: EdgeInsets.zero,
-          itemBuilder: (context, index) {
-            final line = lines[index];
-            final focused = line.startsAt <= position &&
-                line.endsAt >= position;
-            return GestureDetector(
-              onTap: () {
-                playerService.applyPlaybackPosition(line.startsAt);
-              },
-              child: Text(
-                lines[index].text,
-                //minLines: 1,
-                maxLines: 200,
-                style: TextStyle(
-                    color: focused ? Theme
-                        .of(context)
-                        .highlightColor : null,
-                    fontWeight: focused ? FontWeight.bold : null
-                ),
-              ),
-            );
-          },
+        child: PlayingLyrics(
+            padding: EdgeInsets.zero
         ),
       ),
     );
