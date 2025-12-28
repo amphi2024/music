@@ -15,7 +15,9 @@ import MediaPlayer
         super.applicationDidBecomeActive(application)
         MusicService.shared.methodChannel?.invokeMethod("sync_media_source_to_flutter", arguments: [
             "index": MusicService.shared.index,
-            "is_playing": MusicService.shared.isPlaying
+            "is_playing": MusicService.shared.isPlaying,
+            "list": MusicService.shared.itemList.map { $0.songId },
+            "playlist_id": MusicService.shared.playlistId
         ])
     }
     
@@ -61,9 +63,11 @@ import MediaPlayer
               let list = arguments["list"] as! Array<Dictionary<String, Any>>
               let playMode = arguments["play_mode"] as! Int
               let index = arguments["index"] as! Int
+              let playlistId = arguments["playlist_id"] as! String
               MusicService.shared.playMode = playMode
               MusicService.shared.index = index
               MusicService.shared.syncPlaylist(list: list)
+              MusicService.shared.playlistId = playlistId
           }
           result(true)
       case "set_media_source":

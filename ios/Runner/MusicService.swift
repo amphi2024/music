@@ -14,12 +14,13 @@ class MusicService {
     var artist: String = ""
     var albumCoverFilePath: String = ""
     var isPlaying = false
-    private var itemList: [PlayableItem] = []
+    var itemList: [PlayableItem] = []
     var index: Int = 0
     var token: String = ""
     var methodChannel: FlutterMethodChannel?
     var playMode: Int = 0
     var ctx = mpv_create()
+    var playlistId: String = "!SONGS"
     
     private init() {
 
@@ -56,7 +57,9 @@ class MusicService {
             }
             self.methodChannel?.invokeMethod("sync_media_source_to_flutter", arguments: [
                 "index": index,
-                "is_playing": self.isPlaying
+                "is_playing": self.isPlaying,
+                "list": itemList.map { $0.songId },
+                "playlist_id": playlistId
             ])
             return .success
         }

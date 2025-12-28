@@ -4,20 +4,16 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.net.Uri
-import io.flutter.embedding.android.FlutterActivity
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
-import android.util.Log
 import android.view.WindowManager
-import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
+import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import kotlinx.coroutines.*
-import java.io.File
 
 class MainActivity : FlutterActivity() {
 
@@ -63,7 +59,11 @@ class MainActivity : FlutterActivity() {
         super.onResume()
         methodChannel?.invokeMethod("sync_media_source_to_flutter", mapOf(
             "index" to (musicService?.index ?: 0),
-            "is_playing" to (musicService?.isPlaying ?: false)
+            "is_playing" to (musicService?.isPlaying ?: false),
+            "list" to (musicService?.list?.map { item ->
+                item.songId
+            } ?: listOf()),
+            "playlist_id" to (musicService?.playlistId ?: "")
         ))
         setNavigationBarColor(
             window = window,
@@ -185,6 +185,7 @@ class MainActivity : FlutterActivity() {
                             )
                             it.list.add(item)
                         }
+                        it.playlistId = call.argument<String>("playlist_id")!!
                     }
                     result.success(true)
                 }

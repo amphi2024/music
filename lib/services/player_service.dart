@@ -49,7 +49,7 @@ class PlayerService {
 
   Future<void> syncMediaSourceToNative(WidgetRef ref) async {
     await appMethodChannel.invokeMethod(
-        "sync_media_source_to_native", {"index": ref.read(playingSongsProvider).playingSongIndex, "is_playing": ref.read(isPlayingProvider)});
+        "sync_media_source_to_native", {"index": ref.read(playingSongsProvider).playingSongIndex, "is_playing": ref.read(isPlayingProvider), "playlist_id": ref.read(playingSongsProvider).playlistId});
   }
 
   Future<void> resume() async {
@@ -174,7 +174,8 @@ class PlayerService {
 
   Future<void> syncPlaylistState(WidgetRef ref) async {
     List<Map<String, dynamic>> list = [];
-    for (String songId in currentPlaylist(ref).songs) {
+    final playlist = currentPlaylist(ref);
+    for (String songId in playlist.songs) {
       final song = ref.read(songsProvider).get(songId);
       final artists = ref.read(artistsProvider).getAll(song.artistIds);
       final album = ref.read(albumsProvider).get(song.albumId);
@@ -191,7 +192,7 @@ class PlayerService {
 
     if (Platform.isAndroid || Platform.isIOS) {
       await appMethodChannel.invokeMethod(
-          "sync_playlist_state", {"list": list, "play_mode": ref.read(playModeProvider), "index": ref.read(playingSongsProvider).playingSongIndex});
+          "sync_playlist_state", {"list": list, "play_mode": ref.read(playModeProvider), "index": ref.read(playingSongsProvider).playingSongIndex, "playlist_id": playlist.id});
     }
   }
 

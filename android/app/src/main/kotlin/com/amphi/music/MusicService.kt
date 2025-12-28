@@ -42,6 +42,7 @@ class MusicService : Service() {
     var token = ""
     var title = ""
     var artist = ""
+    var playlistId = "!SONGS"
     var albumCoverFilePath: String? = null
     lateinit var mediaSessionCompat: MediaSessionCompat
     lateinit var mediaSession: MediaSession
@@ -56,7 +57,6 @@ class MusicService : Service() {
     @OptIn(UnstableApi::class)
     override fun onCreate() {
         super.onCreate()
-
         notificationManager = NotificationManagerCompat.from(this)
         player = ExoPlayer.Builder(this).build()
         mediaSession = MediaSession.Builder(this, player)

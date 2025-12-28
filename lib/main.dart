@@ -9,10 +9,11 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:media_kit/media_kit.dart';
+import 'package:media_kit/media_kit.dart' show MediaKit;
 import 'package:music/models/app_cache.dart';
 import 'package:music/models/app_settings.dart';
 import 'package:music/models/app_storage.dart';
+import 'package:music/models/music/playlist.dart';
 import 'package:music/providers/albums_provider.dart';
 import 'package:music/providers/artists_provider.dart';
 import 'package:music/providers/genres_provider.dart';
@@ -109,6 +110,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    timer?.cancel();
     super.dispose();
   }
 
@@ -150,7 +152,11 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
           case "sync_media_source_to_flutter":
             final index = call.arguments["index"];
             final isPlaying = call.arguments["is_playing"];
-            ref.read(playingSongsProvider.notifier).setPlayingSongIndex(index);
+            final list = call.arguments["list"];
+            final playlistId = call.arguments["playlist_id"];
+            final playlist = Playlist(id: playlistId);
+            playlist.songs.addAll(list);
+            ref.read(playingSongsProvider.notifier).notifyPlayStarted(song: ref.watch(songsProvider).get(list[index]), playlist: playlist);
             ref.read(isPlayingProvider.notifier).set(isPlaying);
             break;
           case "on_playback_changed":
