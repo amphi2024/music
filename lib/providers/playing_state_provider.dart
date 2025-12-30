@@ -70,6 +70,10 @@ class PlayingSongsNotifier extends Notifier<PlayingSongsState> {
     state = PlayingSongsState(playlistId: playlist.id, songs: songs, shuffled: shuffle ?? state.shuffled, playingSongIndex: index);
   }
 
+  void syncStateWithNative({required int index, required List<dynamic> idList, required String playlistId}) {
+    state = PlayingSongsState(playlistId: playlistId, songs: idList.map((e) => e.toString()).toList(), shuffled: state.shuffled, playingSongIndex: index);
+  }
+
   void updateToNextSong() {
     int index = state.playingSongIndex;
     index++;
