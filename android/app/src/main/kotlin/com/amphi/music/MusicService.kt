@@ -53,6 +53,14 @@ class MusicService : Service() {
         fun getService(): MusicService = this@MusicService
     }
 
+    fun syncMediaSourceToFlutter() {
+        methodChannel?.invokeMethod("sync_media_source_to_flutter", mapOf(
+            "index" to index,
+            "is_playing" to isPlaying,
+            "list" to list.map { item -> item.songId }.toList(),
+            "playlist_id" to playlistId
+        ))
+    }
 
     @OptIn(UnstableApi::class)
     override fun onCreate() {
@@ -99,10 +107,7 @@ class MusicService : Service() {
             override fun onPlaybackStateChanged(playbackState: Int) {
                 if (playbackState == Player.STATE_ENDED) {
                     playNext()
-                    methodChannel?.invokeMethod("sync_media_source_to_flutter", mapOf(
-                        "index" to index,
-                        "is_playing" to isPlaying
-                    ))
+                    syncMediaSourceToFlutter()
                 }
                 updatePlaybackState()
             }
@@ -123,19 +128,12 @@ class MusicService : Service() {
                     else {
                         //methodChannel?.invokeMethod("play_previous", null)
                         playPrevious()
-                        methodChannel?.invokeMethod("sync_media_source_to_flutter", mapOf(
-                            "index" to index,
-                            "is_playing" to isPlaying
-                        ))
+                        syncMediaSourceToFlutter()
                     }
                 }
                 "PLAY_NEXT" -> {
                     playNext()
-                    methodChannel?.invokeMethod("sync_media_source_to_flutter", mapOf(
-                        "index" to index,
-                        "is_playing" to isPlaying
-                    ))
-                    //methodChannel?.invokeMethod("play_next", null)
+                    syncMediaSourceToFlutter()
                 }
                 "PAUSE" -> {
                     if(isPlaying) {
@@ -214,10 +212,7 @@ class MusicService : Service() {
 
         setSource(url = item.url, filePath = item.mediaFilePath, playNow = true)
 
-        methodChannel?.invokeMethod("sync_media_source_to_flutter", mapOf(
-            "index" to index,
-            "is_playing" to isPlaying
-        ))
+        syncMediaSourceToFlutter()
 
         updateNotification()
     }
@@ -233,10 +228,7 @@ class MusicService : Service() {
         albumCoverFilePath = item.albumCoverFilePath
         setSource(url = item.url, filePath = item.mediaFilePath, playNow = true)
 
-        methodChannel?.invokeMethod("sync_media_source_to_flutter", mapOf(
-            "index" to index,
-            "is_playing" to isPlaying
-        ))
+        syncMediaSourceToFlutter()
         updateNotification()
     }
 
