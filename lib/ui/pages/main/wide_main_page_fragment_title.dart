@@ -1,10 +1,8 @@
-import 'package:amphi/models/app_localizations.dart';
-import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:amphi/widgets/move_window_button_or_spacer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/providers/playlists_provider.dart';
-import 'package:music/utils/move_to_trash.dart';
+import 'package:music/ui/pages/main/main_page_selection_actions.dart';
 
 import '../../../providers/providers.dart';
 import '../../components/add_item_button.dart';
@@ -30,6 +28,11 @@ class WideMainPageFragmentTitle extends ConsumerWidget {
                   ref.read(showingPlaylistIdProvider.notifier).set("${showingPlaylistId.split(",").first}S");
                 },
                 icon: Icon(Icons.arrow_back_ios_new))
+          ],
+          if (selectedSongs != null) ... [
+            IconButton(onPressed: () {
+              ref.read(selectedItemsProvider.notifier).endSelection();
+            }, icon: Icon(Icons.check_circle_outline))
           ],
           PopupMenuButton(
               itemBuilder: (context) {
@@ -89,15 +92,7 @@ class WideMainPageFragmentTitle extends ConsumerWidget {
               }, icon: Icon(Icons.search));
           } (),
           AddItemButton(),
-          if(selectedSongs != null && showingPlaylistId == "!SONGS") ... [
-            IconButton(onPressed: () {
-              showDialog(context: context, builder: (context) {
-                return ConfirmationDialog(title: AppLocalizations.of(context).get("move_to_trash"), onConfirmed: () {
-                  moveSelectedSongsToTrash(selectedItems: selectedSongs, showingPlaylistId: showingPlaylistId, ref: ref);
-                });
-              });
-            }, icon: Icon(Icons.delete))
-          ],
+          if(selectedSongs != null && showingPlaylistId == "!SONGS") ... mainPageSelectionActions(ref: ref, context: context, selectedSongs: selectedSongs, showingPlaylistId: showingPlaylistId),
           if(selectedSongs != null && !showingPlaylistId.startsWith("!")) ... [
             IconButton(onPressed: () {
               final playlist = ref.read(playlistsProvider).playlists.get(showingPlaylistId);

@@ -39,102 +39,95 @@ class _WideMainViewState extends ConsumerState<WideMainPage> {
   Widget build(BuildContext context) {
     appMethodChannel.setNavigationBarColor(Theme.of(context).scaffoldBackgroundColor);
     final playlistId = ref.watch(showingPlaylistIdProvider);
-    final floatingMenuShowing = ref.watch(floatingMenuShowingProvider);
     final nowPlayingPanelWidth = ref.watch(nowPlayingPanelWidthProvider);
     final themeData = Theme.of(context);
+    final selectedSongs = ref.watch(selectedItemsProvider);
 
     return PopScope(
-      canPop: !floatingMenuShowing,
+      canPop: selectedSongs == null,
       onPopInvokedWithResult: (didPop, result) {
-        if (floatingMenuShowing) {
-          ref.read(floatingMenuShowingProvider.notifier).set(false);
+        if(selectedSongs != null) {
+          ref.read(selectedItemsProvider.notifier).endSelection();
         }
       },
-      child: GestureDetector(
-        onTap: () {
-          if (floatingMenuShowing) {
-            ref.read(floatingMenuShowingProvider.notifier).set(false);
-          }
-        },
-        child: Scaffold(
-          backgroundColor: themeData.cardColor,
-          extendBodyBehindAppBar: true,
-          extendBody: true,
-          appBar: AppBar(toolbarHeight: 0 // This is needed to change the status bar text (icon) color on Android
-              ),
-          body: Row(
-            children: [
-              const Sidebar(),
-              Expanded(
-                  child: MouseRegion(
-                onHover: (event) {
-                  focusNode.requestFocus();
-                },
-                onExit: (event) {
-                  focusNode.unfocus();
-                },
-                child: Column(
-                  children: [
-                    const WideMainPageFragmentTitle(),
-                    Expanded(
-                        child: Padding(
-                      padding: const EdgeInsets.only(left: 5.0),
-                      child: KeyboardListener(
-                          focusNode: focusNode,
-                          includeSemantics: false,
-                          onKeyEvent: (event) {
-                            if (event is KeyUpEvent) {
-                              ref.read(selectedItemsProvider.notifier).ctrlPressed = false;
-                              ref.read(selectedItemsProvider.notifier).shiftPressed = false;
-                              return;
+      child: Scaffold(
+        backgroundColor: themeData.cardColor,
+        extendBodyBehindAppBar: true,
+        extendBody: true,
+        appBar: AppBar(toolbarHeight: 0 // This is needed to change the status bar text (icon) color on Android
+            ),
+        body: Row(
+          children: [
+            const Sidebar(),
+            Expanded(
+                child: MouseRegion(
+              onHover: (event) {
+                focusNode.requestFocus();
+              },
+              onExit: (event) {
+                focusNode.unfocus();
+              },
+              child: Column(
+                children: [
+                  const WideMainPageFragmentTitle(),
+                  Expanded(
+                      child: Padding(
+                    padding: const EdgeInsets.only(left: 5.0),
+                    child: KeyboardListener(
+                        focusNode: focusNode,
+                        includeSemantics: false,
+                        onKeyEvent: (event) {
+                          if (event is KeyUpEvent) {
+                            ref.read(selectedItemsProvider.notifier).ctrlPressed = false;
+                            ref.read(selectedItemsProvider.notifier).shiftPressed = false;
+                            return;
+                          }
+                          if (event.physicalKey == PhysicalKeyboardKey.metaLeft || event.physicalKey == PhysicalKeyboardKey.controlLeft || event.physicalKey == PhysicalKeyboardKey.controlRight) {
+                            ref.read(selectedItemsProvider.notifier).ctrlPressed = true;
+                            ref.read(selectedItemsProvider.notifier).shiftPressed = false;
+                            if (ref.watch(selectedItemsProvider) == null) {
+                              ref.read(selectedItemsProvider.notifier).startSelection();
                             }
-                            if (event.physicalKey == PhysicalKeyboardKey.metaLeft || event.physicalKey == PhysicalKeyboardKey.controlLeft || event.physicalKey == PhysicalKeyboardKey.controlRight) {
-                              ref.read(selectedItemsProvider.notifier).ctrlPressed = true;
-                              ref.read(selectedItemsProvider.notifier).shiftPressed = false;
-                              if (ref.watch(selectedItemsProvider) == null) {
-                                ref.read(selectedItemsProvider.notifier).startSelection();
-                              }
-                            }
+                          }
 
-                            if (event.physicalKey == PhysicalKeyboardKey.shiftLeft || event.physicalKey == PhysicalKeyboardKey.shiftRight) {
-                              ref.read(selectedItemsProvider.notifier).ctrlPressed = false;
-                              ref.read(selectedItemsProvider.notifier).shiftPressed = true;
-                              if (ref.watch(selectedItemsProvider) == null) {
-                                ref.read(selectedItemsProvider.notifier).startSelection();
-                              }
+                          if (event.physicalKey == PhysicalKeyboardKey.shiftLeft || event.physicalKey == PhysicalKeyboardKey.shiftRight) {
+                            ref.read(selectedItemsProvider.notifier).ctrlPressed = false;
+                            ref.read(selectedItemsProvider.notifier).shiftPressed = true;
+                            if (ref.watch(selectedItemsProvider) == null) {
+                              ref.read(selectedItemsProvider.notifier).startSelection();
                             }
+                          }
 
-                            if (ref.read(selectedItemsProvider.notifier).ctrlPressed && event.physicalKey == PhysicalKeyboardKey.keyA) {
-                              ref.read(selectedItemsProvider.notifier).addAll(showingPlaylist(ref).songs);
-                            }
-                          },
-                          child: _Fragment(playlistId: playlistId)),
-                    )),
-                  ],
-                ),
-              )),
-              MouseRegion(
-                cursor: SystemMouseCursors.resizeColumn,
-                child: GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onDoubleTap: () {
-                    ref.read(nowPlayingPanelWidthProvider.notifier).set(300);
-                    appCacheData.nowPlayingPanelWidth = 300;
-                    appCacheData.save();
-                  },
-                  onHorizontalDragUpdate: (d) {
-                    ref.read(nowPlayingPanelWidthProvider.notifier).set(nowPlayingPanelWidth - d.delta.dx);
-                  },
-                  onHorizontalDragEnd: (d) {
-                    appCacheData.nowPlayingPanelWidth = nowPlayingPanelWidth;
-                    appCacheData.save();
-                  },
-                  child: VerticalDivider(color: Theme.of(context).dividerColor, width: 10),
-                ),
+                          if (ref.read(selectedItemsProvider.notifier).ctrlPressed && event.physicalKey == PhysicalKeyboardKey.keyA) {
+                            ref.read(selectedItemsProvider.notifier).addAll(showingPlaylist(ref).songs);
+                          }
+                        },
+                        child: _Fragment(playlistId: playlistId)),
+                  )),
+                ],
               ),
-              const NowPlayingPanel()
-            ],
-          ),
+            )),
+            MouseRegion(
+              cursor: SystemMouseCursors.resizeColumn,
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onDoubleTap: () {
+                  ref.read(nowPlayingPanelWidthProvider.notifier).set(300);
+                  appCacheData.nowPlayingPanelWidth = 300;
+                  appCacheData.save();
+                },
+                onHorizontalDragUpdate: (d) {
+                  ref.read(nowPlayingPanelWidthProvider.notifier).set(nowPlayingPanelWidth - d.delta.dx);
+                },
+                onHorizontalDragEnd: (d) {
+                  appCacheData.nowPlayingPanelWidth = nowPlayingPanelWidth;
+                  appCacheData.save();
+                },
+                child: VerticalDivider(color: Theme.of(context).dividerColor, width: 10),
+              ),
+            ),
+            const NowPlayingPanel()
+          ],
         ),
       ),
     );

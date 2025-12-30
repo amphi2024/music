@@ -35,36 +35,39 @@ class Sidebar extends ConsumerWidget {
           Expanded(
             child: Column(
               children: [
-                SizedBox(
-                  height: 55,
-                  child: Row(
-                    children: [const Expanded(child: MoveWindowOrSpacer()), AccountButton(
-                      appCacheData: appCacheData,
-                      onLoggedIn: ({required id, required token, required username}) {
-                        onLoggedIn(id: id, token: token, username: username, context: context, ref: ref);
-                      },
-                      iconSize: 25,
-                      profileIconSize: 20,
-                      wideScreenIconSize: 25,
-                      wideScreenProfileIconSize: 20,
-                      appWebChannel: appWebChannel,
-                      appStorage: appStorage,
-                      onUserRemoved: () {
-                        onSelectedUserChanged(ref);
-                      },
-                      onUserAdded: () {
-                        onSelectedUserChanged(ref);
-                      },
-                      onUsernameChanged: () {
-                        onUsernameChanged(ref);
-                      },
-                      onSelectedUserChanged: (user) {
-                        onSelectedUserChanged(ref);
-                      },
-                      setAndroidNavigationBarColor: () {
-                        appMethodChannel.setNavigationBarColor(Theme.of(context).cardColor);
-                      },
-                    )],
+                Padding(
+                  padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top),
+                  child: SizedBox(
+                    height: 55,
+                    child: Row(
+                      children: [const Expanded(child: MoveWindowOrSpacer()), AccountButton(
+                        appCacheData: appCacheData,
+                        onLoggedIn: ({required id, required token, required username}) {
+                          onLoggedIn(id: id, token: token, username: username, context: context, ref: ref);
+                        },
+                        iconSize: 25,
+                        profileIconSize: 20,
+                        wideScreenIconSize: 25,
+                        wideScreenProfileIconSize: 20,
+                        appWebChannel: appWebChannel,
+                        appStorage: appStorage,
+                        onUserRemoved: () {
+                          onSelectedUserChanged(ref);
+                        },
+                        onUserAdded: () {
+                          onSelectedUserChanged(ref);
+                        },
+                        onUsernameChanged: () {
+                          onUsernameChanged(ref);
+                        },
+                        onSelectedUserChanged: (user) {
+                          onSelectedUserChanged(ref);
+                        },
+                        setAndroidNavigationBarColor: () {
+                          appMethodChannel.setNavigationBarColor(Theme.of(context).cardColor);
+                        },
+                      )],
+                    ),
                   ),
                 ),
                 Expanded(
