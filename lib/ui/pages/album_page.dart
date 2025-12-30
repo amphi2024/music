@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/models/music/album.dart';
@@ -9,6 +11,7 @@ import 'package:music/ui/dialogs/edit_album_dialog.dart';
 import 'package:music/ui/fragments/components/floating_button.dart';
 import 'package:music/utils/localized_title.dart';
 import '../../providers/artists_provider.dart';
+import '../../services/player_service.dart';
 
 class AlbumPage extends ConsumerWidget {
   final Album album;
@@ -22,6 +25,7 @@ class AlbumPage extends ConsumerWidget {
         .playlists
         .get("!ALBUM,${album.id}");
     final songs = ref.watch(songsProvider);
+    final songIdList = ref.watch(playlistsProvider).playlists.get("!ALBUM,${album.id}").songs;
 
     final imageSize = MediaQuery
         .of(context)
@@ -83,26 +87,17 @@ class AlbumPage extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Padding(padding: EdgeInsets.only(right: 15), child: FloatingButton(icon: Icons.play_arrow, onPressed: () {
-                          // if (album.songs.isNotEmpty) {
-                          //   // appState.setState(() {
-                          //   //   var id = album.songs[0];
-                          //   //   var song = ref.watch(songsProvider).get(id);
-                          //   //   playerService.isPlaying = true;
-                          //   //   playerService.startPlay(song: song, playlistId: "!ALBUM,${album.id}");
-                          //   //   playerService.shuffled = false;
-                          //   // });
-                          // }
+                          if(songIdList.isNotEmpty) {
+                            final song = ref.read(songsProvider).get(songIdList[0]);
+                            playerService.startPlay(song: song, playlistId: "!ALBUM,${album.id}", ref: ref, shuffle: false);
+                          }
                         })),
                         FloatingButton(icon: Icons.shuffle, onPressed: () {
-                          // if (album.songs.isNotEmpty) {
-                          //   int index = Random().nextInt(album.songs.length);
-                          //   var id = album.songs[index];
-                          //   var song = ref.watch(songsProvider).get(id);
-                          //   // appState.setState(() {
-                          //   //   playerService.isPlaying = true;
-                          //   //   playerService.startPlay(song: song, playlistId: "!ALBUM,${album.id}", shuffle: true);
-                          //   // });
-                          // }
+                          if(songIdList.isNotEmpty) {
+                            final index = Random().nextInt(songIdList.length);
+                            final song = ref.read(songsProvider).get(songIdList[index]);
+                            playerService.startPlay(song: song, playlistId: "!ALBUM,${album.id}", ref: ref, shuffle: true);
+                          }
                         })
                       ],
                     ),

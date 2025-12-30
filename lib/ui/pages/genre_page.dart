@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/providers/playlists_provider.dart';
@@ -5,6 +7,7 @@ import 'package:music/ui/fragments/components/floating_button.dart';
 import 'package:music/utils/localized_title.dart';
 
 import '../../providers/songs_provider.dart';
+import '../../services/player_service.dart';
 import '../components/item/song_list_item.dart';
 
 class GenrePage extends ConsumerWidget {
@@ -16,7 +19,7 @@ class GenrePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final genreName = genre["default"];
     final playlistId = "!GENRE,${genreName}";
-    final genrePlaylist = ref.watch(playlistsProvider).playlists.get(playlistId);
+    final playlist = ref.watch(playlistsProvider).playlists.get(playlistId);
     final songs = ref.watch(songsProvider);
 
     return Scaffold(
@@ -45,27 +48,21 @@ class GenrePage extends ConsumerWidget {
                 FloatingButton(
                     icon: Icons.play_arrow,
                     onPressed: () {
-                      // var song = songList.firstOrNull;
-                      // if (song != null) {
-                      //   // appState.setState(() {
-                      //   //   playerService.isPlaying = true;
-                      //   //   playerService.shuffled = false;
-                      //   //   playerService.startPlay(song: song, playlistId: playlistId);
-                      //   // });
-                      // }
+                      if (playlist.songs.isNotEmpty) {
+                        final song = ref.read(songsProvider).get(playlist.songs[0]);
+                        playerService.startPlay(song: song, playlistId: playlist.id, ref: ref, shuffle: false);
+                      }
                     }),
                 Padding(
                     padding: EdgeInsets.only(left: 15),
                     child: FloatingButton(
                         icon: Icons.shuffle,
                         onPressed: () {
-                          // var song = songList.firstOrNull;
-                          // if (song != null) {
-                          //   // appState.setState(() {
-                          //   //   playerService.isPlaying = true;
-                          //   //   playerService.startPlay(song: song, playlistId: playlistId, shuffle: true);
-                          //   // });
-                          // }
+                          if(playlist.songs.isNotEmpty) {
+                            final index = Random().nextInt(playlist.songs.length);
+                            final song = ref.read(songsProvider).get(playlist.songs[index]);
+                            playerService.startPlay(song: song, playlistId: playlist.id, ref: ref, shuffle: true);
+                          }
                         }))
               ],
             ),
@@ -73,10 +70,10 @@ class GenrePage extends ConsumerWidget {
         ),
         SliverList(
           delegate: SliverChildBuilderDelegate((context, index) {
-            final songId = genrePlaylist.songs[index];
+            final songId = playlist.songs[index];
             final song = songs.get(songId);
             return SongListItem(song: song, playlistId: playlistId);
-          }, childCount: genrePlaylist.songs.length),
+          }, childCount: playlist.songs.length),
         ),
       ]),
     );

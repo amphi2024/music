@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +11,9 @@ import 'package:music/ui/components/image/artist_profile_image.dart';
 import 'package:music/ui/dialogs/edit_artist_dialog.dart';
 import 'package:music/utils/localized_title.dart';
 
+import '../../models/music/playlist.dart';
+import '../../providers/songs_provider.dart';
+import '../../services/player_service.dart';
 import '../fragments/components/floating_button.dart';
 import 'album_page.dart';
 
@@ -25,7 +30,12 @@ class ArtistPage extends ConsumerWidget {
         .of(context)
         .size
         .width - 100;
-    final albumIds = ref.watch(playlistsProvider).playlists.get("!ARTIST,${artist.id}").songs;
+    final String playlistId = "!ARTIST,${artist.id}";
+    final playlists = ref
+        .watch(playlistsProvider)
+        .playlists;
+    final playlist = playlists.get(playlistId);
+    final albumIds = playlist.songs;
     final albums = ref.watch(albumsProvider);
     return Scaffold(
       body: CustomScrollView(
@@ -71,29 +81,27 @@ class ArtistPage extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Padding(padding: EdgeInsets.only(right: 15), child: FloatingButton(icon: Icons.play_arrow, onPressed: () {
-                      // var albumId = artist.albums.firstOrNull;
-                      // if(albumId != null) {
-                      //   var songId = appStorage.albums.get(albumId).songs.firstOrNull;
-                      //   if(songId != null) {
-                      //     // appState.setState(() {
-                      //     //   playerService.isPlaying = true;
-                      //     //   playerService.shuffled = false;
-                      //     //   playerService.startPlay(song: ref.watch(songsProvider).get(songId), playlistId: playlistId);
-                      //     // });
-                      //   }
-                      // }
+                      final artistPlaylist = Playlist(id: "!ARTIST,${artist.id}");
+                      for(var id in playlist.songs) {
+                        final albumPlaylist = playlists.get("!ALBUM,$id");
+                        artistPlaylist.songs.addAll(albumPlaylist.songs);
+                      }
+                      if(artistPlaylist.songs.isNotEmpty) {
+                        final song = ref.read(songsProvider).get(artistPlaylist.songs[0]);
+                        playerService.startPlayFromPlaylist(song: song, playlist: artistPlaylist, ref: ref, shuffle: false);
+                      }
                     })),
                     FloatingButton(icon: Icons.shuffle, onPressed: () {
-                      // var albumId = artist.albums.firstOrNull;
-                      // if(albumId != null) {
-                      //   var songId = appStorage.albums.get(albumId).songs.firstOrNull;
-                      //   if(songId != null) {
-                      //     // appState.setState(() {
-                      //     //   playerService.isPlaying = true;
-                      //     //   playerService.startPlay(song: ref.watch(songsProvider).get(songId), playlistId: playlistId, shuffle: true);
-                      //     // });
-                      //   }
-                      // }
+                      final artistPlaylist = Playlist(id: "!ARTIST,${artist.id}");
+                      for(var id in playlist.songs) {
+                        final albumPlaylist = playlists.get("!ALBUM,$id");
+                        artistPlaylist.songs.addAll(albumPlaylist.songs);
+                      }
+                      if(artistPlaylist.songs.isNotEmpty) {
+                        final index = Random().nextInt(artistPlaylist.songs.length);
+                        final song = ref.read(songsProvider).get(artistPlaylist.songs[index]);
+                        playerService.startPlayFromPlaylist(song: song, playlist: artistPlaylist, ref: ref, shuffle: true);
+                      }
                     })
                   ],
                 ),
