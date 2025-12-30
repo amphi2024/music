@@ -13,7 +13,6 @@ import 'package:media_kit/media_kit.dart' show MediaKit;
 import 'package:music/models/app_cache.dart';
 import 'package:music/models/app_settings.dart';
 import 'package:music/models/app_storage.dart';
-import 'package:music/models/music/playlist.dart';
 import 'package:music/providers/albums_provider.dart';
 import 'package:music/providers/artists_provider.dart';
 import 'package:music/providers/genres_provider.dart';
@@ -140,9 +139,13 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
           final position = await playerService.getPlaybackPosition();
           if (ref.watch(isPlayingProvider)) {
             await onPlaybackChanged(position);
-            if (position + 300 >= ref.watch(durationProvider)) {
-              onPlaybackFinished();
-            }
+          }
+        });
+
+        playerService.player!.stream.completed.listen((completed) async {
+          final position = await playerService.getPlaybackPosition();
+          if(completed && position + 300 >= playerService.player!.state.duration.inMilliseconds) {
+            onPlaybackFinished();
           }
         });
       }
@@ -152,12 +155,12 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
           case "sync_media_source_to_flutter":
             final index = call.arguments["index"];
             final isPlaying = call.arguments["is_playing"];
-            final list = call.arguments["list"];
+            final List<dynamic> list = call.arguments["list"];
             final playlistId = call.arguments["playlist_id"];
-            final playlist = Playlist(id: playlistId);
-            playlist.songs.addAll(list);
-            ref.read(playingSongsProvider.notifier).notifyPlayStarted(song: ref.watch(songsProvider).get(list[index]), playlist: playlist);
+            ref.read(playingSongsProvider.notifier).syncStateWithNative(playlistId: playlistId, index: index, idList: list);
             ref.read(isPlayingProvider.notifier).set(isPlaying);
+            appCacheData.lastPlayedSongId = list[index].toString();
+            appCacheData.save();
             break;
           case "on_playback_changed":
             final position = call.arguments["position"];

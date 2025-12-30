@@ -6,27 +6,29 @@ import media_kit_video
 class MusicService {
     static let shared = MusicService()
 
-    private var volume: Double = 0.5
-    var duration: Int = 0
-    var position: Int = 0
     private var soundLoaded: Bool = false
-    var title: String = ""
-    var artist: String = ""
-    var albumCoverFilePath: String = ""
     var isPlaying = false
     var itemList: [PlayableItem] = []
     var index: Int = 0
     var token: String = ""
     var methodChannel: FlutterMethodChannel?
     var playMode: Int = 0
-    var ctx = mpv_create()
     var playlistId: String = "!SONGS"
+    let avPlayer = AVPlayer()
+    let mpvPlayer = MPVPlayer() // fallback
+    var avPlayerUsageCount = 0
+    let fileManager = FileManager.default
+    
+    func syncMediaSourceToFlutter() {
+        self.methodChannel?.invokeMethod("sync_media_source_to_flutter", arguments: [
+            "index": index,
+            "is_playing": self.isPlaying,
+            "list": itemList.map { $0.songId },
+            "playlist_id": playlistId
+        ])
+    }
     
     private init() {
-
-        mpv_initialize(ctx)
-        mpv_set_option_string(ctx, "ao", "audiounit")
-        mpv_set_option_string(ctx, "vo", "null")
         let commandCenter = MPRemoteCommandCenter.shared()
         
         commandCenter.nextTrackCommand.isEnabled = true
@@ -55,12 +57,7 @@ class MusicService {
             } else {
                 resume()
             }
-            self.methodChannel?.invokeMethod("sync_media_source_to_flutter", arguments: [
-                "index": index,
-                "is_playing": self.isPlaying,
-                "list": itemList.map { $0.songId },
-                "playlist_id": playlistId
-            ])
+            syncMediaSourceToFlutter()
             return .success
         }
         
@@ -80,7 +77,7 @@ class MusicService {
             guard let self = self else { return .commandFailed }
             if let positionEvent = event as? MPChangePlaybackPositionCommandEvent {
                   let positionInSeconds = positionEvent.positionTime
-                  let positionInMilliseconds = Int(positionInSeconds * 1000)
+                  let positionInMilliseconds = Int(positionInSeconds) * 1000
                   self.applyPlaybackPosition(position: positionInMilliseconds)
 
                   return .success
@@ -91,33 +88,30 @@ class MusicService {
         }
     }
     
+    func observePlaybackEnd() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(playerDidFinishPlaying),
+            name: .AVPlayerItemDidPlayToEndTime,
+            object: avPlayer.currentItem
+        )
+    }
+    
+    @objc func playerDidFinishPlaying(_ notification: Notification) {
+        playNext()
+    }
+
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
     func pause() {
-        isPlaying = false
-        var pause: Int32 = 1
-        mpv_set_property(ctx, "pause", MPV_FORMAT_FLAG, &pause)
+        avPlayer.pause()
     }
     
     func resume() {
-        isPlaying = false
-        var pause: Int32 = 0
-        mpv_set_property(ctx, "pause", MPV_FORMAT_FLAG, &pause)
-    }
-    
-    func stop() {
-        var args: [UnsafePointer<CChar>?] = [
-            UnsafePointer(strdup("stop")),
-            nil
-        ]
-
-        args.withUnsafeMutableBufferPointer { buffer in
-            mpv_command(ctx, buffer.baseAddress)
-        }
-
-        for arg in args {
-            if let arg {
-                free(UnsafeMutableRawPointer(mutating: arg))
-            }
-        }
+        avPlayer.play()
     }
     
     func syncPlaylist(list: Array<Dictionary<String, Any>>) {
@@ -127,87 +121,35 @@ class MusicService {
             itemList.append(playableItem)
         }
     }
-    func applyHTTPHeaderFields() {
-        var node = mpv_node()
-        node.format = MPV_FORMAT_NODE_ARRAY
 
-        let listPtr = UnsafeMutablePointer<mpv_node_list>.allocate(capacity: 1)
-        node.u.list = listPtr
-
-        let headers = ["Authorization: \(token)"]
-        let count = headers.count
-        listPtr.pointee.num = Int32(count)
-        
-        let valuesPtr = UnsafeMutablePointer<mpv_node>.allocate(capacity: count)
-        listPtr.pointee.values = valuesPtr
-
-        for (i, header) in headers.enumerated() {
-            valuesPtr[i].format = MPV_FORMAT_STRING
-            valuesPtr[i].u.string = strdup(header)
-        }
-
-        defer {
-            for i in 0..<count {
-                if let strPtr = valuesPtr[i].u.string {
-                    free(strPtr)
-                }
-            }
-            valuesPtr.deallocate()
-            listPtr.deallocate()
-        }
-
-        let result = mpv_set_property(ctx, "http-header-fields", MPV_FORMAT_NODE, &node)
-        
-        if result < 0 {
-            let errorMsg = String(cString: mpv_error_string(result))
-            print("MPV Header Error: \(errorMsg)")
-        }
+    func isSupportedFormat(filePath: String) -> Bool {
+        let format = filePath.split(separator: ".").last
+        return ["flac", "mp3", "aac", "alac", "ogg", "m4a", "mp4", "mov", "wav", "aif", "aiff", "caf",].contains(format)
     }
     
+    // TODO: Ensure MPV works correctly as a fallback
     func setMediaSource(filePath: String, playNow: Bool, url: String) {
-        
-        let fileManager = FileManager.default
-        
-        stop()
-        pause()
-        
         if fileManager.fileExists(atPath: filePath) && !filePath.isEmpty {
-            
-            var args: [UnsafePointer<CChar>?] = [
-                UnsafePointer(strdup("loadfile")),
-                UnsafePointer(strdup(filePath)),
-                nil
-            ]
-
-            args.withUnsafeMutableBufferPointer { buffer in
-                mpv_command(ctx, buffer.baseAddress)
-            }
-
-            for arg in args {
-                if let arg = arg {
-                    free(UnsafeMutableRawPointer(mutating: arg))
+            if isSupportedFormat(filePath: filePath) {
+                avPlayer.replaceCurrentItem(with: AVPlayerItem(url: URL(fileURLWithPath: filePath)))
+                observePlaybackEnd()
+                
+                if mpvPlayer.activated {
+                    avPlayerUsageCount += 1
+                    if avPlayerUsageCount > 5 {
+                        mpvPlayer.deactivate()
+                    }
                 }
+            }
+            else {
+                mpvPlayer.loadURL(url: filePath)
+                avPlayerUsageCount = 0
             }
         }
         else {
-            
-            var args: [UnsafePointer<CChar>?] = [
-                UnsafePointer(strdup("loadfile")),
-                UnsafePointer(strdup(url)),
-                nil
-            ]
-
-            args.withUnsafeMutableBufferPointer { buffer in
-               mpv_command(ctx, buffer.baseAddress)
-            }
-
-            for arg in args {
-                if let arg = arg {
-                    free(UnsafeMutableRawPointer(mutating: arg))
-                }
-            }
-            
-            applyHTTPHeaderFields()
+            mpvPlayer.loadURL(url: url)
+            mpvPlayer.applyHTTPHeaderFields(token: token)
+            avPlayerUsageCount = 0
         }
         
         if playNow {
@@ -216,48 +158,32 @@ class MusicService {
     }
     
     func applyPlaybackPosition(position: Int) {
-        let timeMs = Double(position) / 1000
-        
-        var args: [UnsafePointer<CChar>?] = [
-            UnsafePointer(strdup("seek")),
-            UnsafePointer(strdup(String(timeMs))),
-            UnsafePointer(strdup("absolute")),
-            nil
-        ]
-
-        args.withUnsafeMutableBufferPointer { buffer in
-            mpv_command(ctx, buffer.baseAddress)
+        if mpvPlayer.activated {
+            mpvPlayer.seekTo(position: position)
         }
-
-        for arg in args {
-            if let arg = arg {
-                free(UnsafeMutableRawPointer(mutating: arg))
-            }
+        else {
+            avPlayer.seek(to: CMTime(seconds: Double(position) / 1000, preferredTimescale: 1000))
         }
     }
     
     func setVolume(volume: Double) {
-        self.volume = volume * 100
-        mpv_set_property(ctx, "volume", MPV_FORMAT_DOUBLE, &self.volume)
+        if mpvPlayer.activated {
+            mpvPlayer.setVolume(volume: volume)
+        }
     }
     
     func getDuration() -> Int {
-        var time: Double = 0
-        
-        if mpv_get_property(ctx, "duration", MPV_FORMAT_DOUBLE, &time) < 0 {
-            return 0
+        if mpvPlayer.activated {
+            return mpvPlayer.getDuration()
         }
         
-        duration = Int(time * 1000)
-        
-        return duration
-        
+        let seconds = avPlayer.currentItem?.duration.seconds ?? 0
+        return Int((seconds.isNormal ? seconds : 0) * 1000)
     }
     
     func updateNowPlayingInfo() {
-        
-        let convertedDuration = Double(duration) / 1000.0
-        let convertedPosition = Double(position) / 1000.0
+        let duration = mpvPlayer.activated ? mpvPlayer.getDurationRaw() : avPlayer.currentItem?.duration.seconds ?? 0
+        let position = mpvPlayer.activated ? mpvPlayer.getPlaybackPositionRaw() : avPlayer.currentTime().seconds
         do {
             let audioSession = AVAudioSession.sharedInstance()
             try audioSession.setCategory(.playback, mode: .default, options: [])
@@ -269,15 +195,14 @@ class MusicService {
         UIApplication.shared.beginReceivingRemoteControlEvents()
         
         var info: [String: Any] = [
-            MPMediaItemPropertyTitle: self.title,
-            MPMediaItemPropertyArtist: self.artist,
-            MPMediaItemPropertyPlaybackDuration: convertedDuration,
-            MPNowPlayingInfoPropertyElapsedPlaybackTime: convertedPosition,
+            MPMediaItemPropertyTitle: itemList[index].title,
+            MPMediaItemPropertyArtist: itemList[index].artist,
+            MPMediaItemPropertyPlaybackDuration: duration,
+            MPNowPlayingInfoPropertyElapsedPlaybackTime: position,
             MPNowPlayingInfoPropertyPlaybackRate: 1.0
         ]
         
-        if FileManager.default.fileExists(atPath: self.albumCoverFilePath),
-           let image = UIImage(contentsOfFile: self.albumCoverFilePath) , !self.albumCoverFilePath.isEmpty {
+        if itemList[index].albumCoverFilePath != nil , FileManager.default.fileExists(atPath: itemList[index].albumCoverFilePath!), let image = UIImage(contentsOfFile: itemList[index].albumCoverFilePath!) {
             
             let artwork = MPMediaItemArtwork(boundsSize: image.size) { _ in image }
             info[MPMediaItemPropertyArtwork] = artwork
@@ -290,14 +215,12 @@ class MusicService {
     }
     
     func getPlaybackPosition() -> Int {
-        var time: Double = 0
-        
-        if mpv_get_property(ctx, "time-pos", MPV_FORMAT_DOUBLE, &time) < 0 {
-            return 0
+        if mpvPlayer.activated {
+            return mpvPlayer.getPlaybackPosition()
         }
-        position = Int(time * 1000)
-        
-        return position
+        let seconds = avPlayer.currentTime().seconds
+        let milliseconds = Int((seconds.isNormal ? seconds : 0) * 1000)
+        return milliseconds
     }
     
     func playNext() {
@@ -307,13 +230,8 @@ class MusicService {
         }
         
         let item = itemList[index]
-        title = item.title
-        artist = item.artist
-        albumCoverFilePath = item.albumCoverFilePath ?? ""
         setMediaSource(filePath: item.mediaFilePath, playNow: true, url: item.url)
-        methodChannel?.invokeMethod("sync_media_source_to_flutter", arguments: ["index": index, "is_playing": isPlaying])
-        getPlaybackPosition()
-        getDuration()
+        syncMediaSourceToFlutter()
         updateNowPlayingInfo()
     }
     
@@ -324,13 +242,8 @@ class MusicService {
             index = itemList.count - 1
         }
         let item = itemList[index]
-        title = item.title
-        artist = item.artist
-        albumCoverFilePath = item.albumCoverFilePath ?? ""
         setMediaSource(filePath: item.mediaFilePath, playNow: true, url: item.url)
-        methodChannel?.invokeMethod("sync_media_source_to_flutter", arguments: ["index": index, "is_playing": isPlaying])
-        getPlaybackPosition()
-        getDuration()
+        syncMediaSourceToFlutter()
         updateNowPlayingInfo()
     }
 }

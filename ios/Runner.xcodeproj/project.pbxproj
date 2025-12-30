@@ -19,6 +19,7 @@
 		A1306F112DF9553B0013024A /* MusicService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1306F102DF955360013024A /* MusicService.swift */; };
 		A13132E42DE7FA2D005CD25B /* PlayableItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A13132E32DE7FA29005CD25B /* PlayableItem.swift */; };
 		A1357D602E1E49C9006FF6B5 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A1357D5F2E1E49C9006FF6B5 /* PrivacyInfo.xcprivacy */; };
+		A139B5332F0258CC002C1BCE /* MPVPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A139B5322F0258CC002C1BCE /* MPVPlayer.swift */; };
 		A189AE9B2DFFF1890095A690 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A189AE9A2DFFF1890095A690 /* InfoPlist.xcstrings */; };
 /* End PBXBuildFile section */
 
@@ -69,6 +70,7 @@
 		A1306F102DF955360013024A /* MusicService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicService.swift; sourceTree = "<group>"; };
 		A13132E32DE7FA29005CD25B /* PlayableItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayableItem.swift; sourceTree = "<group>"; };
 		A1357D5F2E1E49C9006FF6B5 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A139B5322F0258CC002C1BCE /* MPVPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MPVPlayer.swift; sourceTree = "<group>"; };
 		A189AE9A2DFFF1890095A690 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		A1FA94D52E0116DF00B82EE4 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Main.strings; sourceTree = "<group>"; };
 		A1FA94D62E0116E000B82EE4 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -223,6 +225,7 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				A139B5322F0258CC002C1BCE /* MPVPlayer.swift */,
 				A1306F102DF955360013024A /* MusicService.swift */,
 				A13132E32DE7FA29005CD25B /* PlayableItem.swift */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
@@ -501,6 +504,7 @@
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
+				A139B5332F0258CC002C1BCE /* MPVPlayer.swift in Sources */,
 				A13132E42DE7FA2D005CD25B /* PlayableItem.swift in Sources */,
 				A1306F112DF9553B0013024A /* MusicService.swift in Sources */,
 			);

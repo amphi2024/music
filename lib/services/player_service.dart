@@ -41,10 +41,10 @@ class PlayerService {
 
     await setMediaSource(song: song, playNow: playNow, ref: ref);
 
-    syncPlaylistState(ref);
-
     ref.read(playingSongsProvider.notifier).notifyPlayStarted(song: song, playlist: playlist, shuffle: shuffle);
     ref.read(isPlayingProvider.notifier).set(playNow);
+
+    syncPlaylistState(ref);
   }
 
   Future<void> syncMediaSourceToNative(WidgetRef ref) async {
@@ -169,13 +169,14 @@ class PlayerService {
     await setMediaSource(song: playingSong(ref), ref: ref, playNow: ref.read(isPlayingProvider));
     if (Platform.isAndroid || Platform.isIOS) {
       await syncMediaSourceToNative(ref);
+      await syncPlaylistState(ref);
     }
   }
 
   Future<void> syncPlaylistState(WidgetRef ref) async {
     List<Map<String, dynamic>> list = [];
     final playlist = currentPlaylist(ref);
-    for (String songId in playlist.songs) {
+    for (String songId in ref.read(playingSongsProvider).songs) {
       final song = ref.read(songsProvider).get(songId);
       final artists = ref.read(artistsProvider).getAll(song.artistIds);
       final album = ref.read(albumsProvider).get(song.albumId);
@@ -185,7 +186,7 @@ class PlayerService {
         "url": "${appWebChannel.serverAddress}/music/songs/${songId}/files/${songFile.id}",
         "title": song.title.toLocalized(),
         "artist": artists.localizedName(),
-        "album_cover_file_path": album.covers.firstOrNull,
+        "album_cover_file_path": album.coverIndex != null ? albumCoverPath(album.id, album.covers[album.coverIndex!]["filename"]) : null,
         "song_id": song.id
       });
     }
@@ -223,6 +224,8 @@ class PlayerService {
                 httpHeaders: {"Authorization": appStorage.selectedUser.token}),
             play: playNow);
       }
+
+
     } else {
       await appMethodChannel.invokeMethod("set_media_source", {
         "path": songMediaFilePath(song.id, song.playingFile().filename),

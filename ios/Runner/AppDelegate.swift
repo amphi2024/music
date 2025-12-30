@@ -13,12 +13,7 @@ import MediaPlayer
     
     override func applicationDidBecomeActive(_ application: UIApplication) {
         super.applicationDidBecomeActive(application)
-        MusicService.shared.methodChannel?.invokeMethod("sync_media_source_to_flutter", arguments: [
-            "index": MusicService.shared.index,
-            "is_playing": MusicService.shared.isPlaying,
-            "list": MusicService.shared.itemList.map { $0.songId },
-            "playlist_id": MusicService.shared.playlistId
-        ])
+        MusicService.shared.syncMediaSourceToFlutter()
     }
     
   override func application(
@@ -81,9 +76,6 @@ import MediaPlayer
               let artist = arguments["artist"]! as! String
               let albumCoverFilePath = arguments["album_cover"]! as! String
               
-              MusicService.shared.title = title
-              MusicService.shared.artist = artist
-              MusicService.shared.albumCoverFilePath = albumCoverFilePath
               MusicService.shared.token = token
               
               MusicService.shared.setMediaSource(filePath: path, playNow: playNow, url: url)
@@ -130,15 +122,16 @@ import MediaPlayer
           timerTask = Task {
                      while !Task.isCancelled {
                          let position = MusicService.shared.getPlaybackPosition()
-                         let duration = MusicService.shared.duration
+                         let duration = MusicService.shared.getDuration()
                          
                          if position > 0 {
                              methodChannel?.invokeMethod("on_playback_changed", arguments: ["position": position])
                              MusicService.shared.updateNowPlayingInfo()
                          }
-                         if(position + 50 >= duration && duration > 0) {
-                             methodChannel?.invokeMethod("play_next", arguments: [])
-                         }
+                         
+//                         if(position >= duration && duration > 0) {
+//                             MusicService.shared.playNext()
+//                         }
                          try? await Task.sleep(nanoseconds: 500_000_000)
                      }
           }
