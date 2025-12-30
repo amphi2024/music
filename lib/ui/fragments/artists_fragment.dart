@@ -20,7 +20,7 @@ class ArtistsFragment extends ConsumerStatefulWidget {
   ConsumerState<ArtistsFragment> createState() => _ArtistsFragmentState();
 }
 
-class _ArtistsFragmentState extends ConsumerState<ArtistsFragment> with FragmentViewMixin {
+class _ArtistsFragmentState extends ConsumerState<ArtistsFragment> with FragmentScrollListener {
 
   @override
   Widget build(BuildContext context) {

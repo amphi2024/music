@@ -14,7 +14,7 @@ class ArchiveFragment extends ConsumerStatefulWidget {
   ConsumerState<ArchiveFragment> createState() => _ArchiveFragmentState();
 }
 
-class _ArchiveFragmentState extends ConsumerState<ArchiveFragment> with FragmentViewMixin {
+class _ArchiveFragmentState extends ConsumerState<ArchiveFragment> with FragmentScrollListener {
 
   @override
   Widget build(BuildContext context) {

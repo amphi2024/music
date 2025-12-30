@@ -17,7 +17,7 @@ class TrashFragment extends ConsumerStatefulWidget {
   TrashFragmentState createState() => TrashFragmentState();
 }
 
-class TrashFragmentState extends ConsumerState<TrashFragment> with FragmentViewMixin {
+class TrashFragmentState extends ConsumerState<TrashFragment> with FragmentScrollListener {
 
   //TODO: optimize performance, improve UI/UX
   @override
