@@ -212,18 +212,16 @@ class _Playlists extends ConsumerWidget {
                   context: context,
                   builder: (context) {
                     return ConfirmationDialog(
-                        title: AppLocalizations.of(context).get("@dialog_title_delete_playlist"),
+                        title: AppLocalizations.of(context).get("dialog_title_move_to_trash"),
                         onConfirmed: () {
-                          // appState.setState(() {
-                          //   playlist.delete();
-                          //   appStorage.playlists.remove(playlist.id);
-                          //   appStorage.playlistIdList.remove(playlist.id);
-                          // });
+                          playlist.deleted = DateTime.now();
+                          playlist.save();
+                          ref.read(playlistsProvider.notifier).insertPlaylist(playlist);
                         });
                   });
             },
             onPressed: () {
-              Navigator.push(context, CupertinoPageRoute(builder: (context) => PlaylistView(playlist: playlist)));
+              Navigator.push(context, CupertinoPageRoute(builder: (context) => PlaylistPage(playlist: playlist)));
             });
       },
     );
