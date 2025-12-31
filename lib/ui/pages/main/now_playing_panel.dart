@@ -4,9 +4,11 @@ import 'package:amphi/widgets/move_window_button_or_spacer.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:music/models/app_settings.dart';
 import 'package:music/providers/albums_provider.dart';
 import 'package:music/providers/artists_provider.dart';
 import 'package:music/providers/providers.dart';
+import 'package:music/ui/components/custom_window_buttons.dart';
 import 'package:music/ui/components/playing/connected_devices.dart';
 import 'package:music/ui/components/playing/desktop_playing_lyrics.dart';
 import 'package:music/ui/components/playing/playing_queue.dart';
@@ -117,7 +119,8 @@ class _NowPlayingPanelState extends ConsumerState<NowPlayingPanel> with TickerPr
                           iconNormal: Color(0xFF805306),
                           iconMouseOver: Color(0xFFFFFFFF),
                           normal: Theme.of(context).cardColor))
-                ]
+                ],
+                 if (Platform.isLinux && !appSettings.windowButtonsOnLeft) ... customWindowButtons()
               ],
             ),
           ),

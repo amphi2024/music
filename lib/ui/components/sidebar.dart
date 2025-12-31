@@ -8,11 +8,14 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/models/app_cache.dart';
+import 'package:music/models/app_settings.dart';
 import 'package:music/providers/fragment_provider.dart';
 import 'package:music/providers/playlists_provider.dart';
 import 'package:music/providers/providers.dart';
 import 'package:music/providers/songs_provider.dart';
+import 'package:music/ui/components/custom_window_buttons.dart';
 import 'package:music/utils/move_to_trash.dart';
+import 'package:window_manager/window_manager.dart';
 
 import '../../channels/app_method_channel.dart';
 import '../../channels/app_web_channel.dart';
@@ -29,49 +32,66 @@ class Sidebar extends ConsumerWidget {
 
     return Container(
       width: sidebarWidth,
-      decoration: BoxDecoration(color: Theme.of(context).navigationBarTheme.backgroundColor),
+      decoration: BoxDecoration(
+          color: Theme.of(context).navigationBarTheme.backgroundColor),
       child: Row(
         children: [
           Expanded(
             child: Column(
               children: [
                 Padding(
-                  padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top),
+                  padding:
+                      EdgeInsets.only(top: MediaQuery.paddingOf(context).top),
                   child: SizedBox(
                     height: 55,
                     child: Row(
-                      children: [const Expanded(child: MoveWindowOrSpacer()), AccountButton(
-                        appCacheData: appCacheData,
-                        onLoggedIn: ({required id, required token, required username}) {
-                          onLoggedIn(id: id, token: token, username: username, context: context, ref: ref);
-                        },
-                        iconSize: 25,
-                        profileIconSize: 20,
-                        wideScreenIconSize: 25,
-                        wideScreenProfileIconSize: 20,
-                        appWebChannel: appWebChannel,
-                        appStorage: appStorage,
-                        onUserRemoved: () {
-                          onSelectedUserChanged(ref);
-                        },
-                        onUserAdded: () {
-                          onSelectedUserChanged(ref);
-                        },
-                        onUsernameChanged: () {
-                          onUsernameChanged(ref);
-                        },
-                        onSelectedUserChanged: (user) {
-                          onSelectedUserChanged(ref);
-                        },
-                        setAndroidNavigationBarColor: () {
-                          appMethodChannel.setNavigationBarColor(Theme.of(context).cardColor);
-                        },
-                      )],
+                      children: [
+                        if(Platform.isLinux && appSettings.windowButtonsOnLeft) ... customWindowButtons(),
+                        const Expanded(child: MoveWindowOrSpacer()),
+                        AccountButton(
+                          appCacheData: appCacheData,
+                          onLoggedIn: (
+                              {required id,
+                              required token,
+                              required username}) {
+                            onLoggedIn(
+                                id: id,
+                                token: token,
+                                username: username,
+                                context: context,
+                                ref: ref);
+                          },
+                          iconSize: 25,
+                          profileIconSize: 20,
+                          wideScreenIconSize: 25,
+                          wideScreenProfileIconSize: 20,
+                          appWebChannel: appWebChannel,
+                          appStorage: appStorage,
+                          onUserRemoved: () {
+                            onSelectedUserChanged(ref);
+                          },
+                          onUserAdded: () {
+                            onSelectedUserChanged(ref);
+                          },
+                          onUsernameChanged: () {
+                            onUsernameChanged(ref);
+                          },
+                          onSelectedUserChanged: (user) {
+                            onSelectedUserChanged(ref);
+                          },
+                          setAndroidNavigationBarColor: () {
+                            appMethodChannel.setNavigationBarColor(
+                                Theme.of(context).cardColor);
+                          },
+                        )
+                      ],
                     ),
                   ),
                 ),
                 Expanded(
-                  child: ListView(padding: EdgeInsets.only(left: 5), children: _menuItems(ref: ref, context: context)),
+                  child: ListView(
+                      padding: EdgeInsets.only(left: 5),
+                      children: _menuItems(ref: ref, context: context)),
                 ),
                 Row(
                   children: [
@@ -99,7 +119,9 @@ class Sidebar extends ConsumerWidget {
                 appCacheData.save();
               },
               onHorizontalDragUpdate: (d) {
-                ref.read(sideBarWidthProvider.notifier).set(sidebarWidth + d.delta.dx);
+                ref
+                    .read(sideBarWidthProvider.notifier)
+                    .set(sidebarWidth + d.delta.dx);
               },
               onHorizontalDragEnd: (d) {
                 appCacheData.sidebarWidth = sidebarWidth;
@@ -119,18 +141,19 @@ class Sidebar extends ConsumerWidget {
   }
 }
 
-List<Widget> _menuItems({required WidgetRef ref, required BuildContext context}) {
+List<Widget> _menuItems(
+    {required WidgetRef ref, required BuildContext context}) {
   final showingPlaylistId = ref.watch(showingPlaylistIdProvider);
   List<Widget> children = [
     _MenuHeader(text: AppLocalizations.of(context).get("@library")),
     DragTarget<List<String>>(
       onAcceptWithDetails: (details) {
-        if(showingPlaylistId != "!ARCHIVE") {
+        if (showingPlaylistId != "!ARCHIVE") {
           return;
         }
         final selectedSongs = details.data;
         final songs = ref.read(songsProvider);
-        for(var id in selectedSongs) {
+        for (var id in selectedSongs) {
           final song = songs.get(id);
           song.archived = false;
           song.save();
@@ -182,12 +205,12 @@ List<Widget> _menuItems({required WidgetRef ref, required BuildContext context})
         }),
     DragTarget<List<String>>(
       onAcceptWithDetails: (details) {
-        if(showingPlaylistId == "!ARCHIVE") {
+        if (showingPlaylistId == "!ARCHIVE") {
           return;
         }
         final selectedSongs = details.data;
         final songs = ref.read(songsProvider);
-        for(var id in selectedSongs) {
+        for (var id in selectedSongs) {
           final song = songs.get(id);
           song.archived = true;
           song.save();
@@ -209,8 +232,12 @@ List<Widget> _menuItems({required WidgetRef ref, required BuildContext context})
     ),
     DragTarget<List<String>>(
       onAcceptWithDetails: (details) {
-        if(showingPlaylistId == "!SONGS" || !showingPlaylistId.startsWith("!")) {
-          moveSelectedSongsToTrash(selectedItems: ref.read(selectedItemsProvider) ?? [], showingPlaylistId: showingPlaylistId, ref: ref);
+        if (showingPlaylistId == "!SONGS" ||
+            !showingPlaylistId.startsWith("!")) {
+          moveSelectedSongsToTrash(
+              selectedItems: ref.read(selectedItemsProvider) ?? [],
+              showingPlaylistId: showingPlaylistId,
+              ref: ref);
         }
       },
       builder: (context, candidateData, rejectedData) {
@@ -249,7 +276,9 @@ List<Widget> _menuItems({required WidgetRef ref, required BuildContext context})
         icon: Icons.playlist_play,
         onPressed: () {
           ref.read(showingPlaylistIdProvider.notifier).set(playlist.id);
-          ref.read(fragmentStateProvider.notifier).setState(titleMinimized: false, titleShowing: true);
+          ref
+              .read(fragmentStateProvider.notifier)
+              .setState(titleMinimized: false, titleShowing: true);
           if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
             saveWindowSize();
           }
@@ -259,11 +288,14 @@ List<Widget> _menuItems({required WidgetRef ref, required BuildContext context})
               context: context,
               builder: (context) {
                 return ConfirmationDialog(
-                    title: AppLocalizations.of(context).get("@dialog_title_delete_playlist"),
+                    title: AppLocalizations.of(context)
+                        .get("@dialog_title_delete_playlist"),
                     onConfirmed: () {
                       playlist.deleted = DateTime.now();
                       playlist.save();
-                      ref.read(playlistsProvider.notifier).movePlaylistToTrash(playlist.id);
+                      ref
+                          .read(playlistsProvider.notifier)
+                          .movePlaylistToTrash(playlist.id);
                     });
               });
         },
@@ -274,9 +306,15 @@ List<Widget> _menuItems({required WidgetRef ref, required BuildContext context})
   return children;
 }
 
-void saveWindowSize() {
-  appCacheData.windowHeight = appWindow.size.height;
-  appCacheData.windowWidth = appWindow.size.width;
+void saveWindowSize() async {
+  if (Platform.isLinux) {
+    final size = await windowManager.getSize();
+    appCacheData.windowHeight = size.height;
+    appCacheData.windowWidth = size.width;
+  } else {
+    appCacheData.windowHeight = appWindow.size.height;
+    appCacheData.windowWidth = appWindow.size.width;
+  }
   appCacheData.save();
 }
 
@@ -289,7 +327,11 @@ class _MenuHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 8.0, top: 5, bottom: 5),
-      child: Text(text, style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).disabledColor, fontSize: 12)),
+      child: Text(text,
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).disabledColor,
+              fontSize: 12)),
     );
   }
 }
@@ -301,12 +343,19 @@ class _MenuItem extends StatelessWidget {
   final void Function() onPressed;
   final void Function()? onLongPressed;
 
-  const _MenuItem({required this.title, required this.icon, required this.onPressed, this.onLongPressed, required this.focused});
+  const _MenuItem(
+      {required this.title,
+      required this.icon,
+      required this.onPressed,
+      this.onLongPressed,
+      required this.focused});
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: focused ? Theme.of(context).dividerColor.withAlpha(50) : Colors.transparent,
+      color: focused
+          ? Theme.of(context).dividerColor.withAlpha(50)
+          : Colors.transparent,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         mouseCursor: SystemMouseCursors.basic,
@@ -316,8 +365,10 @@ class _MenuItem extends StatelessWidget {
         child: Row(
           children: [
             Padding(
-              padding: const EdgeInsets.only(right: 10, left: 15, top: 10, bottom: 10),
-              child: Icon(icon, size: 15, color: Theme.of(context).highlightColor),
+              padding: const EdgeInsets.only(
+                  right: 10, left: 15, top: 10, bottom: 10),
+              child:
+                  Icon(icon, size: 15, color: Theme.of(context).highlightColor),
             ),
             Text(title)
           ],
