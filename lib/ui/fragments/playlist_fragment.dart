@@ -5,6 +5,7 @@ import 'package:music/providers/providers.dart';
 import 'package:music/providers/songs_provider.dart';
 import 'package:music/ui/fragments/components/playlist_fragment_title.dart';
 import 'package:music/utils/fragment_scroll_listener.dart';
+import '../components/custom_list_view.dart';
 import '../components/item/song_list_item.dart';
 import 'components/fragment_padding.dart';
 
@@ -23,7 +24,7 @@ class _PlaylistFragmentState extends ConsumerState<PlaylistFragment> with Fragme
     final playlist = ref.watch(playlistsProvider).playlists.get(showingPlaylistId);
     final songs = ref.watch(songsProvider);
 
-    return ListView.builder(
+    return CustomListView(
       padding: fragmentPadding(context),
       controller: scrollController,
       itemCount: playlist.songs.length + 1,

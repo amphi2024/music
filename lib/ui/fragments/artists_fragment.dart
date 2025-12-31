@@ -11,6 +11,7 @@ import 'package:music/ui/pages/artist_page.dart';
 import 'package:music/utils/fragment_scroll_listener.dart';
 import 'package:music/utils/localized_title.dart';
 
+import '../components/custom_list_view.dart';
 import 'components/fragment_padding.dart';
 
 class ArtistsFragment extends ConsumerStatefulWidget {
@@ -28,7 +29,7 @@ class _ArtistsFragmentState extends ConsumerState<ArtistsFragment> with Fragment
     final artists = ref.watch(artistsProvider);
     final searchKeyword = ref.watch(searchKeywordProvider);
 
-    return ListView.builder(
+    return CustomListView(
       padding: fragmentPadding(context),
       controller: scrollController,
       itemCount: idList.length,

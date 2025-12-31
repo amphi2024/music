@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/providers/playlists_provider.dart';
 import 'package:music/providers/providers.dart';
 import 'package:music/providers/songs_provider.dart';
+import 'package:music/ui/components/custom_list_view.dart';
 import 'package:music/ui/components/item/song_list_item.dart';
 import 'package:music/ui/fragments/components/fragment_padding.dart';
 import 'package:music/utils/fragment_scroll_listener.dart';
@@ -23,7 +24,7 @@ class _SongsFragmentState extends ConsumerState<SongsFragment> with FragmentScro
     final songs = ref.watch(songsProvider);
     final searchKeyword = ref.watch(searchKeywordProvider);
 
-    return ListView.builder(
+    return CustomListView(
       padding: fragmentPadding(context),
       controller: scrollController,
       itemCount: idList.length,

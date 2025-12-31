@@ -5,6 +5,7 @@ import 'package:music/ui/components/item/song_list_item.dart';
 import 'package:music/utils/fragment_scroll_listener.dart';
 
 import '../../providers/playlists_provider.dart';
+import '../components/custom_list_view.dart';
 import 'components/fragment_padding.dart';
 
 class ArchiveFragment extends ConsumerStatefulWidget {
@@ -21,7 +22,7 @@ class _ArchiveFragmentState extends ConsumerState<ArchiveFragment> with Fragment
     final idList = ref.watch(playlistsProvider).playlists.get("!ARCHIVE").songs;
     final songs = ref.watch(songsProvider);
 
-    return ListView.builder(
+    return CustomListView(
       padding: fragmentPadding(context),
       controller: scrollController,
       itemCount: idList.length,

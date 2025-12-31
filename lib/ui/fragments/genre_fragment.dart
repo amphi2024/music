@@ -9,6 +9,7 @@ import 'package:music/utils/localized_title.dart';
 
 import '../../providers/songs_provider.dart';
 import '../../services/player_service.dart';
+import '../components/custom_list_view.dart';
 import '../components/item/song_list_item.dart';
 import 'components/fragment_padding.dart';
 
@@ -28,7 +29,7 @@ class GenreFragment extends ConsumerWidget {
     final songs = ref.watch(songsProvider);
     final searchKeyword = ref.watch(searchKeywordProvider);
 
-    return ListView.builder(
+    return CustomListView(
       padding: fragmentPadding(context),
       itemCount: idList.length + 2,
       itemBuilder: (context, index) {

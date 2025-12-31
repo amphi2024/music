@@ -16,6 +16,7 @@ import 'package:music/ui/fragments/components/floating_button.dart';
 import 'package:music/utils/localized_title.dart';
 
 import '../../services/player_service.dart';
+import '../components/custom_list_view.dart';
 import '../components/image/album_cover.dart';
 import '../components/item/song_list_item.dart';
 import 'components/fragment_padding.dart';
@@ -39,7 +40,7 @@ class ArtistFragment extends ConsumerWidget {
     final playlist = playlists.get(playlistId);
     final searchKeyword = ref.watch(searchKeywordProvider);
 
-    return ListView.builder(
+    return CustomListView(
       padding: fragmentPadding(context),
       itemCount: playlist.songs.length + 1,
       itemBuilder: (context, index) {

@@ -9,6 +9,8 @@ import 'package:music/ui/fragments/components/album_fragment_title.dart';
 import 'package:music/ui/fragments/components/fragment_padding.dart';
 import 'package:music/utils/localized_title.dart';
 
+import '../components/custom_list_view.dart';
+
 class AlbumFragment extends ConsumerWidget {
   const AlbumFragment({super.key});
 
@@ -26,7 +28,7 @@ class AlbumFragment extends ConsumerWidget {
         .get(playlistId);
     final searchKeyword = ref.watch(searchKeywordProvider);
 
-    return ListView.builder(
+    return CustomListView(
       padding: fragmentPadding(context),
       itemCount: playlist.songs.length + 1,
       itemBuilder: (context, index) {

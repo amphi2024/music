@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:amphi/models/app_localizations.dart';
+import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/providers/albums_provider.dart';
@@ -18,13 +22,10 @@ class TrashFragment extends ConsumerStatefulWidget {
 }
 
 class TrashFragmentState extends ConsumerState<TrashFragment> with FragmentScrollListener {
-
   //TODO: optimize performance, improve UI/UX
   @override
   Widget build(BuildContext context) {
-    final trash = ref
-        .watch(playlistsProvider)
-        .trash;
+    final trash = ref.watch(playlistsProvider).trash;
     final songs = ref.watch(songsProvider);
     final artists = ref.watch(artistsProvider);
     final albums = ref.watch(albumsProvider);
@@ -32,73 +33,91 @@ class TrashFragmentState extends ConsumerState<TrashFragment> with FragmentScrol
 
     List<Widget> children = [];
 
-    for(var id in trash.songs) {
+    for (var id in trash.songs) {
       final song = songs.get(id);
-      children.add(_Item(title: song.title.toLocalized(), onRestore: () {
-        song.deleted = null;
-        song.save();
-        ref.read(songsProvider.notifier).insertSong(song);
-        ref.read(playlistsProvider.notifier).notifySongUpdate(song);
-      }, onDelete: () {
-        song.delete();
-        ref.read(songsProvider.notifier).removeSong(song.id);
-        ref.read(playlistsProvider.notifier).deleteSong(song.id);
-      }));
+      children.add(_Item(
+          title: song.title.toLocalized(),
+          onRestore: () {
+            song.deleted = null;
+            song.save();
+            ref.read(songsProvider.notifier).insertSong(song);
+            ref.read(playlistsProvider.notifier).notifySongUpdate(song);
+          },
+          onDelete: () {
+            song.delete();
+            ref.read(songsProvider.notifier).removeSong(song.id);
+            ref.read(playlistsProvider.notifier).deleteSong(song.id);
+          }));
     }
 
-    for(var id in trash.albums) {
+    for (var id in trash.albums) {
       final album = albums.get(id);
-      children.add(_Item(title: album.title.toLocalized(), onRestore: () {
-        album.deleted = null;
-        album.save();
-        ref.read(albumsProvider.notifier).insertAlbum(album);
-        ref.read(playlistsProvider.notifier).notifyAlbumUpdate(album);
-      }, onDelete: () {
-        album.delete();
-        ref.read(albumsProvider.notifier).removeAlbum(album.id);
-        ref.read(playlistsProvider.notifier).deleteAlbum(album.id);
-      }));
+      children.add(_Item(
+          title: album.title.toLocalized(),
+          onRestore: () {
+            album.deleted = null;
+            album.save();
+            ref.read(albumsProvider.notifier).insertAlbum(album);
+            ref.read(playlistsProvider.notifier).notifyAlbumUpdate(album);
+          },
+          onDelete: () {
+            album.delete();
+            ref.read(albumsProvider.notifier).removeAlbum(album.id);
+            ref.read(playlistsProvider.notifier).deleteAlbum(album.id);
+          }));
     }
 
-    for(var id in trash.artists) {
+    for (var id in trash.artists) {
       final artist = artists.get(id);
-      children.add(_Item(title: artist.name.toLocalized(), onRestore: () {
-        artist.deleted = null;
-        artist.save();
-        ref.read(artistsProvider.notifier).insertArtist(artist);
-        ref.read(playlistsProvider.notifier).notifyArtistUpdate(artist);
-      }, onDelete: () {
-        artist.delete();
-        ref.read(artistsProvider.notifier).removeArtist(artist.id);
-        ref.read(playlistsProvider.notifier).deleteArtist(artist.id);
-      }));
+      children.add(_Item(
+          title: artist.name.toLocalized(),
+          onRestore: () {
+            artist.deleted = null;
+            artist.save();
+            ref.read(artistsProvider.notifier).insertArtist(artist);
+            ref.read(playlistsProvider.notifier).notifyArtistUpdate(artist);
+          },
+          onDelete: () {
+            artist.delete();
+            ref.read(artistsProvider.notifier).removeArtist(artist.id);
+            ref.read(playlistsProvider.notifier).deleteArtist(artist.id);
+          }));
     }
 
-    for(var id in trash.playlists) {
+    for (var id in trash.playlists) {
       final playlist = playlists.get(id);
-      children.add(_Item(title: playlist.title, onRestore: () {
-        playlist.deleted = null;
-        playlist.save();
-        ref.read(playlistsProvider.notifier).insertPlaylist(playlist);
-      }, onDelete: () {
-        playlist.delete();
-        ref.read(playlistsProvider.notifier).deletePlaylist(playlist.id);
-      }));
+      children.add(_Item(
+          title: playlist.title,
+          onRestore: () {
+            playlist.deleted = null;
+            playlist.save();
+            ref.read(playlistsProvider.notifier).insertPlaylist(playlist);
+          },
+          onDelete: () {
+            playlist.delete();
+            ref.read(playlistsProvider.notifier).deletePlaylist(playlist.id);
+          }));
     }
 
-    return ListView(
+    final listView = ListView(
       padding: fragmentPadding(context),
       controller: scrollController,
       children: children,
     );
+
+    if (Platform.isAndroid || Platform.isIOS) {
+      return CupertinoScrollbar(controller: scrollController, child: listView);
+    }
+
+    return listView;
   }
 }
 
 class _Item extends StatelessWidget {
-
   final String title;
   final void Function() onRestore;
   final void Function() onDelete;
+
   const _Item({required this.title, required this.onRestore, required this.onDelete});
 
   @override
@@ -115,7 +134,9 @@ class _Item extends StatelessWidget {
               itemBuilder: (context) {
                 return [
                   PopupMenuItem(onTap: onRestore, child: Text(AppLocalizations.of(context).get("restore"))),
-                  PopupMenuItem(onTap: onDelete, child: Text(AppLocalizations.of(context).get("delete"))),
+                  PopupMenuItem(
+                      onTap: onDelete,
+                      child: Text(AppLocalizations.of(context).get("delete"))),
                 ];
               })
         ],

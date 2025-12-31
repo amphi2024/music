@@ -26,7 +26,7 @@ Future<void> migratePlaylists(Database db) async {
 Map<String, dynamic> _parsedLegacyPlaylist(String id, Map<String, dynamic> map) {
   return {
     "id": id,
-    "title": map["title"],
+    "title": map["title"] ?? "",
     "songs": jsonEncode(map["songs"] ?? []),
     "created": map["created"] ?? 0,
     "modified": map["modified"] ?? 0

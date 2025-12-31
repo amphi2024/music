@@ -40,7 +40,7 @@ class _AlbumsFragmentState extends ConsumerState<AlbumsFragment> with FragmentSc
     final searchKeyword = ref.watch(searchKeywordProvider);
     final artists = ref.watch(artistsProvider);
 
-    return MasonryGridView.builder(
+    final gridView = MasonryGridView.builder(
         controller: scrollController,
         padding: fragmentPadding(context),
         gridDelegate: SliverSimpleGridDelegateWithFixedCrossAxisCount(crossAxisCount: axisCount),
@@ -81,5 +81,12 @@ class _AlbumsFragmentState extends ConsumerState<AlbumsFragment> with FragmentSc
             },
           );
         });
+
+    if(Platform.isAndroid || Platform.isIOS) {
+      return CupertinoScrollbar(
+          controller: scrollController,
+          child: gridView);
+    }
+    return gridView;
   }
 }
