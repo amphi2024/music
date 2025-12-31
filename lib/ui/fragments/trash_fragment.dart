@@ -135,7 +135,17 @@ class _Item extends StatelessWidget {
                 return [
                   PopupMenuItem(onTap: onRestore, child: Text(AppLocalizations.of(context).get("restore"))),
                   PopupMenuItem(
-                      onTap: onDelete,
+                      onTap: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return ConfirmationDialog(
+                                  title: AppLocalizations.of(context).get("dialog_title_permanently_delete"),
+                                  onConfirmed: () {
+                                    onDelete();
+                                  });
+                            });
+                      },
                       child: Text(AppLocalizations.of(context).get("delete"))),
                 ];
               })
