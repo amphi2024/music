@@ -48,7 +48,7 @@ Map<String, dynamic> _parsedLegacyArtist(String id, Map<String, dynamic> map, Li
     "id": id,
     "name": jsonEncode(map["name"] ?? {}),
     "images": jsonEncode(images),
-    "created": map["added"] ?? 0,
+    "created": map["added"] ?? map["created"] ?? 0,
     "modified": map["modified"] ?? 0
   };
 }

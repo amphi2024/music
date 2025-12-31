@@ -16,8 +16,11 @@ Future<void> migrateDirectory(String id, String directoryName) async {
 
 String parsedLegacyListValue(Map<String, dynamic> map, String key) {
   final value = map[key];
-  if(value != null) {
+  if(value is String && !value.startsWith("[")) {
     return jsonEncode([value]);
+  }
+  if(value is List<dynamic>) {
+    return jsonEncode(value);
   }
   return jsonEncode([]);
 }

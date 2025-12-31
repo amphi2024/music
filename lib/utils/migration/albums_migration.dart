@@ -51,8 +51,8 @@ Map<String, dynamic> _parsedLegacyAlbum(String id, Map<String, dynamic> map, Lis
     "covers": jsonEncode(covers),
     "genres": jsonEncode([map["genre"] ?? {}]),
     "artist_ids": parsedLegacyListValue(map, "artist"),
-    "created": map["added"],
-    "modified": map["modified"],
+    "created": map["added"] ?? map["created"] ?? 0,
+    "modified": map["modified"] ?? 0,
     "deleted": null,
     "released": map["released"],
     "description": null
