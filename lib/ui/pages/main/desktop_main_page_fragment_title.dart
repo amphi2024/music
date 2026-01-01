@@ -8,8 +8,8 @@ import '../../../providers/providers.dart';
 import '../../components/add_item_button.dart';
 import '../../components/sort_menu_items.dart';
 
-class WideMainPageFragmentTitle extends ConsumerWidget {
-  const WideMainPageFragmentTitle({super.key});
+class DesktopMainPageFragmentTitle extends ConsumerWidget {
+  const DesktopMainPageFragmentTitle({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

@@ -1,3 +1,4 @@
+import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:music/providers/providers.dart';
@@ -11,7 +12,10 @@ import 'package:music/ui/fragments/albums_fragment.dart';
 import 'package:music/ui/fragments/trash_fragment.dart';
 
 import '../../../channels/app_method_channel.dart';
+import '../../../channels/app_web_channel.dart';
+import '../../../models/app_settings.dart';
 import '../../../utils/fragment_title.dart';
+import '../../../utils/toast.dart';
 import '../../components/menu/floating_menu.dart';
 
 class MainPage extends ConsumerStatefulWidget {
@@ -42,6 +46,10 @@ class _MainViewState extends ConsumerState<MainPage> {
         builder: (context) => PlayingBar(),
       );
       overlay.insert(overlayEntry);
+
+      if (appSettings.useOwnServer && appWebChannel.uploadBlocked) {
+        showToast(context, AppLocalizations.of(context).get("server_version_old_message"));
+      }
     });
   }
 

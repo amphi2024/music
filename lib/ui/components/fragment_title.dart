@@ -6,6 +6,7 @@ import 'package:music/providers/providers.dart';
 import 'package:music/ui/components/add_item_button.dart';
 import 'package:music/ui/components/sort_menu_items.dart';
 import 'package:music/ui/pages/main/main_page_selection_actions.dart';
+import 'package:music/utils/screen_size.dart';
 
 
 class FragmentTitle extends ConsumerWidget {
@@ -25,7 +26,7 @@ class FragmentTitle extends ConsumerWidget {
     final showingPlaylistId = ref.watch(showingPlaylistIdProvider);
 
     return Container(
-      height: 55,
+      height: isWideScreen(context) ? 55 + MediaQuery.paddingOf(context).top : 55,
       decoration: BoxDecoration(color: themeData.scaffoldBackgroundColor.withAlpha(125)),
       child: Padding(
         padding: EdgeInsets.only(left: 5, right: 5),

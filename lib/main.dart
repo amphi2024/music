@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:amphi/models/app.dart';
 import 'package:amphi/models/app_localizations.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +20,9 @@ import 'package:music/providers/playing_state_provider.dart';
 import 'package:music/providers/playlists_provider.dart';
 import 'package:music/providers/songs_provider.dart';
 import 'package:music/ui/pages/main/main_page.dart';
-import 'package:music/ui/pages/main/wide_main_page.dart';
+import 'package:music/ui/pages/main/tablet_main_page.dart';
+import 'package:music/ui/pages/main/desktop_main_page.dart';
+import 'package:music/utils/screen_size.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -292,8 +293,6 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate
         ],
-        home: !App.isWideScreen(context) && !App.isDesktop()
-            ? MainPage()
-            : const WideMainPage());
+        home: isDesktop() ? DesktopMainPage() : isWideScreen(context) ? TabletMainPage() : MainPage());
   }
 }

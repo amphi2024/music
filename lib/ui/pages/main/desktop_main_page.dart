@@ -1,3 +1,4 @@
+import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,29 +11,42 @@ import 'package:music/ui/fragments/genre_fragment.dart';
 import 'package:music/ui/fragments/songs_fragment.dart';
 import 'package:music/ui/fragments/trash_fragment.dart';
 import 'package:music/ui/pages/main/now_playing_panel.dart';
-import 'package:music/ui/pages/main/wide_main_page_fragment_title.dart';
+import 'package:music/ui/pages/main/desktop_main_page_fragment_title.dart';
 
 import '../../../channels/app_method_channel.dart';
+import '../../../channels/app_web_channel.dart';
 import '../../../models/app_cache.dart';
+import '../../../models/app_settings.dart';
+import '../../../utils/toast.dart';
 import '../../fragments/album_fragment.dart';
 import '../../fragments/albums_fragment.dart';
 import '../../fragments/artists_fragment.dart';
 import '../../fragments/genres_fragment.dart';
 
-class WideMainPage extends ConsumerStatefulWidget {
-  const WideMainPage({super.key});
+class DesktopMainPage extends ConsumerStatefulWidget {
+  const DesktopMainPage({super.key});
 
   @override
-  ConsumerState<WideMainPage> createState() => _WideMainViewState();
+  ConsumerState<DesktopMainPage> createState() => _WideMainViewState();
 }
 
-class _WideMainViewState extends ConsumerState<WideMainPage> {
+class _WideMainViewState extends ConsumerState<DesktopMainPage> {
   final focusNode = FocusNode();
 
   @override
   void dispose() {
     super.dispose();
     focusNode.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (appSettings.useOwnServer && appWebChannel.uploadBlocked) {
+        showToast(context, AppLocalizations.of(context).get("server_version_old_message"));
+      }
+    });
   }
 
   @override
@@ -69,7 +83,7 @@ class _WideMainViewState extends ConsumerState<WideMainPage> {
               },
               child: Column(
                 children: [
-                  const WideMainPageFragmentTitle(),
+                  const DesktopMainPageFragmentTitle(),
                   Expanded(
                       child: Padding(
                     padding: const EdgeInsets.only(left: 5.0),
