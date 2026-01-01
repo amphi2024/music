@@ -96,6 +96,7 @@
   "dialog_title_move_to_trash": "Voulez-vous vraiment déplacer cet élément dans la corbeille ?",
   "edit": "Modifier",
   "delete": "Supprimer",
-  "dialog_title_permanently_delete": "Voulez-vous vraiment supprimer définitivement cet élément ?"
+  "dialog_title_permanently_delete": "Voulez-vous vraiment supprimer définitivement cet élément ?",
 
+  "server_version_old_message": "La version du serveur est trop ancienne. Veuillez mettre à jour vers la version 3.0.0 ou supérieure."
 }

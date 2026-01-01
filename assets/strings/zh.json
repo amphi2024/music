@@ -96,6 +96,7 @@
   "dialog_title_move_to_trash": "确定要将此项目移至回收站吗？",
   "edit": "编辑",
   "delete": "删除",
-  "dialog_title_permanently_delete": "确定要永久删除此项目吗？"
+  "dialog_title_permanently_delete": "确定要永久删除此项目吗？",
 
+  "server_version_old_message": "服务器版本过旧。请更新至 3.0.0 或更高版本。"
 }

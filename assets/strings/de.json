@@ -96,6 +96,8 @@
   "dialog_title_move_to_trash": "Möchten Sie dieses Element wirklich in den Papierkorb verschieben?",
   "edit": "Bearbeiten",
   "delete": "Löschen",
-  "dialog_title_permanently_delete": "Möchten Sie dieses Element wirklich dauerhaft löschen?"
+  "dialog_title_permanently_delete": "Möchten Sie dieses Element wirklich dauerhaft löschen?",
+
+  "server_version_old_message": "Server version is old. Please update to 3.0.0 or higher."
 
 }

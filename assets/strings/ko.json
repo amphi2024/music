@@ -113,6 +113,7 @@
   "dialog_title_move_to_trash": "휴지통으로 이동하시겠습니까?",
   "edit": "수정",
   "delete": "삭제",
-  "dialog_title_permanently_delete": "영구삭제하시겠습니까?"
+  "dialog_title_permanently_delete": "영구삭제하시겠습니까?",
 
+  "server_version_old_message": "서버 버전이 오래되었습니다. 3.0.0 이상으로 업데이트해주세요."
 }

@@ -111,5 +111,7 @@
   "dialog_title_move_to_trash": "Are you sure you want to move this item to trash?",
   "edit": "Edit",
   "delete": "Delete",
-  "dialog_title_permanently_delete": "Are you sure you want to permanently delete this item?"
+  "dialog_title_permanently_delete": "Are you sure you want to permanently delete this item?",
+
+  "server_version_old_message": "Server version is old. Please update to 3.0.0 or higher."
 }

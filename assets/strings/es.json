@@ -96,6 +96,7 @@
   "dialog_title_move_to_trash": "¿Seguro que deseas mover este elemento a la papelera?",
   "edit": "Editar",
   "delete": "Eliminar",
-  "dialog_title_permanently_delete": "¿Seguro que deseas eliminar este elemento de forma permanente?"
+  "dialog_title_permanently_delete": "¿Seguro que deseas eliminar este elemento de forma permanente?",
 
+  "server_version_old_message": "La versión del servidor es demasiado antigua. Actualiza a la versión 3.0.0 o superior."
 }

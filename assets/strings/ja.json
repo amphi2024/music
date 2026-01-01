@@ -96,6 +96,7 @@
   "dialog_title_move_to_trash": "この項目をゴミ箱に移動してもよろしいですか？",
   "edit": "編集",
   "delete": "削除",
-  "dialog_title_permanently_delete": "この項目を完全に削除してもよろしいですか？"
+  "dialog_title_permanently_delete": "この項目を完全に削除してもよろしいですか？",
 
+  "server_version_old_message": "サーバーのバージョンが古すぎます。3.0.0 以上に更新してください。"
 }
