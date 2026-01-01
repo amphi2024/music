@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -14,37 +12,15 @@ class PlayingLyrics extends ConsumerStatefulWidget {
   final EdgeInsets? padding;
   final Color? color;
   final double? fontSize;
-  const PlayingLyrics({super.key, this.padding, this.color, this.fontSize});
+  final bool following;
+  const PlayingLyrics({super.key, this.padding, this.color, this.fontSize, this.following = true});
 
   @override
   ConsumerState createState() => _PlayingLyricsState();
 }
 
 class _PlayingLyricsState extends ConsumerState<PlayingLyrics> {
-  bool following = true;
   final scrollController = ItemScrollController();
-  Timer? timer;
-  final scrollOffsetListener = ScrollOffsetListener.create();
-
-  @override
-  void dispose() {
-    super.dispose();
-    timer?.cancel();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    scrollOffsetListener.changes.listen((event) {
-      if(event > 10) { // Stop following only on the user's gesture
-        following = false;
-        timer?.cancel();
-        timer = Timer(Duration(seconds: 2), () async {
-          following = true;
-        });
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +28,7 @@ class _PlayingLyricsState extends ConsumerState<PlayingLyrics> {
         .lyrics;
     final List<LyricLine> lines = lyrics.getLinesByLocale(context);
     final position = ref.watch(positionProvider);
-    if(following) {
+    if(widget.following) {
       ref.listen(positionProvider, (prev, position) {
         scrollToCurrentLyric(lyricLines: lines, position: position, scrollController: scrollController);
       });
@@ -62,7 +38,6 @@ class _PlayingLyricsState extends ConsumerState<PlayingLyrics> {
       itemScrollController: scrollController,
       itemCount: lines.length,
       padding: widget.padding,
-      scrollOffsetListener: scrollOffsetListener,
       physics: ClampingScrollPhysics(),
       itemBuilder: (context, index) {
         final line = lines[index];
