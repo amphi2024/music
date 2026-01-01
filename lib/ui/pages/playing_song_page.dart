@@ -13,7 +13,7 @@ import '../components/icon/shuffle_icon.dart';
 import '../components/playing/connected_devices.dart';
 import '../components/playing/desktop_playing_lyrics.dart';
 import '../components/playing/playing_queue.dart';
-// import '../components/seekbar.dart';
+import '../components/seekbar.dart';
 
 class PlayingSongPage extends ConsumerStatefulWidget {
   const PlayingSongPage({super.key});
@@ -102,19 +102,19 @@ class PlayingSongPageState extends ConsumerState<PlayingSongPage> with SingleTic
                   padding: const EdgeInsets.only(left: 30.0, right: 30, bottom: 8, top: 8),
                   child: Column(
                     children: [
-                      // Padding(
-                      //   padding: const EdgeInsets.only(top: 8, bottom: 8),
-                      //   child: SeekBar(
-                      //     value: position,
-                      //     max: duration,
-                      //     onChanged: (value) {
-                      //       ref.read(positionProvider.notifier).set(value);
-                      //     },
-                      //     onChangeEnd: (value) {
-                      //       playerService.applyPlaybackPosition(value);
-                      //     },
-                      //   ),
-                      // ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8, bottom: 8),
+                        child: SeekBar(
+                          value: position,
+                          max: duration,
+                          onChanged: (value) {
+                            ref.read(positionProvider.notifier).set(value);
+                          },
+                          onChangeEnd: (value) {
+                            playerService.applyPlaybackPosition(value);
+                          },
+                        ),
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [Text(DurationConverter.convertedDuration(position)), Text(DurationConverter.convertedDuration(duration))],

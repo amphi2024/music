@@ -4,6 +4,7 @@ import 'package:music/providers/artists_provider.dart';
 import 'package:music/providers/playing_state_provider.dart';
 import 'package:music/ui/components/icon/repeat_icon.dart';
 import 'package:music/ui/components/icon/shuffle_icon.dart';
+import 'package:music/ui/components/seekbar.dart';
 import 'package:music/utils/duration_converter.dart';
 import 'package:music/utils/localized_title.dart';
 
@@ -21,7 +22,6 @@ class PlayControls extends ConsumerWidget {
     final position = ref.watch(positionProvider);
     final isPlaying = ref.watch(isPlayingProvider);
     final artists = ref.watch(artistsProvider).getAll(song.artistIds);
-
     return Column(
       children: [
         Column(
@@ -49,15 +49,14 @@ class PlayControls extends ConsumerWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 8, bottom: 8),
-                child: Slider(
-                  min: 0,
-                  max: duration.toDouble(),
-                  value: position.toDouble(),
-                  onChanged: (d) {
-                    ref.watch(positionProvider.notifier).set(d.toInt());
+                child: SeekBar(
+                  value: position,
+                  max: duration,
+                  onChanged: (value) {
+                    ref.read(positionProvider.notifier).set(value);
                   },
-                  onChangeEnd: (d) {
-                    playerService.applyPlaybackPosition(d.toInt());
+                  onChangeEnd: (value) {
+                    playerService.applyPlaybackPosition(value);
                   },
                 ),
               ),
