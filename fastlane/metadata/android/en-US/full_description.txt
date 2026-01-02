@@ -1,0 +1,7 @@
+Amphi Music is a free and open-source, cross-platform music player.
+It plays all your music in most popular formats — no conversion required.
+You can easily edit song, album, and artist information.
+Once your music library is set up, you can sync your data across devices via a self-hosted server, letting you access and play your library on any platform.
+If you already use Amphi Notes, Amphi Photos, and Amphi Cloud, your notes, photos, and files can also be synced through the same server.
+
+To set up your own server, visit: https://amphi.site
