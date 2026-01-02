@@ -1,0 +1,46 @@
+FROM ubuntu:24.04
+
+ARG FLUTTER_VERSION=3.35.7
+ARG APP_VERSION=v2.0.0
+# git tag or full commit SHA
+ARG ARCH=x64
+# arm64 | x64
+ARG APP_VERSION_DISPLAY=2.0.0
+ARG ARCH_DISPLAY=x86_64
+# arm64 | x86_64
+ARG APP_VERSION_PUBSPEC=2.0.0+2
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PATH="/opt/flutter/bin:/root/.pub-cache/bin:${PATH}"
+
+RUN apt-get update && apt-get install -y \
+    git curl unzip xz-utils zip clang cmake ninja-build \
+    libgtk-3-dev libayatana-appindicator3-dev libfuse2 \
+    libmpv-dev mpv libmimalloc-dev libmimalloc2.0 libtag1-dev \
+    ca-certificates patchelf rpm build-essential fakeroot \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN git clone https://github.com/flutter/flutter.git /opt/flutter \
+&& cd /opt/flutter \
+&& git checkout ${FLUTTER_VERSION} \
+&& flutter config --enable-linux-desktop \
+&& dart pub global activate fastforge
+
+WORKDIR /
+
+RUN git clone https://github.com/amphi2024/music.git /app \
+&& cd /app \
+&& git checkout ${APP_VERSION} \
+&& flutter pub get \
+&& fastforge package --platform linux --targets deb,rpm
+
+WORKDIR /app
+
+RUN mv ./dist/${APP_VERSION_PUBSPEC}/music-${APP_VERSION_PUBSPEC}-linux.deb ./dist/Music-${APP_VERSION_DISPLAY}-Linux-${ARCH_DISPLAY}.deb \
+&& mv ./dist/${APP_VERSION_PUBSPEC}/music-${APP_VERSION_PUBSPEC}-linux.rpm ./dist/Music-${APP_VERSION_DISPLAY}-Linux-${ARCH_DISPLAY}.rpm \
+&& cd ./build/linux/${ARCH}/release/bundle \
+&& tar -czvf ../../../../../dist/Music-${APP_VERSION_DISPLAY}-Linux-${ARCH_DISPLAY}.tar.gz *
+
+# docker build -f build-linux.dockerfile -t amphi-music-linux-builder .
+# docker create --name build-output amphi-music-linux-builder
+# docker cp build-output:/app/dist/. ./result
