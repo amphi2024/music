@@ -163,7 +163,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         playerService.player!.stream.completed.listen((completed) async {
           final position = await playerService.getPlaybackPosition();
           if (completed &&
-              position + 300 >=
+              position + 1000 >=
                   playerService.player!.state.duration.inMilliseconds) {
             onPlaybackFinished();
           }
