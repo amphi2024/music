@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:amphi/models/app_localizations.dart';
+import 'package:amphi/widgets/account/account_button.dart';
 import 'package:amphi/widgets/dialogs/confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,10 +10,13 @@ import 'package:music/ui/components/playing/tablet_playing_bar.dart';
 
 import '../../../channels/app_method_channel.dart';
 import '../../../channels/app_web_channel.dart';
+import '../../../models/app_cache.dart';
 import '../../../models/app_settings.dart';
+import '../../../models/app_storage.dart';
 import '../../../providers/fragment_provider.dart';
 import '../../../providers/playlists_provider.dart';
 import '../../../providers/providers.dart';
+import '../../../utils/account_utils.dart';
 import '../../../utils/fragment_title.dart';
 import '../../../utils/toast.dart';
 import '../../dialogs/settings_dialog.dart';
@@ -83,13 +87,49 @@ class TabletMainPageState extends ConsumerState<TabletMainPage> {
                     child: Column(
                       children: [
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-
+                            AccountButton(
+                              appCacheData: appCacheData,
+                              onLoggedIn: (
+                                  {required id,
+                                    required token,
+                                    required username}) {
+                                onLoggedIn(
+                                    id: id,
+                                    token: token,
+                                    username: username,
+                                    context: context,
+                                    ref: ref);
+                              },
+                              iconSize: 25,
+                              profileIconSize: 20,
+                              wideScreenIconSize: 25,
+                              wideScreenProfileIconSize: 20,
+                              appWebChannel: appWebChannel,
+                              appStorage: appStorage,
+                              onUserRemoved: () {
+                                onSelectedUserChanged(ref);
+                              },
+                              onUserAdded: () {
+                                onSelectedUserChanged(ref);
+                              },
+                              onUsernameChanged: () {
+                                onUsernameChanged(ref);
+                              },
+                              onSelectedUserChanged: (user) {
+                                onSelectedUserChanged(ref);
+                              },
+                              setAndroidNavigationBarColor: () {
+                                appMethodChannel.setNavigationBarColor(
+                                    Theme.of(context).cardColor);
+                              },
+                            )
                           ],
                         ),
                         Expanded(
                           child: ListView(
-                              padding: EdgeInsets.only(left: 5),
+                              padding: EdgeInsets.only(left: 10, right: 10),
                               children: _menuItems(ref: ref, context: context)),
                         ),
                         Row(
@@ -259,10 +299,10 @@ class _MenuItem extends StatelessWidget {
       color: focused
           ? Theme.of(context).dividerColor.withAlpha(50)
           : Colors.transparent,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(15),
       child: InkWell(
         mouseCursor: SystemMouseCursors.basic,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(15),
         onTap: onPressed,
         onLongPress: onLongPressed,
         child: Row(
