@@ -2,7 +2,7 @@
 <component type="desktop-application">
     <id>amphi-music</id>
     <metadata_license>CC0-1.0</metadata_license>
-    <project_license>APACHE</project_license>
+    <project_license>GPLv3</project_license>
     <name>music</name>
     <summary>Cross-platform music player with support for syncing libraries via a self-hosted server</summary>
     <description>
@@ -11,14 +11,11 @@
     <launchable type="desktop-id">amphi-music.desktop</launchable>
     <url type="homepage">https://amphi.site</url>
     <releases>
-        <release version="1.0.0" date="2025-02-12"/>
+        <release version="2.0.0" date="2025-02-12"/>
     </releases>
     <provides>
         <id>amphi-music.desktop</id>
     </provides>
     <content_rating type="oars-1.0" />
-<!--    <developer id="io.github.lijy91">-->
-<!--        <name>lijy91</name>-->
-<!--    </developer>-->
-    <update_contact>amphiprioninae2024@gmail.com</update_contact>
+    <update_contact>support@amphi.site</update_contact>
 </component>

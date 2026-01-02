@@ -1,22 +1,16 @@
 display_name: Music
 packager: Amphi
-packagerEmail: amphiprioninae2024@gmail.com
+packagerEmail: support@amphi.site
 url: https://amphi.site
-license: APACHE
+license: GPLv3
 
 icon: assets/logo/icon_512x512.png
-
-#requires:
-#  - libfuse2
-#  - libmimalloc-dev
-#  - libmimalloc2.0
-#  - taglib
 
 keywords:
   - Music
 
 generic_name: Music Player
-summary: Lightweight music player powered by MPV
+summary: Cross-platform music player with support for syncing libraries via a self-hosted server
 group: Applications/Multimedia
 
 categories:
@@ -25,3 +19,5 @@ categories:
   - Player
 
 startup_notify: false
+
+metainfo: linux/packaging/music.appdata.xml

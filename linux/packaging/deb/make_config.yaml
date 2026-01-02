@@ -2,21 +2,12 @@ display_name: Music
 package_name: amphi-music
 maintainer:
   name: Amphi
-  email: amphiprioninae2024@gmail.com
+  email: support@amphi.site
 priority: optional
 section: x11
 installed_size: 45000
 essential: false
 icon: assets/logo/icon_512x512.png
-
-pre_dependencies:
-  - libc6 (>= 2.31)
-
-dependencies:
-  - libfuse2
-  - libmimalloc-dev
-  - libmimalloc2.0
-  - libtag1v5
 
 postinstall_scripts:
   - echo "Installed Amphi Music successfully"
