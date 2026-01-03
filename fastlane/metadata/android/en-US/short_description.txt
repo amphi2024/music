@@ -1,1 +1,1 @@
-Cross-platform music player with support for syncing libraries via a self-hosted server
+Music player with support for syncing libraries via a self-hosted server
