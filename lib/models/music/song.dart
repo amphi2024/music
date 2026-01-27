@@ -51,7 +51,7 @@ class Song {
 
   Song.fromMap(Map<String, dynamic> data)
       : id = data["id"],
-        archived = data["archived"] == 1,
+        archived = data["archived"] == 1 || data["archived"] == true,
         title = data.getMap("title"),
         genres = data.getMapList("genres"),
         artistIds = data.getStringList("artist_ids"),
