@@ -16,6 +16,7 @@ import '../../../channels/app_web_channel.dart';
 import '../../../models/app_settings.dart';
 import '../../../utils/fragment_title.dart';
 import '../../../utils/toast.dart';
+import '../../../utils/update_check.dart';
 import '../../components/menu/floating_menu.dart';
 
 class MainPage extends ConsumerStatefulWidget {
@@ -39,6 +40,8 @@ class _MainViewState extends ConsumerState<MainPage> {
   @override
   void initState() {
     super.initState();
+    checkForAppUpdate(context);
+    checkForServerUpdate(context);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final overlay = Overlay.of(context);

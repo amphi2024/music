@@ -18,6 +18,7 @@ import '../../../channels/app_web_channel.dart';
 import '../../../models/app_cache.dart';
 import '../../../models/app_settings.dart';
 import '../../../utils/toast.dart';
+import '../../../utils/update_check.dart';
 import '../../fragments/album_fragment.dart';
 import '../../fragments/albums_fragment.dart';
 import '../../fragments/artists_fragment.dart';
@@ -42,6 +43,8 @@ class _WideMainViewState extends ConsumerState<DesktopMainPage> {
   @override
   void initState() {
     super.initState();
+    checkForAppUpdate(context);
+    checkForServerUpdate(context);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (appSettings.useOwnServer && appWebChannel.uploadBlocked) {
         showToast(context, AppLocalizations.of(context).get("server_version_old_message"));

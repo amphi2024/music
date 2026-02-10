@@ -62,6 +62,8 @@ dependencies:
   handy_window: ^0.4.0
   libadwaita: ^2.0.2
   modern_titlebar_buttons: ^1.1.2
+  flutter_platform_alert: ^0.8.0
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

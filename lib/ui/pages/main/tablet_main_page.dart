@@ -19,6 +19,7 @@ import '../../../providers/providers.dart';
 import '../../../utils/account_utils.dart';
 import '../../../utils/fragment_title.dart';
 import '../../../utils/toast.dart';
+import '../../../utils/update_check.dart';
 import '../../dialogs/settings_dialog.dart';
 import '../../fragments/album_fragment.dart';
 import '../../fragments/albums_fragment.dart';
@@ -43,6 +44,8 @@ class TabletMainPageState extends ConsumerState<TabletMainPage> {
   @override
   void initState() {
     super.initState();
+    checkForAppUpdate(context);
+    checkForServerUpdate(context);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (appSettings.useOwnServer && appWebChannel.uploadBlocked) {
         showToast(context, AppLocalizations.of(context).get("server_version_old_message"));

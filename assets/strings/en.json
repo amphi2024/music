@@ -113,5 +113,13 @@
   "delete": "Delete",
   "dialog_title_permanently_delete": "Are you sure you want to permanently delete this item?",
 
-  "server_version_old_message": "Server version is old. Please update to 3.0.0 or higher."
+  "server_version_old_message": "Server version is old. Please update to 3.0.0 or higher.",
+
+  "automatically_check_updates": "Automatically check for updates",
+  "update_alert_title": "Update Available",
+  "update_alert_text": "A new version is available. Update now?",
+  "update_now": "Go to download",
+  "update_later": "I will do it manually",
+  "automatically_check_server_updates": "Automatically check for server updates",
+  "server_update_message": "New server version available. Update recommended."
 }
