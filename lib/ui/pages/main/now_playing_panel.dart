@@ -18,7 +18,6 @@ import '../../../models/app_cache.dart';
 import '../../../providers/playing_state_provider.dart';
 import '../../../services/player_service.dart';
 import '../../../utils/duration_converter.dart';
-import '../../components/custom_window_button.dart';
 import '../../components/icon/repeat_icon.dart';
 import '../../components/icon/shuffle_icon.dart';
 import '../../components/image/album_cover.dart';
@@ -76,7 +75,7 @@ class _NowPlayingPanelState extends ConsumerState<NowPlayingPanel> with TickerPr
     final position = ref.watch(positionProvider);
     final volume = ref.watch(volumeProvider);
 
-    final colors = CustomWindowButtonColors(
+    final colors = WindowButtonColors(
       iconMouseOver: Theme.of(context).textTheme.bodyMedium?.color,
       mouseOver: Color.fromRGBO(125, 125, 125, 0.1),
       iconNormal: Theme.of(context).textTheme.bodyMedium?.color,
@@ -94,9 +93,9 @@ class _NowPlayingPanelState extends ConsumerState<NowPlayingPanel> with TickerPr
               children: [
                 const Expanded(child: MoveWindowOrSpacer()),
                 if (Platform.isWindows) ...[
-                  MinimizeCustomWindowButton(colors: colors),
+                  MinimizeWindowButton(colors: colors),
                   appWindow.isMaximized
-                      ? RestoreCustomWindowButton(
+                      ? RestoreWindowButton(
                           colors: colors,
                           onPressed: () {
                             setState(() {
@@ -104,7 +103,7 @@ class _NowPlayingPanelState extends ConsumerState<NowPlayingPanel> with TickerPr
                             });
                           },
                         )
-                      : MaximizeCustomWindowButton(
+                      : MaximizeWindowButton(
                           colors: colors,
                           onPressed: () {
                             setState(() {
@@ -112,11 +111,11 @@ class _NowPlayingPanelState extends ConsumerState<NowPlayingPanel> with TickerPr
                             });
                           },
                         ),
-                  CloseCustomWindowButton(
-                      colors: CustomWindowButtonColors(
+                  CloseWindowButton(
+                      colors: WindowButtonColors(
                           mouseOver: Color(0xFFD32F2F),
                           mouseDown: Color(0xFFB71C1C),
-                          iconNormal: Color(0xFF805306),
+                          iconNormal: Theme.of(context).textTheme.bodyMedium?.color,
                           iconMouseOver: Color(0xFFFFFFFF),
                           normal: Theme.of(context).cardColor))
                 ],
