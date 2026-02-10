@@ -4,6 +4,7 @@ import 'package:amphi/models/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:music/main.dart';
 import 'package:music/ui/components/settings/language_settings.dart';
+import 'package:window_manager/window_manager.dart';
 
 import '../../models/app_settings.dart';
 import '../components/settings/server_settings_component.dart';
@@ -65,6 +66,16 @@ class _SettingsViewState extends State<SettingsView> {
         Visibility(
             child: ServerSettingComponent(
                 serverAddressController: serverAddressController)),
+        Visibility(
+            visible: appSettings.useOwnServer,
+            child: _TitledCheckBox(
+                title: AppLocalizations.of(context).get("automatically_check_server_updates"),
+                value: appSettings.autoCheckServerUpdate,
+                onChanged: (value) {
+                  setState(() {
+                    appSettings.autoCheckServerUpdate = value;
+                  });
+                })),
         Row(
           // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,61 +98,127 @@ class _SettingsViewState extends State<SettingsView> {
             ),
           ],
         ),
+        _TitledCheckBox(
+            title: AppLocalizations.of(context).get("automatically_check_updates"),
+            value: appSettings.autoCheckUpdate,
+            onChanged: (value) {
+              setState(() {
+                appSettings.autoCheckUpdate = value;
+              });
+            }),
         Visibility(
             visible: Platform.isLinux,
-            child: Row(
-              children: [
-                Text("Window Controls Style"),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: DropdownButton<String?>(
-                      value: appSettings.windowControlsStyle,
-                      items: [
-                        DropdownMenuItem(value: "yaru", child: Text("Yaru")),
-                        DropdownMenuItem(value: "arc", child: Text("Arc")),
-                        DropdownMenuItem(
-                            value: "breeze", child: Text("Breeze")),
-                        DropdownMenuItem(
-                            value: "elementary", child: Text("Elementary")),
-                        DropdownMenuItem(
-                            value: "flatRemix", child: Text("Flat Remix")),
-                        DropdownMenuItem(
-                            value: "materia", child: Text("Materia")),
-                        DropdownMenuItem(
-                            value: "nordic", child: Text("Nordic")),
-                        DropdownMenuItem(value: "pop", child: Text("Pop")),
-                        DropdownMenuItem(value: "unity", child: Text("Unity")),
-                        DropdownMenuItem(value: "vimix", child: Text("Vimix")),
-                        DropdownMenuItem(
-                            value: "osxarc", child: Text("OSx Arc")),
-                        DropdownMenuItem(value: null, child: Text("Adwaita"))
-                      ],
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 10),
+              child: Row(
+                children: [
+                  Text(AppLocalizations.of(context).get("prefers_custom_title_bar")),
+                  Checkbox(
+                      value: appSettings.prefersCustomTitleBar,
                       onChanged: (value) {
-                        mainScreenKey.currentState?.setState(() {
-                          appSettings.windowControlsStyle = value;
-                        });
-                        setState(() {});
-                      }),
-                )
-              ],
+                        if (value != null) {
+                          mainScreenKey.currentState?.setState(() {
+                            appSettings.prefersCustomTitleBar = value;
+                            windowManager.setTitleBarStyle(appSettings.prefersCustomTitleBar ? TitleBarStyle.hidden : TitleBarStyle.normal);
+                          });
+                          setState(() {});
+                        }
+                      })
+                ],
+              ),
             )),
         Visibility(
             visible: Platform.isLinux,
-            child: Row(
-              children: [
-                Text("Window Controls on Left"),
-                Checkbox(
-                    value: appSettings.windowButtonsOnLeft,
-                    onChanged: (value) {
-                      if (value != null) {
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 10),
+              child: Row(
+                children: [
+                  Text(AppLocalizations.of(context).get("window_controls_style")),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: DropdownButton<String?>(
+                        value: appSettings.windowControlsStyle,
+                        items: [
+                          DropdownMenuItem(value: "yaru", child: Text("Yaru")),
+                          DropdownMenuItem(value: "arc", child: Text("Arc")),
+                          DropdownMenuItem(
+                              value: "breeze", child: Text("Breeze")),
+                          DropdownMenuItem(
+                              value: "elementary", child: Text("Elementary")),
+                          DropdownMenuItem(
+                              value: "flatRemix", child: Text("Flat Remix")),
+                          DropdownMenuItem(
+                              value: "materia", child: Text("Materia")),
+                          DropdownMenuItem(
+                              value: "nordic", child: Text("Nordic")),
+                          DropdownMenuItem(value: "pop", child: Text("Pop")),
+                          DropdownMenuItem(value: "unity", child: Text("Unity")),
+                          DropdownMenuItem(value: "vimix", child: Text("Vimix")),
+                          DropdownMenuItem(
+                              value: "osxarc", child: Text("OSx Arc")),
+                          DropdownMenuItem(value: null, child: Text("Adwaita"))
+                        ],
+                        onChanged: (value) {
                           mainScreenKey.currentState?.setState(() {
-                          appSettings.windowButtonsOnLeft = value;
-                        });
-                        setState(() {});
-                      }
-                    })
-              ],
-            ))
+                            appSettings.windowControlsStyle = value;
+                          });
+                          setState(() {});
+                        }),
+                  )
+                ],
+              ),
+            )),
+        Visibility(
+            visible: Platform.isLinux,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10.0, right: 10),
+              child: Row(
+                children: [
+                  Text(AppLocalizations.of(context).get("window_controls_on_left")),
+                  Checkbox(
+                      value: appSettings.windowButtonsOnLeft,
+                      onChanged: (value) {
+                        if (value != null) {
+                          mainScreenKey.currentState?.setState(() {
+                            appSettings.windowButtonsOnLeft = value;
+                          });
+                          setState(() {});
+                        }
+                      })
+                ],
+              ),
+            )),
+      ],
+    );
+  }
+}
+
+class _TitledCheckBox extends StatelessWidget {
+  final String title;
+  final bool value;
+  final void Function(bool) onChanged;
+  const _TitledCheckBox({required this.title, required this.value, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Flexible(
+          child: Padding(
+            padding: const EdgeInsets.only(left: 10, top: 5),
+            child: Text(
+              title,
+              textAlign: TextAlign.left,
+            ),
+          ),
+        ),
+        Checkbox(
+            value: value, onChanged: (value) {
+          if(value != null) {
+            onChanged(value);
+          }
+        }),
       ],
     );
   }
