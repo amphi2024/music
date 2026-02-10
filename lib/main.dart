@@ -44,53 +44,49 @@ void main() async {
   await appCacheData.getData();
   SemanticsBinding.instance.ensureSemantics();
   MediaKit.ensureInitialized();
-    if (Platform.isLinux) {
-      await windowManager.ensureInitialized();
+  if (Platform.isLinux) {
+    await windowManager.ensureInitialized();
 
-  WindowOptions windowOptions = WindowOptions(
-    size: Size(appCacheData.data["windowWidth"] ?? 1280, appCacheData.data["windowHeight"] ?? 720),
-    center: true,
-    backgroundColor: Colors.transparent,
-    skipTaskbar: false,
-    titleBarStyle: TitleBarStyle.hidden,
-  );
-  windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-    await windowManager.focus();
-  });
+    WindowOptions windowOptions = WindowOptions(
+      size: Size(appCacheData.data["windowWidth"] ?? 1280, appCacheData.data["windowHeight"] ?? 720),
+      center: true,
+      backgroundColor: Colors.transparent,
+      skipTaskbar: false,
+      titleBarStyle: TitleBarStyle.hidden,
+    );
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
   }
-  appStorage.initialize(() async {
-    await appSettings.getData();
-    // appColors.getData();
+  await appStorage.initialize();
+  await appSettings.getData();
+  // appColors.getData();
 
-    final songs = await SongsNotifier.initialized();
-    final artists = await ArtistsNotifier.initialized();
-    final albums = await AlbumsNotifier.initialized();
-    final playlistsState = await PlaylistsNotifier.initialized(
-        songs: songs, albums: albums, artists: artists);
-    final genres = GenresNotifier.initialized(songs: songs, albums: albums);
+  final songs = await SongsNotifier.initialized();
+  final artists = await ArtistsNotifier.initialized();
+  final albums = await AlbumsNotifier.initialized();
+  final playlistsState = await PlaylistsNotifier.initialized(songs: songs, albums: albums, artists: artists);
+  final genres = GenresNotifier.initialized(songs: songs, albums: albums);
 
-    runApp(ProviderScope(overrides: [
-      songsProvider.overrideWithBuild((ref, notifier) => songs),
-      playlistsProvider.overrideWithBuild((ref, notifier) => playlistsState),
-      albumsProvider.overrideWithBuild((ref, notifier) => albums),
-      artistsProvider.overrideWithBuild((ref, notifier) => artists),
-      genresProvider.overrideWithBuild((ref, notifier) => genres),
-      volumeProvider.overrideWithBuild((ref, notifier) => appCacheData.volume),
-      playModeProvider
-          .overrideWithBuild((ref, notifier) => appCacheData.playMode)
-    ], child: MyApp(key: mainScreenKey)));
+  runApp(ProviderScope(overrides: [
+    songsProvider.overrideWithBuild((ref, notifier) => songs),
+    playlistsProvider.overrideWithBuild((ref, notifier) => playlistsState),
+    albumsProvider.overrideWithBuild((ref, notifier) => albums),
+    artistsProvider.overrideWithBuild((ref, notifier) => artists),
+    genresProvider.overrideWithBuild((ref, notifier) => genres),
+    volumeProvider.overrideWithBuild((ref, notifier) => appCacheData.volume),
+    playModeProvider.overrideWithBuild((ref, notifier) => appCacheData.playMode)
+  ], child: MyApp(key: mainScreenKey)));
 
-    if (Platform.isWindows || Platform.isMacOS) {
-      doWhenWindowReady(() {
-        appWindow.minSize = Size(600, 350);
-        appWindow.size =
-            Size(appCacheData.windowWidth, appCacheData.windowHeight);
-        appWindow.alignment = Alignment.center;
-        appWindow.show();
-      });
-    }
-  });
+  if (Platform.isWindows || Platform.isMacOS) {
+    doWhenWindowReady(() {
+      appWindow.minSize = Size(600, 350);
+      appWindow.size = Size(appCacheData.windowWidth, appCacheData.windowHeight);
+      appWindow.alignment = Alignment.center;
+      appWindow.show();
+    });
+  }
 }
 
 class MyApp extends ConsumerStatefulWidget {
@@ -162,9 +158,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
 
         playerService.player!.stream.completed.listen((completed) async {
           final position = await playerService.getPlaybackPosition();
-          if (completed &&
-              position + 1000 >=
-                  playerService.player!.state.duration.inMilliseconds) {
+          if (completed && position + 1000 >= playerService.player!.state.duration.inMilliseconds) {
             onPlaybackFinished();
           }
         });
@@ -177,8 +171,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
             final isPlaying = call.arguments["is_playing"];
             final List<dynamic> list = call.arguments["list"];
             final playlistId = call.arguments["playlist_id"];
-            ref.read(playingSongsProvider.notifier).syncStateWithNative(
-                playlistId: playlistId, index: index, idList: list);
+            ref.read(playingSongsProvider.notifier).syncStateWithNative(playlistId: playlistId, index: index, idList: list);
             ref.read(isPlayingProvider.notifier).set(isPlaying);
             appCacheData.lastPlayedSongId = list[index].toString();
             appCacheData.save();
@@ -208,10 +201,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
 
     if (lastPlayedSongId.isNotEmpty) {
       playerService.startPlay(
-          ref: ref,
-          playlistId: appCacheData.lastPlayedPlaylistId,
-          playNow: false,
-          song: ref.read(songsProvider).get(lastPlayedSongId));
+          ref: ref, playlistId: appCacheData.lastPlayedPlaylistId, playNow: false, song: ref.read(songsProvider).get(lastPlayedSongId));
     }
     if (appSettings.useOwnServer) {
       appWebChannel.connectWebSocket();
@@ -233,8 +223,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   void onPlaybackFinished() {
     switch (ref.watch(playModeProvider)) {
       case playOnce:
-        if (ref.read(playingSongsProvider).playingSongIndex ==
-            playerService.currentPlaylist(ref).songs.length - 1) {
+        if (ref.read(playingSongsProvider).playingSongIndex == playerService.currentPlaylist(ref).songs.length - 1) {
           ref.read(positionProvider.notifier).set(ref.watch(durationProvider));
           ref.read(isPlayingProvider.notifier).set(false);
         } else {
@@ -255,14 +244,10 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     if (position <= ref.watch(durationProvider)) {
       ref.read(positionProvider.notifier).set(position);
       if (position < 1500) {
-        ref
-            .read(durationProvider.notifier)
-            .set(await playerService.getMusicDuration());
+        ref.read(durationProvider.notifier).set(await playerService.getMusicDuration());
       }
     } else {
-      ref
-          .read(durationProvider.notifier)
-          .set(await playerService.getMusicDuration());
+      ref.read(durationProvider.notifier).set(await playerService.getMusicDuration());
     }
 
     final deviceType = Platform.operatingSystem;
@@ -281,10 +266,8 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: appSettings.themeModel
-            .toThemeData(context: context, brightness: Brightness.light),
-        darkTheme: appSettings.themeModel
-            .toThemeData(context: context, brightness: Brightness.dark),
+        theme: appSettings.themeModel.toThemeData(context: context, brightness: Brightness.light),
+        darkTheme: appSettings.themeModel.toThemeData(context: context, brightness: Brightness.dark),
         locale: appSettings.locale ?? PlatformDispatcher.instance.locale,
         supportedLocales: AppLocalizations.supportedLocales,
         localizationsDelegates: const [
@@ -293,6 +276,10 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate
         ],
-        home: isDesktop() ? DesktopMainPage() : isWideScreen(context) ? TabletMainPage() : MainPage());
+        home: isDesktop()
+            ? DesktopMainPage()
+            : isWideScreen(context)
+                ? TabletMainPage()
+                : MainPage());
   }
 }
