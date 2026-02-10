@@ -35,6 +35,18 @@ class AppSettings {
   set windowControlsStyle(String? value) => data["windowControlsStyle"] = value;
   String? get windowControlsStyle => data["windowControlsStyle"];
 
+  set permanentDeletionPeriod(value) => data["permanentDeletionPeriod"] = value;
+  int get permanentDeletionPeriod => data.putIfAbsent("permanentDeletionPeriod", () => 30);
+
+  set autoCheckUpdate(bool value) => data["autoCheckUpdate"] = value;
+  bool get autoCheckUpdate => data["autoCheckUpdate"] ?? Platform.isWindows || Platform.isMacOS;
+
+  set autoCheckServerUpdate(bool value) => data["autoCheckServerUpdate"] = value;
+  bool get autoCheckServerUpdate => data["autoCheckServerUpdate"] ?? true;
+
+  set prefersCustomTitleBar(bool value) => data["prefersCustomTitleBar"] = value;
+  bool get prefersCustomTitleBar => data["prefersCustomTitleBar"] ?? true;
+
   Future<void> getData() async {
     try {
       var file = File(appStorage.settingsPath);
