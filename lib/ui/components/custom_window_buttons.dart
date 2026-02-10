@@ -219,7 +219,7 @@ List<Widget> customWindowButtons() {
               height: _iconSize,
               onPressed: () => _maximizeOrRestore()),
         ];
-      case "whitesur":
+      case "osxarc":
         return [
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
@@ -472,7 +472,7 @@ List<Widget> customWindowButtons() {
                 onPressed: () => _close()),
           ),
         ];
-      case "whitesur":
+      case "osxarc":
         return [
           DecoratedMinimizeButton(
               type: ThemeType.osxArc,

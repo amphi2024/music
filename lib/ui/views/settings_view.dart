@@ -113,7 +113,7 @@ class _SettingsViewState extends State<SettingsView> {
                         DropdownMenuItem(value: "unity", child: Text("Unity")),
                         DropdownMenuItem(value: "vimix", child: Text("Vimix")),
                         DropdownMenuItem(
-                            value: "whitesur", child: Text("WhiteSur")),
+                            value: "osxarc", child: Text("OSx Arc")),
                         DropdownMenuItem(value: null, child: Text("Adwaita"))
                       ],
                       onChanged: (value) {
