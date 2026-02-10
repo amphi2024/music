@@ -1,28 +1,54 @@
-![logo](assets/logo/icon_256x256.png)
-
 # Amphi Music
 
-Amphi Music is a free and open-source, cross-platform music player.<br>
-It plays all your music in most popular formats — no conversion required.<br>
-You can easily edit song, album, and artist information.<br>
-Once your music library is set up, you can sync your data across devices via a self-hosted server, letting you access and play your library on any platform.
+[Website](https://amphi.site)
 
-[Server Setup Guide](https://amphi.site/archive/servers)
+[English](README.md) • [한국어](docs/README_KO.md)
 
-## Download
+Amphi Music is the premium music service you truly own. Open-source, self-hosted, and available on all platforms.
 
-- [Official Website](https://amphi.site/music)
-- [GitHub Releases](https://github.com/amphi2024/music/releases/latest)
-- [Play Store](https://play.google.com/store/apps/details?id=com.amphi.music)
-- [iOS App Store](https://apps.apple.com/app/amphi-music/id6747280291?l)
-- [Scoop](https://github.com/amphi2024/scoop-bucket)
-- [Homebrew](https://github.com/amphi2024/homebrew-amphi)
-- [AUR](https://aur.archlinux.org/packages/amphi-music)
-- [Flatpak](https://github.com/amphi2024/amphi-flatpak)
-- [Snap Store](https://snapcraft.io/amphi-music)
+![preview](preview-apple.png)
+
+## Installation
+
+### App
+
+[githubRelease]: https://github.com/amphi2024/music/releases/latest
+
+**Android**: [Play Store](https://play.google.com/store/apps/details?id=com.amphi.music) • [APK][githubRelease]
+
+**iOS**: [App Store](https://apps.apple.com/app/amphi-music/id6747280291?l)
+
+**Windows**: [Scoop](https://github.com/amphi2024/scoop-bucket) • [EXE][githubRelease] • [ZIP][githubRelease]
+
+**macOS**: [Homebrew](https://github.com/amphi2024/homebrew-amphi) • [DMG][githubRelease]
+
+**Linux**: [AUR](https://aur.archlinux.org/packages/amphi-music) • [Flatpak](https://github.com/amphi2024/amphi-flatpak) • [Snap](https://snapcraft.io/amphi-music) • [DEB][githubRelease] • [RPM][githubRelease] • [TAR][githubRelease]
+
+### Server
+
+You can easily set up a server by downloading the `.jar`file and running it with a JVM, like a Minecraft server.
+
+To get started: [Website](https://amphi.site/server) • [GitHub](https://github.com/amphi2024/server)
+
+### Other Apps
+
+If you set up a server, you can also sync data for other apps:
+- [Amphi Notes](https://github.com/amphi2024/notes)
+- [Amphi Photos](https://github.com/amphi2024/photos)
+- [Amphi Cloud](https://github.com/amphi2024/cloud)
 
 ## Contributing
 
-If you find a bug or notice any incorrect or awkward translations, please feel free to fix them.
-You can contribute by forking the repository, making your changes, and submitting a pull request.
-Thank you for helping improve Amphi Music!
+We welcome contributions in many ways, such as:
+
+- Translating the app
+- Fixing bugs
+- Implementing missing features (especially TODO comments in the code)
+
+Please note that while we may not be able to accept every contribution, we truly appreciate your time and effort.
+
+To contribute:
+
+- Send us an email: support@amphi.site
+- Translate the app on [Weblate](https://hosted.weblate.org/projects/amphi-music)
+- Create a pull request: [Contribution Guide](CONTRIBUTING.md)
